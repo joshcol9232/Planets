@@ -4,6 +4,7 @@ lk = love.keyboard
 lg = love.graphics
 lw = love.window
 
-WINDOW_WIDTH, WINDOW_HEIGHT = 400, 400
+WINDOW_WIDTH, WINDOW_HEIGHT = 800, 800
 
-GRAV_STRENGTH = 1
+GCONST = 6.67*(10^-3)  -- is supposed to be ^-11 however this is a model so
+PI 	   = math.pi
