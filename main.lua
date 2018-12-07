@@ -12,8 +12,9 @@ function love.load()
 	lg.setFont(font)
 		
   planets = {}
-  Planet(1, Vec2(300, 400), Vec2(0, 0), 50, 1000)
-  Planet(2, Vec2(300, 100), Vec2(15, 0), 10, 2000)
+  --Planet(1, Vec2(300, 400), Vec2(0, 0), 50, 1000)
+  Planet(1, Vec2(300, 100), Vec2(1, 0), 10, 1000)
+  Planet(2, Vec2(300, 200), Vec2(0, 0), 10, 1000)
   --Planet(2, Vec2(400, 500), Vec2(0, 0), 25, 10)
   --Planet(3, Vec2(400, 300), Vec2(0, 0), 25, 10)
 	--Planet(4, Vec2(400, 200), Vec2(0, 0), 25, 10)
