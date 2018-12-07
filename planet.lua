@@ -83,10 +83,10 @@ function Planet(id, pos, vel, r, d)
 			--print()
 
 			--local friction = 0.8
-			self:collideWindowEdge()--friction)
+			--self:collideWindowEdge()--friction)
 			
 			self:applyMomentum(dxMomentum, dyMomentum)
-			print(self.id, "Momentum:", self.momentum.x, self.momentum.y)
+			--print(self.id, "Momentum:", self.momentum.x, self.momentum.y)
 			self:applyVel()
     end
 
@@ -99,7 +99,7 @@ function Planet(id, pos, vel, r, d)
 			lg.circle("line", self.pos.x, self.pos.y, self.radius)
 			lg.print(self.id, self.pos.x, self.pos.y)
 			lg.print(tostring(math.floor(self.momentum.x))..", "..tostring(math.floor(self.momentum.y)), self.pos.x-30, self.pos.y-30)
-			lg.line(self.pos.x, self.pos.y, self.momentum.x, self.momentum.y)
+			--lg.line(self.pos.x, self.pos.y, self.momentum.x, self.momentum.y)
 			
 			
 			for i=1, #planets do
