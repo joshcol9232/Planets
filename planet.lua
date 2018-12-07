@@ -47,7 +47,11 @@ function Planet(id, pos, vel, r, d)
 		end
 		
 		function p:collide(other)
-			self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y = other.momentum.x, other.momentum.y, self.momentum.x, self.momentum.y
+			--local momAngle = getAngle(self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
+			local hitAngle = getAngle(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
+			print("Before collision:", self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
+			self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y = math.sin(hitAngle)*other.momentum.x, math.cos(hitAngle)*other.momentum.y, math.sin(hitAngle)*self.momentum.x, math.sin(hitAngle)*self.momentum.y
+			print("After collision:", self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
 			self.colliding = true
 		end
 		
@@ -100,7 +104,6 @@ function Planet(id, pos, vel, r, d)
 			lg.print(self.id, self.pos.x, self.pos.y)
 			lg.print(tostring(math.floor(self.momentum.x))..", "..tostring(math.floor(self.momentum.y)), self.pos.x-30, self.pos.y-30)
 			--lg.line(self.pos.x, self.pos.y, self.momentum.x, self.momentum.y)
-			
 			
 			for i=1, #planets do
 				if i ~= self.id then
