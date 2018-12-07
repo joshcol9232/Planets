@@ -38,19 +38,17 @@ function Planet(id, pos, vel, r, d)
 			self.colliding = false
 		
 			local dist = getDist(self.pos.x, self.pos.y, other.pos.x, other.pos.y) -- This could be passed into the function so that dist calculation only happens once
-			if dist <= (self.radius + other.radius) then
-				self:collide(other)--, friction)
-				other:collide(self)--, friction)
+			if dist < (self.radius + other.radius) then
+				self:collide(other)
+				local angle = getAngle(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
+				other.pos.x = self.pos.x + math.cos(angle)*(self.radius+other.radius)
+				other.pos.y = self.pos.y + math.sin(angle)*(self.radius+other.radius)
+				--other:collide(self)
 			end
 		end
 		
 		function p:collide(other)
-			--local momAngle = getAngle(self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
-			local hitAngle = getRelativeAngle(self.momentum, other.pos)
-			print("Hit angle:", hitAngle)
-			print("Before collision at:", self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
-			self.momentum.x, self.momentum.y = math.sin(hitAngle)*other.momentum.x, math.cos(hitAngle)*other.momentum.y
-			print("After collision:", self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
+			self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y = other.momentum.x, other.momentum.y, self.momentum.x, self.momentum.y
 			self.colliding = true
 		end
 		

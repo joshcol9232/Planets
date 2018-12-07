@@ -13,8 +13,7 @@ function love.load()
 		
   planets = {}
   --Planet(1, Vec2(300, 400), Vec2(0, 0), 50, 1000)
-  Planet(1, Vec2(300, 100), Vec2(1, 0), 10, 1000)
-  Planet(2, Vec2(300, 200), Vec2(0, 0), 10, 1000)
+  --Planet(2, Vec2(300, 100), Vec2(15, 0), 10, 2000)
   --Planet(2, Vec2(400, 500), Vec2(0, 0), 25, 10)
   --Planet(3, Vec2(400, 300), Vec2(0, 0), 25, 10)
 	--Planet(4, Vec2(400, 200), Vec2(0, 0), 25, 10)
@@ -31,9 +30,10 @@ function love.keypressed(key)
 		le.quit("restart")
 	elseif key == "escape" then
 		le.quit()
-	elseif
+	elseif key == "c" then
+		planets = {}
 	
-	key == "1" then
+	elseif key == "1" then
 		DRAW_COLLISIONS = not DRAW_COLLISIONS
 	elseif key == "2" then
 		DRAW_MOMENTUM = not DRAW_MOMENTUM

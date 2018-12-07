@@ -6,7 +6,7 @@ lw = love.window
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 800, 700
 
-GCONST = 6.67*(10^-3)  -- is supposed to be ^-11 however this is a model so
+GCONST = 6.67*(10^-4)  -- is supposed to be ^-11 however this is a model so
 PI 	   = math.pi
 
 RED   = {255, 0, 0}
