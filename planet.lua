@@ -12,16 +12,14 @@ function Planet(id, pos, vel, r, d)
     print(p.radius, "Mass:", p.mass)
     p.momentum = Vec2((p.mass * p.vel.x), (p.mass * p.vel.y))
 
-    function p:getGravMomentum(other)
-      local x_force, y_force = 0, 0
-        
+    function p:getGravMomentum(other)        
 			local angle = getAngle(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
 			local dist  = getDist(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
 
 			local force = (GCONST * self.mass * other.mass)/(dist^2)
 
-			x_force = x_force + math.cos(angle) * force
-			y_force = y_force + math.sin(angle) * force
+			local x_force = math.cos(angle) * force
+			local y_force = math.sin(angle) * force
 
       return (x_force*deltaT), (y_force*deltaT) -- Force = change in momentum / time, so Force * Time = Momentum
     end
@@ -47,11 +45,7 @@ function Planet(id, pos, vel, r, d)
 		end
 		
 		function p:collide(other)
-			--local momAngle = getAngle(self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
-			local hitAngle = getAngle(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
-			print("Before collision:", self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
-			self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y = math.sin(hitAngle)*other.momentum.x, math.cos(hitAngle)*other.momentum.y, math.sin(hitAngle)*self.momentum.x, math.sin(hitAngle)*self.momentum.y
-			print("After collision:", self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y)
+			self.momentum.x, self.momentum.y, other.momentum.x, other.momentum.y = other.momentum.x, other.momentum.y, self.momentum.x, self.momentum.y
 			self.colliding = true
 		end
 		
@@ -84,40 +78,69 @@ function Planet(id, pos, vel, r, d)
 					self:checkCollision(other)
 				end
 			end
-			--print()
-
-			--local friction = 0.8
-			--self:collideWindowEdge()--friction)
-			
+						
 			self:applyMomentum(dxMomentum, dyMomentum)
 			--print(self.id, "Momentum:", self.momentum.x, self.momentum.y)
 			self:applyVel()
     end
-
-    function p:draw()
-			if self.colliding then
-				lg.setColor({255, 0, 0})
-			else
+		
+		function p:drawArrow(x1, y1, x2, y2, a)
+			lg.line(x1, y1, x2, y2)
+			lg.push()
+				lg.translate(x2, y2)
+				lg.rotate(a)
 				lg.setColor({255, 255, 255})
-			end
-			lg.circle("line", self.pos.x, self.pos.y, self.radius)
-			lg.print(self.id, self.pos.x, self.pos.y)
+				lg.polygon("fill", 0, -8, 0, 8, 12, 0)
+			lg.pop()
+		end
+		
+		function p:drawMomentum()
 			lg.print(tostring(math.floor(self.momentum.x))..", "..tostring(math.floor(self.momentum.y)), self.pos.x-30, self.pos.y-30)
-			--lg.line(self.pos.x, self.pos.y, self.momentum.x, self.momentum.y)
+			local angle = getAngle(self.pos.x, self.pos.y, self.momentum.x, self.momentum.y)
 			
+			local mx = self.pos.x + math.cos(angle)*(self.radius+24)
+			local my = self.pos.y + math.sin(angle)*(self.radius+24)
+			self:drawArrow(self.pos.x, self.pos.y, mx, my, angle)
+		end
+		
+		function p:drawConnections()
 			for i=1, #planets do
 				if i ~= self.id then
 					local other = planets[i]
-					lg.setColor(100, 100, 100, 100)
+					lg.setColor(DGRAY, 100)
 					
 					local angle = getAngle(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
 					local dist = getDist(self.pos.x, self.pos.y, other.pos.x, other.pos.y)
 					
 					local x_offset = self.pos.x + math.cos(angle)*dist
 					local y_offset = self.pos.y + math.sin(angle)*dist
-					--lg.line(self.pos.x, self.pos.y, x_offset, y_offset)
+					lg.line(self.pos.x, self.pos.y, x_offset, y_offset)
 				end
 			end
+		end
+		
+		function p:drawPlanet()
+			lg.setColor(WHITE)
+			lg.circle("line", self.pos.x, self.pos.y, self.radius)
+			lg.print(self.id, self.pos.x, self.pos.y)
+		end
+		
+    function p:draw()
+			if self.colliding and DRAW_COLLISIONS then
+				lg.setColor({255, 0, 0})
+			else
+				lg.setColor({255, 255, 255})
+			end
+			
+			if DRAW_MOMENTUM then
+				self:drawMomentum()
+			end
+			
+			if DRAW_CONNECTIONS then
+				self:drawConnections()
+			end
+			
+			self:drawPlanet()
     end
 
     table.insert(planets, p)
