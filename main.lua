@@ -39,6 +39,8 @@ end
 
 function love.keypressed(key)
   if key == "c" then
+    world:destroy()
+    world = love.physics.newWorld(0, 0, true)
     planets = {}
   elseif key == "1" then
     FORCE_DEBUG = not FORCE_DEBUG
