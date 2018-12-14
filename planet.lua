@@ -5,11 +5,12 @@ function Planet(id, pos, vel, r, d)
   p.d     = d
 
   p.body    = love.physics.newBody(world, pos.x, pos.y, "dynamic")
-  p.body:setLinearVelocity(vel.x, vel.y)
   p.shape   = love.physics.newCircleShape(r)
   p.fixture = love.physics.newFixture(p.body, p.shape, p.d)
-  p.fixture:setRestitution(0.2)
-  p.fixture:setFriction(1)
+  p.fixture:setRestitution(0.4)
+
+  print(vel.x, vel.y, "Start Velocity")
+  p.body:setLinearVelocity(vel.x, vel.y)
 
   function p:draw()
     lg.setColor({1, 1, 1})
