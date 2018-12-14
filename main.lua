@@ -30,6 +30,7 @@ function love.update(dt)
 end
 
 function love.draw()
+  lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
   for i=1, #planets do
     planets[i]:draw()

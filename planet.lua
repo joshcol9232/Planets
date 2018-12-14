@@ -9,13 +9,11 @@ function Planet(id, pos, vel, r, d)
   p.fixture = love.physics.newFixture(p.body, p.shape, p.d)
   p.fixture:setRestitution(0.4)
 
+  p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
+
   print(vel.x, vel.y, "Start Velocity")
   p.body:setLinearVelocity(vel.x, vel.y)
 
-  function p:draw()
-    lg.setColor({1, 1, 1})
-    lg.circle("line", self.body:getX(), self.body:getY(), self.r)
-  end
 
   function p:getGravForce(other)
     local xDist = other.body:getX() - self.body:getX()
@@ -28,14 +26,35 @@ function Planet(id, pos, vel, r, d)
   end
 
   function p:update()
-    local fTotalX, fTotalY = 0, 0
+    self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do
       if planets[i].id ~= self.id then
         local dx, dy = self:getGravForce(planets[i])
-        fTotalX, fTotalY = fTotalX + dx, fTotalY + dy
+        self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end
     end
-    self.body:applyForce(fTotalX, fTotalY)
+    self.body:applyForce(self.fTotalX, self.fTotalY)
+  end
+
+  function p:draw()
+    lg.setColor({1, 1, 1})
+    lg.circle("line", self.body:getX(), self.body:getY(), self.r)
+    self:debugVel()
+    self:debugForce()
+  end
+
+  -- Debug functions
+  function p:debugVel()
+    lg.setColor({0, 1, 0})
+    local x, y = self.body:getX(), self.body:getY()
+    local velX, velY = self.body:getLinearVelocity()
+    lg.line(x, y, velX+x, velY+y)
+  end
+
+  function p:debugForce()
+    lg.setColor({1, 0, 0})
+    local x, y = self.body:getX(), self.body:getY()
+    lg.line(x, y, (self.fTotalX/10000)+x, (self.fTotalY/10000)+y)
   end
 
   table.insert(planets, p)
