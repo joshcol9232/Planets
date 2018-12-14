@@ -54,7 +54,7 @@ function Planet(id, pos, vel, r, d)
   function p:debugForce()
     lg.setColor({1, 0, 0})
     local x, y = self.body:getX(), self.body:getY()
-    lg.line(x, y, (self.fTotalX/10000)+x, (self.fTotalY/10000)+y)
+    lg.line(x, y, (self.fTotalX/20000)+x, (self.fTotalY/20000)+y)
   end
 
   table.insert(planets, p)
