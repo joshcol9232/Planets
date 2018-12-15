@@ -27,7 +27,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 100)
+    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 50, 100)
   end
 
   if button == 2 then
