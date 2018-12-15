@@ -7,7 +7,7 @@ function Planet(id, pos, vel, r, d)
   p.body    = love.physics.newBody(world, pos.x, pos.y, "dynamic")
   p.shape   = love.physics.newCircleShape(r)
   p.fixture = love.physics.newFixture(p.body, p.shape, p.d)
-  p.fixture:setRestitution(0.4)
+  p.fixture:setRestitution(0)
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
 
