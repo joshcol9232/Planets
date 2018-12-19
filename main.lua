@@ -5,6 +5,12 @@ G = 6.67*(10^-3)
 
 lg = love.graphics
 
+function resetWorld()
+  world:destroy()
+  world = love.physics.newWorld(0, 0, true)
+  planets = {}
+end
+
 function love.load()
   love.window.setMode(1000, 700)
 
@@ -27,7 +33,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 50, 100)
+    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 1, 100)
   end
 
   if button == 2 then
@@ -42,9 +48,11 @@ end
 
 function love.keypressed(key)
   if key == "c" then
-    world:destroy()
-    world = love.physics.newWorld(0, 0, true)
-    planets = {}
+    resetWorld()
+  elseif key == "r" then
+    resetWorld()
+    Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 100)
+    Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 100)
   elseif key == "1" then
     FORCE_DEBUG = not FORCE_DEBUG
   elseif key == "2" then
