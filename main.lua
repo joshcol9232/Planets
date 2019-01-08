@@ -16,7 +16,7 @@ end
 
 function love.load()
   love.window.setMode(1000, 700)
-	plGridSize = 1
+	plSize = 1
 	love.keyboard.setKeyRepeat(true)
   -- Create the two players
   player1 = nil
@@ -43,11 +43,11 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 100)
+    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), plSize, 100)
   end
 
   if button == 2 then
-		drawGridOfPlanets(mouseX, mouseY, x, y, plGridSize)
+		drawGridOfPlanets(mouseX, mouseY, x, y, plSize)
   end
 end
 
@@ -63,9 +63,9 @@ function love.keypressed(key)
   elseif key == "v" then
     VEL_DEBUG = not VEL_DEBUG
 	elseif key == "=" then
-		plGridSize = plGridSize + 1
-	elseif key == "-" then
-		plGridSize = plGridSize - 1
+		plSize = plSize + 1
+	elseif key == "-" and plSize > 1 then
+		plSize = plSize - 1
   end
 
   -- player 1 controls
@@ -82,6 +82,7 @@ function love.keypressed(key)
 		player1:changeThrust(-0.2)
   end
 
+	-- player 2 controls
   if key == "up" then
 		if player2 == nil then
 			local mX, mY = love.mouse.getPosition()
@@ -94,7 +95,6 @@ function love.keypressed(key)
 	if key == "down" and player2 ~= nil then
 		player2:changeThrust(-0.2)
 	end
-
 end
 
 function love.update(dt)
@@ -121,8 +121,8 @@ function love.draw()
   lg.print(love.timer.getFPS(), 10, 10)
   lg.print("Object Count: "..#planets, 10, 24)
 
-	if plGridSize > 0 then
-		lg.print("Size: "..plGridSize, 10, 68)
+	if plSize > 0 then
+		lg.print("Size: "..plSize, 10, 68)
 	end
 
   if FORCE_DEBUG then
@@ -157,6 +157,8 @@ function love.draw()
       player1:turnRight()
     end
     player1:draw()
+	else
+		lg.print("Player 1 press 'w' to join.", 400, 10)
 	end
 
 	if player2 ~= nil then
@@ -167,7 +169,9 @@ function love.draw()
 			player2:turnRight()
 		end
 		player2:draw()
-  end
+  elseif player1 ~= nil then
+		lg.print("Player 2 press UP to join.", 400, 10)
+	end
 
   if player2 ~= nil then
     player2:draw()

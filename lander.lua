@@ -10,7 +10,6 @@ function Lander(id, x, y, vel, w, h, d)
   l.shape   = love.physics.newRectangleShape(w, h)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
   l.fixture:setRestitution(0.2)
-  l.body:setAngularDamping(0.8)
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
   l.rotationFactor = 100000

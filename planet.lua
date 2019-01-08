@@ -39,8 +39,6 @@ function Planet(id, pos, vel, r, d)
   function p:draw()
     lg.setColor({1, 1, 1})
     lg.circle("line", self.body:getX(), self.body:getY(), self.r)
-    --self:debugVel()
-    --self:debugForce()
   end
 
   -- Debug functions
