@@ -13,6 +13,8 @@ end
 
 function love.load()
   love.window.setMode(1000, 700)
+	plGridSize = 1
+	love.keyboard.setKeyRepeat(true)
 
   VEL_DEBUG = false
   FORCE_DEBUG = false
@@ -33,16 +35,15 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 1, 100)
+    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 100)
   end
 
   if button == 2 then
-    local size = 1
-    for i=0, 5 do
-      for j=0, 5 do
-        Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 100)
-      end
-    end
+		drawGridOfPlanets(mouseX, mouseY, x, y, plGridSize)
+  end
+
+  if button == 3 then
+	
   end
 end
 
@@ -53,11 +54,15 @@ function love.keypressed(key)
     resetWorld()
     Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 100)
     Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 100)
-  elseif key == "1" then
+  elseif key == "f" then
     FORCE_DEBUG = not FORCE_DEBUG
-  elseif key == "2" then
+  elseif key == "v" then
     VEL_DEBUG = not VEL_DEBUG
-  end
+	elseif key == "=" then
+		plGridSize = plGridSize + 1
+	elseif key == "-" then
+		plGridSize = plGridSize - 1
+	end
 end
 
 function love.update(dt)
@@ -76,21 +81,23 @@ function love.draw()
   lg.print(love.timer.getFPS(), 10, 10)
   lg.print("Object Count: "..#planets, 10, 24)
 
+	if plGridSize > 0 then
+		lg.print("Size: "..plGridSize, 10, 68)
+	end
+
   if FORCE_DEBUG then
     lg.setColor({1, 0, 0})
   else
     lg.setColor({0.3, 0.3, 0.3})
   end
-  lg.print("1: Force debug", 10, 40)
+  lg.print("F: Force debug", 10, 40)
 
   if VEL_DEBUG then
     lg.setColor({0, 1, 0})
   else
     lg.setColor({0.3, 0.3, 0.3})
   end
-  lg.print("2: Velocity debug", 10, 54)
-
-
+  lg.print("V: Velocity debug", 10, 54)
 
   for i=1, #planets do
     planets[i]:draw()
@@ -100,5 +107,18 @@ function love.draw()
     if FORCE_DEBUG then
       planets[i]:debugForce()
     end
+  end
+end
+
+function drawGridOfPlanets(mouseX, mouseY, x, y, size)
+	local num = 30*(1/size)
+	if num > 10 then
+		num = num/2
+	end
+
+  for i=0, num do
+		for j=0, num do
+			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 100)
+		end
   end
 end
