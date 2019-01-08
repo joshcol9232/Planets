@@ -10,7 +10,6 @@ function Planet(id, pos, vel, r, d)
   p.fixture:setRestitution(0.4)
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
-	p.Type = "planet"
 
   print(vel.x, vel.y, "Start Velocity")
   p.body:setLinearVelocity(vel.x, vel.y)
@@ -28,9 +27,9 @@ function Planet(id, pos, vel, r, d)
 
   function p:update()
     self.fTotalX, self.fTotalY = 0, 0
-    for i=1, #bodies do
-      if bodies[i].id ~= self.id then
-        local dx, dy = self:getGravForce(bodies[i])
+    for i=1, #planets do
+      if planets[i].id ~= self.id then
+        local dx, dy = self:getGravForce(planets[i])
         self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end
     end
@@ -58,6 +57,6 @@ function Planet(id, pos, vel, r, d)
     lg.line(x, y, (self.fTotalX/20000)+x, (self.fTotalY/20000)+y)
   end
 
-  table.insert(bodies, p)
+  table.insert(planets, p)
   return p
 end

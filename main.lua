@@ -9,20 +9,25 @@ lg = love.graphics
 function resetWorld()
   world:destroy()
   world = love.physics.newWorld(0, 0, true)
-	bodies = {}
+  planets = {}
+  player1 = nil
+  player2 = nil
 end
 
 function love.load()
   love.window.setMode(1000, 700)
 	plGridSize = 1
 	love.keyboard.setKeyRepeat(true)
-	bodies = {}
+  -- Create the two players
+  player1 = nil
+  player2 = nil
 
   VEL_DEBUG = false
   FORCE_DEBUG = false
   mouseX, mouseY = 0, 0
   love.physics.setMeter(1)
   world = love.physics.newWorld(0, 0, true)
+  planets = {}
   Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 100)
   Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 100)
 
@@ -36,15 +41,11 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#bodies+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 100)
+    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 100)
   end
 
   if button == 2 then
 		drawGridOfPlanets(mouseX, mouseY, x, y, plGridSize)
-  end
-
-  if button == 3 then
-		Lander(#bodies+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 10, 100)
   end
 end
 
@@ -63,14 +64,50 @@ function love.keypressed(key)
 		plGridSize = plGridSize + 1
 	elseif key == "-" then
 		plGridSize = plGridSize - 1
-	end
+  end
+
+  -- player 1 controls
+  if key == "w" then
+    if player1 == nil then
+      local mX, mY = love.mouse.getPosition()
+      player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, 10)
+    else
+      if player1.thrustLevel < 1 then
+        player1.thrustLevel = player1.thrustLevel + 0.25
+        print("Increasing thrust on p1 to:", player1.thrustLevel)
+      end
+    end
+  end
+
+  if key == "s" and player1 ~= nil then
+    if player1.thrustLevel > 0 then
+      player1.thrustLevel = player1.thrustLevel - 0.25
+      print("Decreasing thrust on p1 to:", player1.thrustLevel)
+    end
+  end
+
+  if key == "a" and player1 ~= nil then
+    player1:turnLeft()
+  end
+
+  if key == "d" and player1 ~= nil then
+    player1:turnRight()
+  end
 end
 
 function love.update(dt)
   --update_timer = update_timer + dt
   --if update_timer >= update_rate then
-  for i=1, #bodies do
-    bodies[i]:update()
+  for i=1, #planets do
+    planets[i]:update()
+  end
+
+  if player1 ~= nil then
+    player1:update()
+  end
+
+  if player2 ~= nil then
+    player2:update()
   end
 
   world:update(dt)
@@ -80,7 +117,7 @@ end
 function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
-  lg.print("Object Count: "..#bodies, 10, 24)
+  lg.print("Object Count: "..#planets, 10, 24)
 
 	if plGridSize > 0 then
 		lg.print("Size: "..plGridSize, 10, 68)
@@ -100,14 +137,22 @@ function love.draw()
   end
   lg.print("V: Velocity debug", 10, 54)
 
-  for i=1, #bodies do
-    bodies[i]:draw()
+  for i=1, #planets do
+    planets[i]:draw()
     if VEL_DEBUG then
-      bodies[i]:debugVel()
+      planets[i]:debugVel()
     end
     if FORCE_DEBUG then
-      bodies[i]:debugForce()
+      planets[i]:debugForce()
     end
+  end
+
+  if player1 ~= nil then
+    player1:draw()
+  end
+
+  if player2 ~= nil then
+    player2:draw()
   end
 end
 
@@ -119,7 +164,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 
   for i=0, num do
 		for j=0, num do
-			Planet(#bodies+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 100)
+			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 100)
 		end
   end
 end
