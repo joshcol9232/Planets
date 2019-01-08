@@ -13,7 +13,6 @@ function Lander(id, x, y, vel, w, h, d)
   l.body:setAngularDamping(0.8)
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
-	l.Type = "lander"
   l.rotationFactor = 100000
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
   l.thrustFactor = 50000  -- Multiplyer
