@@ -1,4 +1,5 @@
 require "planet"
+require "lander"
 require "vec2"
 
 G = 6.67*(10^-3)
@@ -8,20 +9,20 @@ lg = love.graphics
 function resetWorld()
   world:destroy()
   world = love.physics.newWorld(0, 0, true)
-  planets = {}
+	bodies = {}
 end
 
 function love.load()
   love.window.setMode(1000, 700)
 	plGridSize = 1
 	love.keyboard.setKeyRepeat(true)
+	bodies = {}
 
   VEL_DEBUG = false
   FORCE_DEBUG = false
   mouseX, mouseY = 0, 0
   love.physics.setMeter(1)
   world = love.physics.newWorld(0, 0, true)
-  planets = {}
   Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 100)
   Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 100)
 
@@ -35,7 +36,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 100)
+    Planet(#bodies+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 100)
   end
 
   if button == 2 then
@@ -43,7 +44,7 @@ function love.mousereleased(x, y, button)
   end
 
   if button == 3 then
-	
+		Lander(#bodies+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), 10, 10, 100)
   end
 end
 
@@ -68,8 +69,8 @@ end
 function love.update(dt)
   --update_timer = update_timer + dt
   --if update_timer >= update_rate then
-  for i=1, #planets do
-    planets[i]:update()
+  for i=1, #bodies do
+    bodies[i]:update()
   end
 
   world:update(dt)
@@ -79,7 +80,7 @@ end
 function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
-  lg.print("Object Count: "..#planets, 10, 24)
+  lg.print("Object Count: "..#bodies, 10, 24)
 
 	if plGridSize > 0 then
 		lg.print("Size: "..plGridSize, 10, 68)
@@ -99,13 +100,13 @@ function love.draw()
   end
   lg.print("V: Velocity debug", 10, 54)
 
-  for i=1, #planets do
-    planets[i]:draw()
+  for i=1, #bodies do
+    bodies[i]:draw()
     if VEL_DEBUG then
-      planets[i]:debugVel()
+      bodies[i]:debugVel()
     end
     if FORCE_DEBUG then
-      planets[i]:debugForce()
+      bodies[i]:debugForce()
     end
   end
 end
@@ -118,7 +119,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 
   for i=0, num do
 		for j=0, num do
-			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 100)
+			Planet(#bodies+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 100)
 		end
   end
 end
