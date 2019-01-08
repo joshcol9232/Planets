@@ -74,19 +74,23 @@ function love.keypressed(key)
       local mX, mY = love.mouse.getPosition()
       player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, 1)
     else
-      if player1.thrustLevel <= 0.75 then
-        player1.thrustLevel = player1.thrustLevel + 0.25
-        print("Increasing thrust on p1 to:", player1.thrustLevel)
-      end
+			player1:changeThrust(0.2)
     end
   end
 
   if key == "s" and player1 ~= nil then
-    if player1.thrustLevel >= 0.25 then
-      player1.thrustLevel = player1.thrustLevel - 0.25
-      print("Decreasing thrust on p1 to:", player1.thrustLevel)
-    end
+		player1:changeThrust(-0.2)
   end
+
+  if key == "up" then
+		if player2 == nil then
+			local mX, mY = love.mouse.getPosition()
+      player2 = Lander(2, mX, mY, Vec2(0, 0), 20, 20, 1)
+		else
+			player2:changeThrust(0.2)
+		end
+	end	
+
 end
 
 function love.update(dt)
@@ -148,8 +152,17 @@ function love.draw()
     if love.keyboard.isDown("d") then
       player1:turnRight()
     end
-
     player1:draw()
+	end
+
+	if player2 ~= nil then
+		if love.keyboard.isDown("left") then
+			player2:turnLeft()
+		end
+		if love.keyboard.isDown("right") then
+			player2:turnRight()
+		end
+		player2:draw()
   end
 
   if player2 ~= nil then

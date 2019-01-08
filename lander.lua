@@ -25,6 +25,12 @@ function Lander(id, x, y, vel, w, h, d)
     return math.sin(angle)*self.thrustLevel*self.thrustFactor, -math.cos(angle)*self.thrustLevel*self.thrustFactor
   end
 
+	function l:changeThrust(amount)
+		if self.thrustLevel+amount <= 1 and self.thrustLevel+amount >= 0 then
+			self.thrustLevel = self.thrustLevel + amount
+		end
+	end
+
   function l:turnLeft()
     self.body:applyTorque(-self.rotationFactor)
   end
@@ -60,7 +66,7 @@ function Lander(id, x, y, vel, w, h, d)
 			lg.translate(self.body:getX(), self.body:getY())
 			lg.rotate(self.body:getAngle())
 			lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
-      lg.line(0, 0, 0, 10)
+		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*50))
 		lg.pop()
 
     if VEL_DEBUG then
