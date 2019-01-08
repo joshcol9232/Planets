@@ -91,6 +91,10 @@ function love.keypressed(key)
 		end
 	end	
 
+	if key == "down" and player2 ~= nil then
+		player2:changeThrust(-0.2)
+	end
+
 end
 
 function love.update(dt)
