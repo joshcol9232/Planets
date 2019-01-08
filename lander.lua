@@ -9,13 +9,14 @@ function Lander(id, x, y, vel, w, h, d)
   l.body    = love.physics.newBody(world, x, y, "dynamic")
   l.shape   = love.physics.newRectangleShape(w, h)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
-  l.fixture:setRestitution(0.6)
+  l.fixture:setRestitution(0.2)
+  l.body:setAngularDamping(0.8)
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
 	l.Type = "lander"
-  l.rotationFactor = 100
-  l.thrustLevel = 0.25         -- Thrust level from 0 to 1
-  l.thrustFactor = 100000  -- Multiplyer
+  l.rotationFactor = 100000
+  l.thrustLevel = 0.0         -- Thrust level from 0 to 1
+  l.thrustFactor = 50000  -- Multiplyer
 
   print(vel.x, vel.y, "Start Velocity")
   l.body:setLinearVelocity(vel.x, vel.y)
@@ -26,11 +27,11 @@ function Lander(id, x, y, vel, w, h, d)
   end
 
   function l:turnLeft()
-    self.body:applyTorque(self.rotationFactor)
+    self.body:applyTorque(-self.rotationFactor)
   end
 
   function l:turnRight()
-    self.body:applyTorque(-self.rotationFactor)
+    self.body:applyTorque(self.rotationFactor)
   end
 
   function l:getGravForce(other)
@@ -60,6 +61,7 @@ function Lander(id, x, y, vel, w, h, d)
 			lg.translate(self.body:getX(), self.body:getY())
 			lg.rotate(self.body:getAngle())
 			lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
+      lg.line(0, 0, 0, 10)
 		lg.pop()
 
     if VEL_DEBUG then

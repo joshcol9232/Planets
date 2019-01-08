@@ -22,6 +22,8 @@ function love.load()
   player1 = nil
   player2 = nil
 
+  autoDampening = true  -- Automatic dampening of landers.
+
   VEL_DEBUG = false
   FORCE_DEBUG = false
   mouseX, mouseY = 0, 0
@@ -70,9 +72,9 @@ function love.keypressed(key)
   if key == "w" then
     if player1 == nil then
       local mX, mY = love.mouse.getPosition()
-      player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, 10)
+      player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, 1)
     else
-      if player1.thrustLevel < 1 then
+      if player1.thrustLevel <= 0.75 then
         player1.thrustLevel = player1.thrustLevel + 0.25
         print("Increasing thrust on p1 to:", player1.thrustLevel)
       end
@@ -80,18 +82,10 @@ function love.keypressed(key)
   end
 
   if key == "s" and player1 ~= nil then
-    if player1.thrustLevel > 0 then
+    if player1.thrustLevel >= 0.25 then
       player1.thrustLevel = player1.thrustLevel - 0.25
       print("Decreasing thrust on p1 to:", player1.thrustLevel)
     end
-  end
-
-  if key == "a" and player1 ~= nil then
-    player1:turnLeft()
-  end
-
-  if key == "d" and player1 ~= nil then
-    player1:turnRight()
   end
 end
 
@@ -148,6 +142,13 @@ function love.draw()
   end
 
   if player1 ~= nil then
+    if love.keyboard.isDown("a") then
+      player1:turnLeft()
+    end
+    if love.keyboard.isDown("d") then
+      player1:turnRight()
+    end
+
     player1:draw()
   end
 
