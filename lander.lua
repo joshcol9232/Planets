@@ -12,11 +12,10 @@ function Lander(id, x, y, vel, w, h, d)
   l.fixture:setRestitution(0.2)
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
-  l.rotationFactor = 100000
+  l.rotationFactor = 200000
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
   l.thrustFactor = 50000  -- Multiplyer
 
-  print(vel.x, vel.y, "Start Velocity")
   l.body:setLinearVelocity(vel.x, vel.y)
 
   function l:thrust()
@@ -49,6 +48,9 @@ function Lander(id, x, y, vel, w, h, d)
   end
 
   function l:update()
+		--local bodX, bodY = self.body:getX(), self.body:getY()
+		--if bodX < 0 then
+
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do
       local dx, dy = self:getGravForce(planets[i])
@@ -64,8 +66,10 @@ function Lander(id, x, y, vel, w, h, d)
 		lg.push()
 			lg.translate(self.body:getX(), self.body:getY())
 			lg.rotate(self.body:getAngle())
-			lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
-		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*50))
+			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
+			lg.draw(landerImg, -self.w/2, -self.h/2)
+			lg.setColor({1, 0, 0})
+		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*20))
 		lg.pop()
 
     if VEL_DEBUG then

@@ -5,6 +5,8 @@ require "vec2"
 G = 6.67*(10^-3)
 
 lg = love.graphics
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 700
 
 function resetWorld()
   world:destroy()
@@ -15,14 +17,14 @@ function resetWorld()
 end
 
 function love.load()
-  love.window.setMode(1000, 700)
+  love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
 	plSize = 1
 	love.keyboard.setKeyRepeat(true)
   -- Create the two players
   player1 = nil
   player2 = nil
 
-  autoDampening = true  -- Automatic dampening of landers.
+	landerImg = lg.newImage("assets/lander.png")    -- Load lander image
 
   VEL_DEBUG = false
   FORCE_DEBUG = false
@@ -158,6 +160,7 @@ function love.draw()
     end
     player1:draw()
 	else
+		lg.setColor({0, 1, 0})
 		lg.print("Player 1 press 'w' to join.", 400, 10)
 	end
 
@@ -170,6 +173,7 @@ function love.draw()
 		end
 		player2:draw()
   elseif player1 ~= nil then
+		lg.setColor({0, 1, 0})
 		lg.print("Player 2 press UP to join.", 400, 10)
 	end
 
