@@ -32,8 +32,8 @@ function love.load()
   love.physics.setMeter(1)
   world = love.physics.newWorld(0, 0, true)
   planets = {}
-  Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 100)
-  Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 100)
+  Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 10)
+  Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 10)
 
   --update_rate = 1/60
   --update_timer = 0
@@ -45,7 +45,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), plSize, 100)
+    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), plSize, 10)
   end
 
   if button == 2 then
@@ -58,8 +58,12 @@ function love.keypressed(key)
     resetWorld()
   elseif key == "r" then
     resetWorld()
-    Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 100)
-    Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 100)
+		if love.keyboard.isDown("1") then
+			Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 10)
+			Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 10)
+		elseif love.keyboard.isDown("2") then
+			Planet(1, Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(0, 0), 200, 10)
+		end
   elseif key == "f" then
     FORCE_DEBUG = not FORCE_DEBUG
   elseif key == "v" then
@@ -76,12 +80,12 @@ function love.keypressed(key)
       local mX, mY = love.mouse.getPosition()
       player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, 1)
     else
-			player1:changeThrust(0.2)
+			player1:changeThrust(0.1)
     end
   end
 
   if key == "s" and player1 ~= nil then
-		player1:changeThrust(-0.2)
+		player1:changeThrust(-0.1)
   end
 
 	-- player 2 controls
@@ -90,12 +94,12 @@ function love.keypressed(key)
 			local mX, mY = love.mouse.getPosition()
       player2 = Lander(2, mX, mY, Vec2(0, 0), 20, 20, 1)
 		else
-			player2:changeThrust(0.2)
+			player2:changeThrust(0.1)
 		end
-	end	
+	end
 
 	if key == "down" and player2 ~= nil then
-		player2:changeThrust(-0.2)
+		player2:changeThrust(-0.1)
 	end
 end
 
@@ -190,7 +194,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 
   for i=0, num do
 		for j=0, num do
-			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 100)
+			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 10)
 		end
   end
 end

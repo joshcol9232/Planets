@@ -69,7 +69,7 @@ function Lander(id, x, y, vel, w, h, d)
 			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
 			lg.draw(landerImg, -self.w/2, -self.h/2)
 			lg.setColor({1, 0, 0})
-		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*20))
+		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*50))
 		lg.pop()
 
     if VEL_DEBUG then
@@ -92,7 +92,7 @@ function Lander(id, x, y, vel, w, h, d)
   function l:debugForce()
     lg.setColor({1, 0, 0})
     local x, y = self.body:getX(), self.body:getY()
-    lg.line(x, y, (self.fTotalX/20000)+x, (self.fTotalY/20000)+y)
+    lg.line(x, y, (self.fTotalX/20)+x, (self.fTotalY/20)+y)
   end
 
   return l
