@@ -18,6 +18,12 @@ function Lander(id, x, y, vel, w, h, d)
 
   l.body:setLinearVelocity(vel.x, vel.y)
 
+  function l:destroySelf()
+    self.body:destroy()
+
+    self = nil
+  end
+
   function l:thrust()
     local angle = self.body:getAngle()
     return math.sin(angle)*self.thrustLevel*self.thrustFactor, -math.cos(angle)*self.thrustLevel*self.thrustFactor
@@ -48,8 +54,18 @@ function Lander(id, x, y, vel, w, h, d)
   end
 
   function l:update()
-		--local bodX, bodY = self.body:getX(), self.body:getY()
-		--if bodX < 0 then
+    if love.keyboard.isDown("a") then
+      self:turnLeft()
+    end
+    if love.keyboard.isDown("d") then
+      self:turnRight()
+    end
+
+    -- contacts = self.body:getContacts()
+    -- if #contacts > 0 then
+    --   print("Touching something")
+    --   self:destroySelf()
+    -- end
 
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do

@@ -2,11 +2,14 @@ require "planet"
 require "lander"
 require "vec2"
 
-G = 6.67*(10^-3)
+G = 6.67*(10^-6)
 
 lg = love.graphics
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
+
+PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
+LD_DENSITY = 2    -- Lander density.
 
 function resetWorld()
   world:destroy()
@@ -32,8 +35,8 @@ function love.load()
   love.physics.setMeter(1)
   world = love.physics.newWorld(0, 0, true)
   planets = {}
-  Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 10)
-  Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 10)
+  Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
+  Planet(2, Vec2(300, 100), Vec2(33, 0), 5, PL_DENSITY)
 
   --update_rate = 1/60
   --update_timer = 0
@@ -45,7 +48,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), plSize, 10)
+    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), plSize, PL_DENSITY)
   end
 
   if button == 2 then
@@ -59,10 +62,10 @@ function love.keypressed(key)
   elseif key == "r" then
     resetWorld()
 		if love.keyboard.isDown("1") then
-			Planet(1, Vec2(500, 350), Vec2(0, 0), 50, 10)
-			Planet(2, Vec2(300, 100), Vec2(33, 0), 5, 10)
+			Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
+			Planet(2, Vec2(300, 100), Vec2(33, 0), 5, PL_DENSITY)
 		elseif love.keyboard.isDown("2") then
-			Planet(1, Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(0, 0), 200, 10)
+			Planet(1, Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(0, 0), 200, PL_DENSITY)
 		end
   elseif key == "f" then
     FORCE_DEBUG = not FORCE_DEBUG
@@ -78,7 +81,7 @@ function love.keypressed(key)
   if key == "w" then
     if player1 == nil then
       local mX, mY = love.mouse.getPosition()
-      player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, 1)
+      player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, LD_DENSITY)
     else
 			player1:changeThrust(0.1)
     end
@@ -92,7 +95,7 @@ function love.keypressed(key)
   if key == "up" then
 		if player2 == nil then
 			local mX, mY = love.mouse.getPosition()
-      player2 = Lander(2, mX, mY, Vec2(0, 0), 20, 20, 1)
+      player2 = Lander(2, mX, mY, Vec2(0, 0), 20, 20, LD_DENSITY)
 		else
 			player2:changeThrust(0.1)
 		end
@@ -156,12 +159,6 @@ function love.draw()
   end
 
   if player1 ~= nil then
-    if love.keyboard.isDown("a") then
-      player1:turnLeft()
-    end
-    if love.keyboard.isDown("d") then
-      player1:turnRight()
-    end
     player1:draw()
 	else
 		lg.setColor({0, 1, 0})
@@ -169,12 +166,6 @@ function love.draw()
 	end
 
 	if player2 ~= nil then
-		if love.keyboard.isDown("left") then
-			player2:turnLeft()
-		end
-		if love.keyboard.isDown("right") then
-			player2:turnRight()
-		end
 		player2:draw()
   elseif player1 ~= nil then
 		lg.setColor({0, 1, 0})
@@ -194,7 +185,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 
   for i=0, num do
 		for j=0, num do
-			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, 10)
+			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, PL_DENSITY)
 		end
   end
 end
