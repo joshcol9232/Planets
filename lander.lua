@@ -1,4 +1,4 @@
-function Lander(id, x, y, vel, w, h, d)
+function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
   l.playerId = id
 	l.w     = w
@@ -25,9 +25,9 @@ function Lander(id, x, y, vel, w, h, d)
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
   l.rotationFactor = 200000
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
-  l.maxThrust = 75000  -- Multiplyer
+  l.maxThrust = 100000  -- Multiplyer
 
-  l.body:setLinearVelocity(vel.x, vel.y)
+  l.body:setLinearVelocity(velx, vely)
 
   function l:destroySelf()
     self.body:destroy()

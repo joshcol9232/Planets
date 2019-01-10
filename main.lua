@@ -1,6 +1,7 @@
 require "planet"
 require "lander"
 require "misc"
+require "levels"
 
 G = 6.67*(10^-5)
 
@@ -8,8 +9,6 @@ lg = love.graphics
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
 
-PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
-LD_DENSITY = 2    -- Lander density.
 
 function resetWorld()
   world:destroy()
@@ -31,13 +30,12 @@ function love.load()
 
   VEL_DEBUG = false
   FORCE_DEBUG = false
-  levels = {"0", "1", "2"}
   mouseX, mouseY = 0, 0
   love.physics.setMeter(1)
   world = love.physics.newWorld(0, 0, true)
-  planets = {}
-  Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
-  Planet(2, Vec2(300, 200), Vec2(20, 0), 5, PL_DENSITY)
+  planets, player1, player2 = loadLvl(1)
+  print(planets[0])
+
 
   --update_rate = 1/60
   --update_timer = 0
@@ -49,7 +47,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, Vec2(mouseX, mouseY), Vec2(mouseX-x, mouseY-y), plSize, PL_DENSITY)
+    Planet(#planets+1, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY)
   end
 
   if button == 2 then
@@ -66,10 +64,10 @@ function love.keypressed(key)
 		if love.keyboard.isDown("l") then
       resetWorld()
       if key == "1" then
-  			Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
-  			Planet(2, Vec2(300, 100), Vec2(33, 0), 5, PL_DENSITY)
+
       elseif key == "2" then
-  			Planet(1, Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(0, 0), 200, PL_DENSITY)
+      elseif key == "3" then
+
       end
 		end
   elseif key == "f" then
@@ -86,7 +84,7 @@ function love.keypressed(key)
   if key == "w" then
     if player1 == nil then
       local mX, mY = love.mouse.getPosition()
-      player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, LD_DENSITY)
+      player1 = Lander(1, mX, mY, 0, 0, 20, 20, LD_DENSITY)
     end
   end
 
@@ -94,7 +92,7 @@ function love.keypressed(key)
   if key == "up" then
 		if player2 == nil then
 			local mX, mY = love.mouse.getPosition()
-      player2 = Lander(2, mX, mY, Vec2(0, 0), 20, 20, LD_DENSITY)
+      player2 = Lander(2, mX, mY, 0, 0, 20, 20, LD_DENSITY)
     end
   end
 end
@@ -178,7 +176,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 
   for i=0, num do
 		for j=0, num do
-			Planet(#planets+1, Vec2(mouseX+(i*size*2), mouseY+(j*size*2)), Vec2(mouseX-x, mouseY-y), size, PL_DENSITY)
+			Planet(#planets+1, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY)
 		end
   end
 end

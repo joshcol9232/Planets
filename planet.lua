@@ -1,18 +1,19 @@
-function Planet(id, pos, vel, r, d)
+function Planet(id, x, y, velx, vely, r, d)
+  print(id, x, y, velx, vely, r, d)
   local p = {}
   p.id    = id
   p.r     = r
   p.d     = d
 
-  p.body    = love.physics.newBody(world, pos.x, pos.y, "dynamic")
+  p.body    = love.physics.newBody(world, x, y, "dynamic")
   p.shape   = love.physics.newCircleShape(r)
   p.fixture = love.physics.newFixture(p.body, p.shape, p.d)
   p.fixture:setRestitution(0.4)
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
 
-  print(vel.x, vel.y, "Start Velocity")
-  p.body:setLinearVelocity(vel.x, vel.y)
+  print(velx, vely, "Start Velocity")
+  p.body:setLinearVelocity(velx, vely)
 
 
   function p:getGravForce(other)
@@ -55,6 +56,5 @@ function Planet(id, pos, vel, r, d)
     lg.line(x, y, (self.fTotalX/20)+x, (self.fTotalY/20)+y)
   end
 
-  table.insert(planets, p)
   return p
 end
