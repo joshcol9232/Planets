@@ -1,31 +1,22 @@
+require "constants"
 require "planet"
 require "lander"
 require "misc"
 require "levels"
 
-G = 6.67*(10^-5)
-
 lg = love.graphics
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 700
-
 
 function resetWorld()
   world:destroy()
   world = love.physics.newWorld(0, 0, true)
   planets = {}
-  player1 = nil
-  player2 = nil
+  players = {}
 end
 
 function love.load()
   love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
 	plSize = 1
 	love.keyboard.setKeyRepeat(true)
-  -- Create the two players
-  player1 = nil
-  player2 = nil
-
 	landerImg = lg.newImage("assets/lander.png")    -- Load lander image
 
   VEL_DEBUG = false
@@ -33,12 +24,10 @@ function love.load()
   mouseX, mouseY = 0, 0
   love.physics.setMeter(1)
   world = love.physics.newWorld(0, 0, true)
-  planets, player1, player2 = loadLvl(1)
-  print(planets[0])
-
-
-  --update_rate = 1/60
-  --update_timer = 0
+  planets, players = loadLvl(1)
+  if players == nil then
+    players = {}
+  end
 end
 
 function love.mousepressed(x, y, button)
@@ -47,7 +36,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    Planet(#planets+1, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY)
+    table.insert(planets, Planet(#planets+1, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY))
   end
 
   if button == 2 then
@@ -60,15 +49,10 @@ function love.keypressed(key)
     resetWorld()
   end
 
-  if inTable(levels, key) then
-		if love.keyboard.isDown("l") then
+  if inTable(levelNames, key) then
+		if love.keyboard.isDown("r") then
       resetWorld()
-      if key == "1" then
-
-      elseif key == "2" then
-      elseif key == "3" then
-
-      end
+      planets, players = loadLvl(tonumber(key))
 		end
   elseif key == "f" then
     FORCE_DEBUG = not FORCE_DEBUG
@@ -82,17 +66,17 @@ function love.keypressed(key)
 
   -- player 1 controls
   if key == "w" then
-    if player1 == nil then
+    if players[1] == nil then
       local mX, mY = love.mouse.getPosition()
-      player1 = Lander(1, mX, mY, 0, 0, 20, 20, LD_DENSITY)
+       table.insert(players, Lander(1, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
 
 	-- player 2 controls
   if key == "up" then
-		if player2 == nil then
+		if players[2] == nil then
 			local mX, mY = love.mouse.getPosition()
-      player2 = Lander(2, mX, mY, 0, 0, 20, 20, LD_DENSITY)
+        table.insert(players, Lander(2, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
 end
@@ -104,12 +88,8 @@ function love.update(dt)
     planets[i]:update()
   end
 
-  if player1 ~= nil then
-    player1:update()
-  end
-
-  if player2 ~= nil then
-    player2:update()
+  for i=1, #players do
+    players[i]:update()
   end
 
   world:update(dt)
@@ -141,31 +121,19 @@ function love.draw()
 
   for i=1, #planets do
     planets[i]:draw()
-    if VEL_DEBUG then
-      planets[i]:debugVel()
-    end
-    if FORCE_DEBUG then
-      planets[i]:debugForce()
-    end
   end
 
-  if player1 ~= nil then
-    player1:draw()
-	else
+  for i=1, #players do
+    players[i]:draw()
+  end
+
+  if #players < 1 then
 		lg.setColor({0, 1, 0})
 		lg.print("Player 1 press 'w' to join.", 400, 10)
-	end
-
-	if player2 ~= nil then
-		player2:draw()
-  elseif player1 ~= nil then
+  elseif #players < 2 then
 		lg.setColor({0, 1, 0})
 		lg.print("Player 2 press UP to join.", 400, 10)
 	end
-
-  if player2 ~= nil then
-    player2:draw()
-  end
 end
 
 function drawGridOfPlanets(mouseX, mouseY, x, y, size)
@@ -176,7 +144,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 
   for i=0, num do
 		for j=0, num do
-			Planet(#planets+1, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY)
+			table.insert(planets, Planet(#planets+1, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY))
 		end
   end
 end

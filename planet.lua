@@ -1,3 +1,6 @@
+require "debug"
+require "gravFuncs"
+
 function Planet(id, x, y, velx, vely, r, d)
   print(id, x, y, velx, vely, r, d)
   local p = {}
@@ -15,24 +18,18 @@ function Planet(id, x, y, velx, vely, r, d)
   print(velx, vely, "Start Velocity")
   p.body:setLinearVelocity(velx, vely)
 
-
-  function p:getGravForce(other)
-    local xDist = other.body:getX() - self.body:getX()
-    local yDist = other.body:getY() - self.body:getY()
-
-    local dist  = love.physics.getDistance(self.fixture, other.fixture) + self.r + other.r
-    local F = (G * self.body:getMass() * other.body:getMass())/(dist*dist)
-
-    return F*xDist, F*yDist
-  end
-
   function p:update()
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do
       if planets[i].id ~= self.id then
-        local dx, dy = self:getGravForce(planets[i])
+        local dx, dy = getGravForce(self, planets[i])
         self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end
+    end
+
+    for i=1, #players do
+      local dx, dy = getGravForce(self, players[i])
+      self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
     self.body:applyForce(self.fTotalX, self.fTotalY)
   end
@@ -40,20 +37,13 @@ function Planet(id, x, y, velx, vely, r, d)
   function p:draw()
     lg.setColor({1, 1, 1})
     lg.circle("line", self.body:getX(), self.body:getY(), self.r)
-  end
+    if VEL_DEBUG then
+      debugVel(self)
+    end
 
-  -- Debug functions
-  function p:debugVel()
-    lg.setColor({0, 1, 0})
-    local x, y = self.body:getX(), self.body:getY()
-    local velX, velY = self.body:getLinearVelocity()
-    lg.line(x, y, velX+x, velY+y)
-  end
-
-  function p:debugForce()
-    lg.setColor({1, 0, 0})
-    local x, y = self.body:getX(), self.body:getY()
-    lg.line(x, y, (self.fTotalX/20)+x, (self.fTotalY/20)+y)
+    if FORCE_DEBUG then
+      debugForce(self)
+    end
   end
 
   return p

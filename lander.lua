@@ -1,3 +1,6 @@
+require "debugFuncs"
+require "gravFuncs"
+
 function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
   l.playerId = id
@@ -21,11 +24,13 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.shape   = love.physics.newRectangleShape(w, h)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
   l.fixture:setRestitution(0.2)
+  l.Type = "lander"
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
-  l.rotationFactor = 200000
+  l.rotationFactor = 100000000
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
-  l.maxThrust = 100000  -- Multiplyer
+  l.thrustChange = 0.02       -- Amount the thrust changes when changing thrust
+  l.maxThrust = 65200000  -- Maximum thrust
 
   l.body:setLinearVelocity(velx, vely)
 
@@ -40,9 +45,13 @@ function Lander(id, x, y, velx, vely, w, h, d)
   end
 
 	function l:changeThrust(amount)
-		if self.thrustLevel+amount <= 1 and self.thrustLevel+amount >= 0 then
-			self.thrustLevel = self.thrustLevel + amount
-		end
+		if self.thrustLevel+amount <= 0 then   -- Prevents stupid 0 error (where 0.02 - 0.02 is apparently 2.4e-17)
+      self.thrustLevel = 0
+    elseif self.thrustLevel+amount >= 1 then
+      self.thrustLevel = 1
+    else
+      self.thrustLevel = self.thrustLevel+amount
+    end
 	end
 
   function l:turnLeft()
@@ -53,16 +62,6 @@ function Lander(id, x, y, velx, vely, w, h, d)
     self.body:applyTorque(self.rotationFactor)
   end
 
-  function l:getGravForce(other)
-    local xDist = other.body:getX() - self.body:getX()
-    local yDist = other.body:getY() - self.body:getY()
-
-    local dist  = love.physics.getDistance(self.fixture, other.fixture) + self.r + other.r
-    local F = (G * self.body:getMass() * other.body:getMass())/(dist*dist)
-
-    return F*xDist, F*yDist
-  end
-
   function l:update()
     if love.keyboard.isDown(self.leftKey) then
       self:turnLeft()
@@ -71,9 +70,9 @@ function Lander(id, x, y, velx, vely, w, h, d)
       self:turnRight()
     end
     if love.keyboard.isDown(self.upKey) then
-      self:changeThrust(0.04)
+      self:changeThrust(self.thrustChange)
     else
-      self:changeThrust(-0.05)
+      self:changeThrust(-self.thrustChange)
     end
 
     -- contacts = self.body:getContacts()
@@ -84,9 +83,17 @@ function Lander(id, x, y, velx, vely, w, h, d)
 
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do
-      local dx, dy = self:getGravForce(planets[i])
+      local dx, dy = getGravForce(self, planets[i])
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
+    for i=1, #players do
+      if players[i].id ~= self.id then
+        local dx, dy = getGravForce(self, players[i])
+        print("Force from other landers:", dx, dy)
+        self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
+      end
+    end
+
     local tX, tY = self:thrust()
     self.fTotalX, self.fTotalY = self.fTotalX+tX, self.fTotalY+tY
     self.body:applyForce(self.fTotalX, self.fTotalY)
@@ -104,26 +111,12 @@ function Lander(id, x, y, velx, vely, w, h, d)
 		lg.pop()
 
     if VEL_DEBUG then
-      self:debugVel()
+      debugVel(self)
     end
 
     if FORCE_DEBUG then
-      self:debugForce()
+      debugForce(self)
     end
-  end
-
-  -- Debug functions
-  function l:debugVel()
-    lg.setColor({0, 1, 0})
-    local x, y = self.body:getX(), self.body:getY()
-    local velX, velY = self.body:getLinearVelocity()
-    lg.line(x, y, velX+x, velY+y)
-  end
-
-  function l:debugForce()
-    lg.setColor({1, 0, 0})
-    local x, y = self.body:getX(), self.body:getY()
-    lg.line(x, y, (self.fTotalX/20)+x, (self.fTotalY/20)+y)
   end
 
   return l
