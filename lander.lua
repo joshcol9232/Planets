@@ -6,6 +6,17 @@ function Lander(id, x, y, vel, w, h, d)
   l.d     = d
 	l.r     = math.max(w, h) -- For compatibilty with planet bois
 
+  l.leftKey  = "a"
+  l.rightKey = "d"
+  l.upKey    = "w"
+  l.downKey  = "s"
+  if l.playerId == 2 then
+    l.leftKey  = "left"
+    l.rightKey = "right"
+    l.upKey    = "up"
+    l.downKey  = "down"
+  end
+
   l.body    = love.physics.newBody(world, x, y, "dynamic")
   l.shape   = love.physics.newRectangleShape(w, h)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
@@ -14,19 +25,18 @@ function Lander(id, x, y, vel, w, h, d)
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
   l.rotationFactor = 200000
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
-  l.thrustFactor = 50000  -- Multiplyer
+  l.maxThrust = 75000  -- Multiplyer
 
   l.body:setLinearVelocity(vel.x, vel.y)
 
   function l:destroySelf()
     self.body:destroy()
-
-    self = nil
+    print(self, player1, "Self should be nil")
   end
 
   function l:thrust()
     local angle = self.body:getAngle()
-    return math.sin(angle)*self.thrustLevel*self.thrustFactor, -math.cos(angle)*self.thrustLevel*self.thrustFactor
+    return math.sin(angle)*self.thrustLevel*self.maxThrust, -math.cos(angle)*self.thrustLevel*self.maxThrust
   end
 
 	function l:changeThrust(amount)
@@ -54,11 +64,16 @@ function Lander(id, x, y, vel, w, h, d)
   end
 
   function l:update()
-    if love.keyboard.isDown("a") then
+    if love.keyboard.isDown(self.leftKey) then
       self:turnLeft()
     end
-    if love.keyboard.isDown("d") then
+    if love.keyboard.isDown(self.rightKey) then
       self:turnRight()
+    end
+    if love.keyboard.isDown(self.upKey) then
+      self:changeThrust(0.04)
+    else
+      self:changeThrust(-0.05)
     end
 
     -- contacts = self.body:getContacts()
@@ -85,7 +100,7 @@ function Lander(id, x, y, vel, w, h, d)
 			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
 			lg.draw(landerImg, -self.w/2, -self.h/2)
 			lg.setColor({1, 0, 0})
-		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*50))
+		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*20))
 		lg.pop()
 
     if VEL_DEBUG then

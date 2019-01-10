@@ -1,8 +1,8 @@
 require "planet"
 require "lander"
-require "vec2"
+require "misc"
 
-G = 6.67*(10^-6)
+G = 6.67*(10^-5)
 
 lg = love.graphics
 SCREEN_WIDTH = 1000
@@ -31,12 +31,13 @@ function love.load()
 
   VEL_DEBUG = false
   FORCE_DEBUG = false
+  levels = {"0", "1", "2"}
   mouseX, mouseY = 0, 0
   love.physics.setMeter(1)
   world = love.physics.newWorld(0, 0, true)
   planets = {}
   Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
-  Planet(2, Vec2(300, 100), Vec2(33, 0), 5, PL_DENSITY)
+  Planet(2, Vec2(300, 200), Vec2(20, 0), 5, PL_DENSITY)
 
   --update_rate = 1/60
   --update_timer = 0
@@ -59,13 +60,17 @@ end
 function love.keypressed(key)
   if key == "c" then
     resetWorld()
-  elseif key == "r" then
-    resetWorld()
-		if love.keyboard.isDown("1") then
-			Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
-			Planet(2, Vec2(300, 100), Vec2(33, 0), 5, PL_DENSITY)
-		elseif love.keyboard.isDown("2") then
-			Planet(1, Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(0, 0), 200, PL_DENSITY)
+  end
+
+  if inTable(levels, key) then
+		if love.keyboard.isDown("r") then
+      resetWorld()
+      if key == "1" then
+  			Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
+  			Planet(2, Vec2(300, 100), Vec2(33, 0), 5, PL_DENSITY)
+      elseif key == "2" then
+  			Planet(1, Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(0, 0), 200, PL_DENSITY)
+      end
 		end
   elseif key == "f" then
     FORCE_DEBUG = not FORCE_DEBUG
@@ -82,13 +87,7 @@ function love.keypressed(key)
     if player1 == nil then
       local mX, mY = love.mouse.getPosition()
       player1 = Lander(1, mX, mY, Vec2(0, 0), 20, 20, LD_DENSITY)
-    else
-			player1:changeThrust(0.1)
     end
-  end
-
-  if key == "s" and player1 ~= nil then
-		player1:changeThrust(-0.1)
   end
 
 	-- player 2 controls
@@ -96,14 +95,8 @@ function love.keypressed(key)
 		if player2 == nil then
 			local mX, mY = love.mouse.getPosition()
       player2 = Lander(2, mX, mY, Vec2(0, 0), 20, 20, LD_DENSITY)
-		else
-			player2:changeThrust(0.1)
-		end
-	end
-
-	if key == "down" and player2 ~= nil then
-		player2:changeThrust(-0.1)
-	end
+    end
+  end
 end
 
 function love.update(dt)
