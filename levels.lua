@@ -17,9 +17,7 @@ levels = {
         d = PL_DENSITY
       }
     },
-    landers = {
-
-    }
+    landers = {}
   }
 }
 
@@ -36,6 +34,13 @@ function loadLvl(num)
     table.insert(planets, Planet(pl.id, pl.posx, pl.posy, pl.vx, pl.vy, pl.r, pl.d))
   end
 
+  if #lvl.landers == 1 then
+    player1 = Lander(lvl.landers[1].id, lvl.landers[1].posx, lvl.landers[1].posy, lvl.landers[1].vx, lvl.landers[1].vy, lvl.landers[1].r, lvl.landers[1].d)
+  end
+  if #lvl.landers == 2 then
+    player2 = Lander(lvl.landers[2].id, lvl.landers[2].posx, lvl.landers[2].posy, lvl.landers[2].vx, lvl.landers[2].vy, lvl.landers[2].r, lvl.landers[2].d)
+  end
+  
   return planets, player1, player2
 end
 
