@@ -63,7 +63,7 @@ function love.keypressed(key)
   end
 
   if inTable(levels, key) then
-		if love.keyboard.isDown("r") then
+		if love.keyboard.isDown("l") then
       resetWorld()
       if key == "1" then
   			Planet(1, Vec2(500, 350), Vec2(0, 0), 50, PL_DENSITY)
