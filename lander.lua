@@ -3,7 +3,7 @@ require "gravFuncs"
 
 function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
-  l.playerId = id
+  l.id = id
 	l.w     = w
   l.h     = h
   l.d     = d
@@ -13,7 +13,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.rightKey = "d"
   l.upKey    = "w"
   l.downKey  = "s"
-  if l.playerId == 2 then
+  if l.id == 2 then
     l.leftKey  = "left"
     l.rightKey = "right"
     l.upKey    = "up"
@@ -29,8 +29,8 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
   l.rotationFactor = 100000000
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
-  l.thrustChange = 0.02       -- Amount the thrust changes when changing thrust
-  l.maxThrust = 65200000  -- Maximum thrust
+  l.thrustChange = 0.04       -- Amount the thrust changes when changing thrust
+  l.maxThrust = 6520000000--65200000  -- Maximum thrust
 
   l.body:setLinearVelocity(velx, vely)
 
@@ -62,7 +62,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
     self.body:applyTorque(self.rotationFactor)
   end
 
-  function l:update()
+  function l:update(dt)
     if love.keyboard.isDown(self.leftKey) then
       self:turnLeft()
     end
@@ -72,7 +72,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
     if love.keyboard.isDown(self.upKey) then
       self:changeThrust(self.thrustChange)
     else
-      self:changeThrust(-self.thrustChange)
+      self:changeThrust(-0.06)
     end
 
     -- contacts = self.body:getContacts()
@@ -89,13 +89,13 @@ function Lander(id, x, y, velx, vely, w, h, d)
     for i=1, #players do
       if players[i].id ~= self.id then
         local dx, dy = getGravForce(self, players[i])
-        print("Force from other landers:", dx, dy)
         self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end
     end
 
     local tX, tY = self:thrust()
     self.fTotalX, self.fTotalY = self.fTotalX+tX, self.fTotalY+tY
+    print(self.body:getLinearVelocity())
     self.body:applyForce(self.fTotalX, self.fTotalY)
   end
 

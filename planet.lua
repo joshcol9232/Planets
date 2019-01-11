@@ -18,7 +18,7 @@ function Planet(id, x, y, velx, vely, r, d)
   print(velx, vely, "Start Velocity")
   p.body:setLinearVelocity(velx, vely)
 
-  function p:update()
+  function p:update(dt)
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do
       if planets[i].id ~= self.id then

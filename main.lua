@@ -82,17 +82,17 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+  -- local rate = idealFrameTime * dt * 100 * gameSpeed
+  world:update(dt)
   --update_timer = update_timer + dt
   --if update_timer >= update_rate then
   for i=1, #planets do
-    planets[i]:update()
+    planets[i]:update(dt)
   end
 
   for i=1, #players do
-    players[i]:update()
+    players[i]:update(dt)
   end
-
-  world:update(dt)
     --update_timer = update_timer - update_rate
 end
 
