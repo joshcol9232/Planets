@@ -32,7 +32,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.thrustChange = 0.04       -- Amount the thrust changes when changing thrust
   l.maxThrust = 6520000000--65200000  -- Maximum thrust
 
-  l.body:setLinearVelocity(velx, vely)
+  l.body:setLinearVelocity(0, -10000)--velx, vely)
 
   function l:destroySelf()
     self.body:destroy()

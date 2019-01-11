@@ -82,10 +82,7 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-  -- local rate = idealFrameTime * dt * 100 * gameSpeed
   world:update(dt)
-  --update_timer = update_timer + dt
-  --if update_timer >= update_rate then
   for i=1, #planets do
     planets[i]:update(dt)
   end
@@ -93,13 +90,12 @@ function love.update(dt)
   for i=1, #players do
     players[i]:update(dt)
   end
-    --update_timer = update_timer - update_rate
 end
 
 function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
-  lg.print("Object Count: "..#planets, 10, 24)
+  lg.print("Object Count: "..#planets+#players, 10, 24)
 
 	if plSize > 0 then
 		lg.print("Size: "..plSize, 10, 68)
