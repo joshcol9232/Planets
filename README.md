@@ -1,2 +1,2 @@
 # Planets
-Idk planet boi
+Just a little lander game
