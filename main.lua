@@ -78,7 +78,7 @@ function love.keypressed(key)
   if key == "up" then
 		if players[2] == nil then
 			local mX, mY = love.mouse.getPosition()
-        table.insert(players, Lander(2, mX, mY, 0, 0, 20, 20, LD_DENSITY))
+        table.insert(players, Lander(9999999, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
 end

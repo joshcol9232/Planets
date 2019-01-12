@@ -14,7 +14,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.rightKey = "d"
   l.upKey    = "w"
   l.downKey  = "s"
-  if l.id == 2 then
+  if l.id == 9999999 then
     l.leftKey  = "left"
     l.rightKey = "right"
     l.upKey    = "up"
@@ -112,7 +112,9 @@ function Lander(id, x, y, velx, vely, w, h, d)
     lg.setColor({1, 1, 1})
 		lg.push()
 			lg.translate(self.body:getX(), self.body:getY())
-      lg.print(self.id, 0, -25)
+      if self.id == 9999999 then lg.print("2", 0, -25) else
+        lg.print(self.id, 0, -25)
+      end
 			lg.rotate(self.body:getAngle())
 			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
 			lg.draw(landerImg, -self.w/2, -self.h/2)
