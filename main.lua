@@ -19,6 +19,7 @@ function love.load()
 	love.keyboard.setKeyRepeat(true)
 	landerImg = lg.newImage("assets/lander.png")    -- Load lander image
 
+  dampening = false
   VEL_DEBUG = false
   FORCE_DEBUG = false
   mouseX, mouseY = 0, 0
@@ -63,9 +64,8 @@ function love.keypressed(key)
 	elseif key == "-" and plSize > 1 then
 		plSize = plSize - 1
   elseif key == "t" then
-    players[1].angularDampeners = not players[1].angularDampeners
+    dampening = not dampening
   end
-
   -- player 1 controls
   if key == "w" then
     if players[1] == nil then
@@ -100,7 +100,7 @@ function love.draw()
   lg.print("Object Count: "..#planets+#players, 10, 24)
 
 	if plSize > 0 then
-		lg.print("Size: "..plSize, 10, 68)
+		lg.print("Size: "..plSize, 10, 82)
 	end
 
   if FORCE_DEBUG then
@@ -116,6 +116,14 @@ function love.draw()
     lg.setColor({0.3, 0.3, 0.3})
   end
   lg.print("V: Velocity debug", 10, 54)
+
+  if dampening then
+    lg.setColor({1, 1 ,1})
+  else
+    lg.setColor({0.3, 0.3, 0.3})
+  end
+  lg.print("T: Angular Dampeners", 10, 68)
+  lg.setColor({1, 1, 1})
 
   for i=1, #planets do
     planets[i]:draw()

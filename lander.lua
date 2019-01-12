@@ -28,7 +28,6 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.Type = "lander"
   l.mass = l.body:getMass()
 
-  l.angularDampeners = false
   l.turnKeyDown = false
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
@@ -69,7 +68,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
 
   function l:reactionControl(delT)
     local v = self.body:getAngularVelocity()
-    v = (v/LD_DAMPENING^delT)   -- y = y/10^x == slope from y=1
+    v = (v/LD_DAMPENING^delT)   -- y = y/LD_DAMPENING^x == slope from y=1
     self.body:setAngularVelocity(v)
   end
 
@@ -104,7 +103,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
     self.fTotalX, self.fTotalY = self.fTotalX+tX, self.fTotalY+tY
     self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
 
-    if self.angularDampeners and (not self.turnKeyDown) then
+    if dampening and (not self.turnKeyDown) then
       self:reactionControl(dt)
     end
   end
