@@ -22,7 +22,7 @@ function love.load()
   VEL_DEBUG = false
   FORCE_DEBUG = false
   mouseX, mouseY = 0, 0
-  love.physics.setMeter(1)
+  love.physics.setMeter(SCALE)
   world = love.physics.newWorld(0, 0, true)
   planets, players = loadLvl(1)
   if players == nil then
@@ -62,6 +62,8 @@ function love.keypressed(key)
 		plSize = plSize + 1
 	elseif key == "-" and plSize > 1 then
 		plSize = plSize - 1
+  elseif key == "t" then
+    players[1].angularDampeners = not players[1].angularDampeners
   end
 
   -- player 1 controls

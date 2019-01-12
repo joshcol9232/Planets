@@ -1,12 +1,13 @@
 require "debugFuncs"
 require "gravFuncs"
+require "constants"
 
 function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
   l.id = id
 	l.w     = w
   l.h     = h
-  l.d     = d
+  l.d     = d*SCALE
 	l.r     = math.max(w, h) -- For compatibilty with planet bois
 
   l.leftKey  = "a"
@@ -25,12 +26,16 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
   l.fixture:setRestitution(0.2)
   l.Type = "lander"
+  l.mass = l.body:getMass()
+
+  l.angularDampeners = false
+  l.turnKeyDown = false
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
-  l.rotationFactor = 100000000
+  l.rotationFactor = l.mass*1000
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
   l.thrustChange = 0.04       -- Amount the thrust changes when changing thrust
-  l.maxThrust = 6520000000--65200000  -- Maximum thrust
+  l.maxThrust = l.mass*10000  -- Maximum thrust
 
   l.body:setLinearVelocity(velx, vely)
 
@@ -62,11 +67,19 @@ function Lander(id, x, y, velx, vely, w, h, d)
     self.body:applyTorque(self.rotationFactor)
   end
 
+  function l:reactionControl(delT)
+    local v = self.body:getAngularVelocity()
+    v = (v/LD_DAMPENING^delT)   -- y = y/10^x == slope from y=1
+    self.body:setAngularVelocity(v)
+  end
+
   function l:update(dt)
-    if love.keyboard.isDown(self.leftKey) then
+    local leftD, rightD = love.keyboard.isDown(self.leftKey), love.keyboard.isDown(self.rightKey)
+    self.turnKeyDown = leftD or rightD
+    if leftD then
       self:turnLeft()
     end
-    if love.keyboard.isDown(self.rightKey) then
+    if rightD then
       self:turnRight()
     end
     if love.keyboard.isDown(self.upKey) then
@@ -74,12 +87,6 @@ function Lander(id, x, y, velx, vely, w, h, d)
     else
       self:changeThrust(-0.06)
     end
-
-    -- contacts = self.body:getContacts()
-    -- if #contacts > 0 then
-    --   print("Touching something")
-    --   self:destroySelf()
-    -- end
 
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do
@@ -95,14 +102,18 @@ function Lander(id, x, y, velx, vely, w, h, d)
 
     local tX, tY = self:thrust()
     self.fTotalX, self.fTotalY = self.fTotalX+tX, self.fTotalY+tY
-    print(self.body:getLinearVelocity())
-    self.body:applyForce(self.fTotalX, self.fTotalY)
+    self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
+
+    if self.angularDampeners and (not self.turnKeyDown) then
+      self:reactionControl(dt)
+    end
   end
 
   function l:draw()
     lg.setColor({1, 1, 1})
 		lg.push()
 			lg.translate(self.body:getX(), self.body:getY())
+      lg.print(self.id, 0, -25)
 			lg.rotate(self.body:getAngle())
 			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
 			lg.draw(landerImg, -self.w/2, -self.h/2)

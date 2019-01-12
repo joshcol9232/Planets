@@ -1,12 +1,13 @@
 require "debug"
 require "gravFuncs"
+require "constants"
 
 function Planet(id, x, y, velx, vely, r, d)
   print(id, x, y, velx, vely, r, d)
   local p = {}
   p.id    = id
   p.r     = r
-  p.d     = d
+  p.d     = d*SCALE
 
   p.body    = love.physics.newBody(world, x, y, "dynamic")
   p.shape   = love.physics.newCircleShape(r)
@@ -31,7 +32,7 @@ function Planet(id, x, y, velx, vely, r, d)
       local dx, dy = getGravForce(self, players[i])
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
-    self.body:applyForce(self.fTotalX, self.fTotalY)
+    self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
   end
 
   function p:draw()
