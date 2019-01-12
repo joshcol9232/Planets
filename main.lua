@@ -4,6 +4,8 @@ require "lander"
 require "misc"
 require "levels"
 
+debugGraph = require "debugGraph"
+
 lg = love.graphics
 
 function resetWorld()
@@ -18,6 +20,9 @@ function love.load()
 	plSize = 1
 	love.keyboard.setKeyRepeat(true)
 	landerImg = lg.newImage("assets/lander.png")    -- Load lander image
+
+  fpsGraph = debugGraph:new('fps', 0, 96)
+  memGraph = debugGraph:new('mem', 0, 126)
 
   dampening = false
   VEL_DEBUG = false
@@ -92,6 +97,10 @@ function love.update(dt)
   for i=1, #players do
     players[i]:update(dt)
   end
+
+  -- Update the graphs
+  fpsGraph:update(dt)
+  memGraph:update(dt)
 end
 
 function love.draw()
@@ -140,6 +149,10 @@ function love.draw()
 		lg.setColor({0, 1, 0})
 		lg.print("Player 2 press UP to join.", 400, 10)
 	end
+
+  lg.setColor({1, 1, 1})
+  fpsGraph:draw()
+  memGraph:draw()
 end
 
 function drawGridOfPlanets(mouseX, mouseY, x, y, size)
