@@ -13,6 +13,7 @@ function resetWorld()
   world = love.physics.newWorld(0, 0, true)
   planets = {}
   players = {}
+  bullets = {}
 end
 
 function love.load()
@@ -34,6 +35,7 @@ function love.load()
   if players == nil then
     players = {}
   end
+  bullets = {}
 end
 
 function love.mousepressed(x, y, button)
@@ -98,6 +100,10 @@ function love.update(dt)
     players[i]:update(dt)
   end
 
+  for i=1, #bullets do
+    bullets[i]:update()
+  end
+
   -- Update the graphs
   fpsGraph:update(dt)
   memGraph:update(dt)
@@ -106,7 +112,7 @@ end
 function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
-  lg.print("Object Count: "..#planets+#players, 10, 24)
+  lg.print("Object Count: "..#planets+#players+#bullets, 10, 24)
 
 	if plSize > 0 then
 		lg.print("Size: "..plSize, 10, 82)
@@ -140,6 +146,10 @@ function love.draw()
 
   for i=1, #players do
     players[i]:draw()
+  end
+
+  for i=1, #bullets do
+    bullets[i]:draw()
   end
 
   if #players < 1 then

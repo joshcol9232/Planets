@@ -1,6 +1,7 @@
 require "debugFuncs"
 require "gravFuncs"
 require "constants"
+require "bullet"
 
 function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
@@ -14,11 +15,13 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.rightKey = "d"
   l.upKey    = "w"
   l.downKey  = "s"
+  l.fireKey  = "e"
   if l.id == 9999999 then
     l.leftKey  = "left"
     l.rightKey = "right"
     l.upKey    = "up"
     l.downKey  = "down"
+    l.fireKey  = "kp0" -- Key pad 0
   end
 
   l.body    = love.physics.newBody(world, x, y, "dynamic")
@@ -85,6 +88,10 @@ function Lander(id, x, y, velx, vely, w, h, d)
       self:changeThrust(self.thrustChange)
     else
       self:changeThrust(-0.06)
+    end
+
+    if love.keyboard.isDown(self.fireKey) then
+      Bullet(self.body:getX(), self.body:getY()+self.h, BLT_VELOCITY, BLT_VELOCITY, BLT_DIMENSION, BLT_DIMENSION, BLT_DENSITY, self.body:getAngle())
     end
 
     self.fTotalX, self.fTotalY = 0, 0
