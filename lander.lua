@@ -82,7 +82,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
     local b = Bullet(self.body:getX()+(math.sin(angle)*self.w/2), --Stored in temporary variable, and also put in bullets table
                      self.body:getY()-(math.cos(angle)*self.h/2),
                      BLT_VELOCITY,
-                     BLT_DIMENSION, BLT_DIMENSION,
+                     BLT_DIMENSION, BLT_DIMENSION*2,
                      BLT_DENSITY,
                      angle,
                      self.body:getLinearVelocity())

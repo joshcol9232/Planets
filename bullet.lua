@@ -4,7 +4,7 @@ require "gravFuncs"
 function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   local b = {}
   b.w     = w
-  b.h     = h*2
+  b.h     = h
   b.d     = d*SCALE
   b.r     = math.max(w, h) -- For compatibilty with planet bois
 
