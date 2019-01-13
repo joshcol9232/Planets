@@ -19,12 +19,12 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
 
   function b:update()
     self.fTotalX, self.fTotalY = 0, 0
-    for i=1, #planets do
-      local dx, dy = getGravForce(self, planets[i])
+    for i=1, #bodies.planets do
+      local dx, dy = getGravForce(self, bodies.planets[i])
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
-    for i=1, #players do
-      local dx, dy = getGravForce(self, players[i])
+    for i=1, #bodies.players do
+      local dx, dy = getGravForce(self, bodies.players[i])
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
 
@@ -56,6 +56,6 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   local velX, velY = b:getVelXY(vel, rotation)
   b.body:setLinearVelocity(velX+parentVelX, velY+parentVelY)
 
-  table.insert(bullets, b)
+  table.insert(bodies.bullets, b)
   return b
 end

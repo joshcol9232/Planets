@@ -21,15 +21,15 @@ function Planet(id, x, y, velx, vely, r, d)
 
   function p:update(dt)
     self.fTotalX, self.fTotalY = 0, 0
-    for i=1, #planets do
-      if planets[i].id.num ~= self.id.num then
-        local dx, dy = getGravForce(self, planets[i])
+    for i=1, #bodies.planets do
+      if bodies.planets[i].id.num ~= self.id.num then
+        local dx, dy = getGravForce(self, bodies.planets[i])
         self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end
     end
 
-    for i=1, #players do
-      local dx, dy = getGravForce(self, players[i])
+    for i=1, #bodies.players do
+      local dx, dy = getGravForce(self, bodies.players[i])
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
     self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)

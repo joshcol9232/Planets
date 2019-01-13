@@ -31,6 +31,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.mass = l.body:getMass()
 
   l.turnKeyDown = false
+  l.targetOn = false
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
   l.rotationFactor = l.mass*1000
@@ -76,10 +77,14 @@ function Lander(id, x, y, velx, vely, w, h, d)
     self.body:setAngularVelocity(v)
   end
 
+  function l:getXYTopOfObj(angle)
+    return self.body:getX()+(math.sin(angle)*self.w/2), self.body:getY()-(math.cos(angle)*self.h/2)
+  end
+
   function l:fireBullet()
     local angle = self.body:getAngle()
-    local b = Bullet(self.body:getX()+(math.sin(angle)*self.w/2), --Stored in temporary variable, and also put in bullets table
-                     self.body:getY()-(math.cos(angle)*self.h/2),
+    local topX, topY = self:getXYTopOfObj(angle)
+    local b = Bullet(topX, topY,
                      BLT_VELOCITY,
                      BLT_DIMENSION, BLT_DIMENSION*2,
                      BLT_DENSITY,
@@ -88,6 +93,32 @@ function Lander(id, x, y, velx, vely, w, h, d)
 
     local fx, fy = b.body:getLinearVelocity()
     self.body:applyForce(-fx*b.body:getMass(), -fy*b.body:getMass())
+  end
+
+  function l:getNearestPlayer() -- In lander so that the user gets the view of what lander to target
+    local closestPlayer = {dist=-1, player=nil}
+    for i=1, #bodies.players do
+      if bodies.players[i].id.num ~= self.id.num then
+        local distance = love.physics.getDistance(self.fixture, bodies.players[i].fixture)
+        if closestPlayer.dist < distance then
+          closestPlayer = {dist=distance, player=bodies.players[i]}
+        end
+      end
+    end
+    return closestPlayer.player, closestPlayer.dist
+  end
+
+  function l:drawMissileTarget(otherPl)
+    lg.setColor({1, 0, 0})
+    local otherX, otherY = otherPl.body:getX(), otherPl.body:getY()
+
+    lg.line(otherX-20, otherY-20, otherX-20, otherY+20) -- Furthest left large
+    lg.line(otherX-20, otherY-20, otherX-10, otherY-20) -- Furthest left two smaller parts
+    lg.line(otherX-20, otherY+20, otherX-10, otherY+20)
+
+    lg.line(otherX+20, otherY-20, otherX+20, otherY+20) -- Furthest right large
+    lg.line(otherX+20, otherY-20, otherX+10, otherY-20) -- Furthest right smaller parts
+    lg.line(otherX+20, otherY+20, otherX+10, otherY+20)
   end
 
   function l:update(dt)
@@ -114,13 +145,13 @@ function Lander(id, x, y, velx, vely, w, h, d)
     end
 
     self.fTotalX, self.fTotalY = 0, 0
-    for i=1, #planets do
-      local dx, dy = getGravForce(self, planets[i])
+    for i=1, #bodies.planets do
+      local dx, dy = getGravForce(self, bodies.planets[i])
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
-    for i=1, #players do
-      if players[i].id.num ~= self.id.num then
-        local dx, dy = getGravForce(self, players[i])
+    for i=1, #bodies.players do
+      if bodies.players[i].id.num ~= self.id.num then
+        local dx, dy = getGravForce(self, bodies.players[i])
         self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end
     end
@@ -147,6 +178,11 @@ function Lander(id, x, y, velx, vely, w, h, d)
 			lg.setColor({1, 0, 0})
 		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*20))
 		lg.pop()
+
+    if self.targetOn and #bodies.players > 1 then
+      local otherPl, dist = self:getNearestPlayer()
+      self:drawMissileTarget(otherPl)
+    end
 
     if VEL_DEBUG then
       debugVel(self)
