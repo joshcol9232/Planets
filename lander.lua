@@ -28,7 +28,6 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.shape   = love.physics.newRectangleShape(w, h)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
   l.fixture:setRestitution(0.2)
-  l.Type = "lander"
   l.mass = l.body:getMass()
 
   l.turnKeyDown = false
