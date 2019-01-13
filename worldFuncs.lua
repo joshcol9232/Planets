@@ -15,7 +15,6 @@ end
 
 function destroyBullet(i) -- index of bullet in bullet table
   bullets[i].body:destroy()
-  bullets[i] = nil
   table.remove(bullets, i)
 end
 
