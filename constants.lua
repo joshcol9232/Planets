@@ -10,7 +10,7 @@ LD_FIRE_RATE = 0.1  -- Seconds between firing a bullet
 
 BLT_DENSITY = 11340 -- Density of lead
 BLT_DIMENSION = 2
-BLT_VELOCITY = 300
+BLT_VELOCITY = 400
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700

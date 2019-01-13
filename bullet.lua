@@ -13,6 +13,7 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   b.fixture = love.physics.newFixture(b.body, b.shape, b.d)
   b.fixture:setRestitution(0.2)
   b.body:setAngle(rotation)
+  b.body:setBullet(true)
 
   b.Type = "bullet"
 
