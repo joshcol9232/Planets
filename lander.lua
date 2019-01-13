@@ -2,6 +2,7 @@ require "debugFuncs"
 require "gravFuncs"
 require "constants"
 require "bullet"
+require "missile"
 
 function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
@@ -42,6 +43,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.body:setLinearVelocity(velx, vely)
 
   l.lastFire = love.timer.getTime()
+  l.otherPl = nil
 
   function l:destroySelf()
     self.body:destroy()
@@ -84,15 +86,19 @@ function Lander(id, x, y, velx, vely, w, h, d)
   function l:fireBullet()
     local angle = self.body:getAngle()
     local topX, topY = self:getXYTopOfObj(angle)
-    local b = Bullet(topX, topY,
-                     BLT_VELOCITY,
-                     BLT_DIMENSION, BLT_DIMENSION*2,
-                     BLT_DENSITY,
-                     angle,
-                     self.body:getLinearVelocity())
+    local b = Bullet(topX, topY, BLT_VELOCITY, BLT_DIMENSION, BLT_DIMENSION*2, BLT_DENSITY, angle, self.body:getLinearVelocity())
 
     local fx, fy = b.body:getLinearVelocity()
     self.body:applyForce(-fx*b.body:getMass(), -fy*b.body:getMass())
+  end
+
+  function l:fireMissile()  -- x, y, vel, w, h, d, rotation, parentVelX, parentVelY, target, homing
+    local angle = self.body:getAngle()
+    local topX, topY = self:getXYTopOfObj(angle)
+    local vX, vY = self.body:getLinearVelocity()
+    local m = Missile(topX, topY, 50, MS_DIMENSION_X, MS_DIMENSION_Y, MS_DENSITY, angle, vX, vY, self.otherPl, true)
+    local fx, fy = m.body:getLinearVelocity()
+    self.body:applyForce(-fx*m.body:getMass(), -fy*m.body:getMass())
   end
 
   function l:getNearestPlayer() -- In lander so that the user gets the view of what lander to target
@@ -180,8 +186,8 @@ function Lander(id, x, y, velx, vely, w, h, d)
 		lg.pop()
 
     if self.targetOn and #bodies.players > 1 then
-      local otherPl, dist = self:getNearestPlayer()
-      self:drawMissileTarget(otherPl)
+      self.otherPl, dist = self:getNearestPlayer()
+      self:drawMissileTarget(self.otherPl)
     end
 
     if VEL_DEBUG then

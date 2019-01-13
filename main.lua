@@ -62,16 +62,23 @@ function love.keypressed(key)
     dampening = not dampening
   elseif key == "b" then
     clearBullets()
-  elseif key == "x" then
-    if bodies.players[1] ~= nil then
-      bodies.players[1].targetOn = not bodies.players[1].targetOn
-    end
 
   -- player 1 controls
   elseif key == "w" then
     if bodies.players[1] == nil then
       local mX, mY = love.mouse.getPosition()
       table.insert(bodies.players, Lander({type="l", num=1}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
+    end
+
+  elseif key == "x" then
+    if bodies.players[1] ~= nil and #bodies.players > 1 then
+      bodies.players[1].targetOn = not bodies.players[1].targetOn
+    end
+  elseif key == "space" then
+    if bodies.players[1] ~= nil then
+      if bodies.players[1].targetOn then
+        bodies.players[1]:fireMissile()
+      end
     end
 
 	-- player 2 controls
@@ -85,17 +92,12 @@ end
 
 function love.update(dt)
   world:update(dt)
-  for i=1, #bodies.planets do
-    bodies.planets[i]:update(dt)
-  end
-
-  for i=1, #bodies.players do
-    bodies.players[i]:update(dt)
-  end
-
   checkBulletsInBounds()
-  for i=1, #bodies.bullets do
-    bodies.bullets[i]:update()
+
+  for _, j in pairs(bodies) do
+    for x=1, #j do
+      j[x]:update(dt)
+    end
   end
 
   -- Update the graphs
@@ -106,7 +108,7 @@ end
 function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
-  lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets, 10, 24)
+  lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
 
 	if plSize > 0 then
 		lg.print("Size: "..plSize, 10, 82)
@@ -134,16 +136,10 @@ function love.draw()
   lg.print("T: Angular Dampeners", 10, 68)
   lg.setColor({1, 1, 1})
 
-  for i=1, #bodies.planets do
-    bodies.planets[i]:draw()
-  end
-
-  for i=1, #bodies.players do
-    bodies.players[i]:draw()
-  end
-
-  for i=1, #bodies.bullets do
-    bodies.bullets[i]:draw()
+  for _, j in pairs(bodies) do
+    for x=1, #j do
+      j[x]:draw()
+    end
   end
 
   if #bodies.players < 1 then

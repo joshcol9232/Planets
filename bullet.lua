@@ -1,5 +1,6 @@
 require "constants"
 require "gravFuncs"
+require "misc"
 
 function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   local b = {}
@@ -15,9 +16,7 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   b.body:setAngle(rotation)
   b.body:setBullet(true)
 
-  b.Type = "bullet"
-
-  function b:update()
+  function b:update(dt)
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #bodies.planets do
       local dx, dy = getGravForce(self, bodies.planets[i])
@@ -49,11 +48,7 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
     end
   end
 
-  function b:getVelXY(vel, angle)
-    return math.sin(angle)*vel, -math.cos(angle)*vel
-  end
-
-  local velX, velY = b:getVelXY(vel, rotation)
+  local velX, velY = getComponent(vel, rotation)
   b.body:setLinearVelocity(velX+parentVelX, velY+parentVelY)
 
   table.insert(bodies.bullets, b)
