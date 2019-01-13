@@ -22,7 +22,7 @@ function Planet(id, x, y, velx, vely, r, d)
   function p:update(dt)
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #planets do
-      if planets[i].id ~= self.id then
+      if planets[i].id.num ~= self.id.num then
         local dx, dy = getGravForce(self, planets[i])
         self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end

@@ -5,7 +5,7 @@ require "bullet"
 
 function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
-  l.id = id
+  l.id    = id
 	l.w     = w
   l.h     = h
   l.d     = d*SCALE
@@ -16,7 +16,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.upKey    = "w"
   l.downKey  = "s"
   l.fireKey  = "e"
-  if l.id == 9999999 then
+  if l.id.num == 9999999 then
     l.leftKey  = "left"
     l.rightKey = "right"
     l.upKey    = "up"
@@ -120,7 +120,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
     for i=1, #players do
-      if players[i].id ~= self.id then
+      if players[i].id.num ~= self.id.num then
         local dx, dy = getGravForce(self, players[i])
         self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
       end
@@ -139,8 +139,8 @@ function Lander(id, x, y, velx, vely, w, h, d)
     lg.setColor({1, 1, 1})
 		lg.push()
 			lg.translate(self.body:getX(), self.body:getY())
-      if self.id == 9999999 then lg.print("2", 0, -25) else
-        lg.print(self.id, 0, -25)
+      if self.id.num == 9999999 then lg.print("2", 0, -25) else
+        lg.print(self.id.num, 0, -25)
       end
 			lg.rotate(self.body:getAngle())
 			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)

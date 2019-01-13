@@ -19,14 +19,16 @@ function destroyBullet(i) -- index of bullet in bullet table
 end
 
 function checkBulletsInBounds()
-  local w, h = love.graphics.getDimensions() -- In case the window changes size
-  local i = 1
-  while i <= #bullets do
-    local x, y = bullets[i].body:getX(), bullets[i].body:getY()
-    if x < 0 or x > w or y < 0 or y > h then
-      destroyBullet(i)
-    else
-      i = i + 1
+  if #bullets > 0 then
+    local w, h = love.graphics.getDimensions() -- In case the window changes size
+    local i = 1
+    while i <= #bullets do
+      local x, y = bullets[i].body:getX(), bullets[i].body:getY()
+      if x < 0 or x > w or y < 0 or y > h then
+        destroyBullet(i)
+      else
+        i = i + 1
+      end
     end
   end
 end

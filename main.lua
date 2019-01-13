@@ -37,7 +37,7 @@ end
 
 function love.mousereleased(x, y, button)
   if button == 1 then
-    table.insert(planets, Planet(#planets+1, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY))
+    table.insert(planets, Planet({type="p", num=#planets+1}, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY))
   end
 
   if button == 2 then
@@ -72,7 +72,7 @@ function love.keypressed(key)
   if key == "w" then
     if players[1] == nil then
       local mX, mY = love.mouse.getPosition()
-       table.insert(players, Lander(1, mX, mY, 0, 0, 20, 20, LD_DENSITY))
+       table.insert(players, Lander({type="l", num=1}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
 
@@ -80,7 +80,7 @@ function love.keypressed(key)
   if key == "up" then
 		if players[2] == nil then
 			local mX, mY = love.mouse.getPosition()
-        table.insert(players, Lander(9999999, mX, mY, 0, 0, 20, 20, LD_DENSITY))
+        table.insert(players, Lander({type="l", num=9999999}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
 end
@@ -169,7 +169,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 
   for i=0, num do
 		for j=0, num do
-			table.insert(planets, Planet(#planets+1, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY))
+			table.insert(planets, Planet({type="p", num=#planets+1}, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY))
 		end
   end
 end

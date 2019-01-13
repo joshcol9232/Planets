@@ -24,10 +24,8 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
       self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
     for i=1, #players do
-      if players[i].id ~= self.id then
-        local dx, dy = getGravForce(self, players[i])
-        self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
-      end
+      local dx, dy = getGravForce(self, players[i])
+      self.fTotalX, self.fTotalY = self.fTotalX + dx, self.fTotalY + dy
     end
 
     self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
