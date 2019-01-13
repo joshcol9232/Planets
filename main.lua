@@ -3,18 +3,11 @@ require "planet"
 require "lander"
 require "misc"
 require "levels"
+require "worldFuncs"
 
 debugGraph = require "debugGraph"
 
 lg = love.graphics
-
-function resetWorld()
-  world:destroy()
-  world = love.physics.newWorld(0, 0, true)
-  planets = {}
-  players = {}
-  bullets = {}
-end
 
 function love.load()
   love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -72,6 +65,8 @@ function love.keypressed(key)
 		plSize = plSize - 1
   elseif key == "t" then
     dampening = not dampening
+  elseif key == "b" then
+    clearBullets()
   end
   -- player 1 controls
   if key == "w" then
@@ -100,6 +95,7 @@ function love.update(dt)
     players[i]:update(dt)
   end
 
+  checkBulletsInBounds()
   for i=1, #bullets do
     bullets[i]:update()
   end

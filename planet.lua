@@ -1,5 +1,5 @@
-require "debug"
 require "gravFuncs"
+require "debugFuncs"
 require "constants"
 
 function Planet(id, x, y, velx, vely, r, d)

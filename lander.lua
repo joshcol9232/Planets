@@ -41,6 +41,8 @@ function Lander(id, x, y, velx, vely, w, h, d)
 
   l.body:setLinearVelocity(velx, vely)
 
+  l.lastFire = love.timer.getTime()
+
   function l:destroySelf()
     self.body:destroy()
     print(self, player1, "Self should be nil")
@@ -75,6 +77,20 @@ function Lander(id, x, y, velx, vely, w, h, d)
     self.body:setAngularVelocity(v)
   end
 
+  function l:fireBullet()
+    local angle = self.body:getAngle()
+    local b = Bullet(self.body:getX()+(math.sin(angle)*self.w/2), --Stored in temporary variable, and also put in bullets table
+                     self.body:getY()-(math.cos(angle)*self.h/2),
+                     BLT_VELOCITY,
+                     BLT_DIMENSION, BLT_DIMENSION,
+                     BLT_DENSITY,
+                     angle,
+                     self.body:getLinearVelocity())
+
+    local fx, fy = b.body:getLinearVelocity()
+    self.body:applyForce(-fx*b.body:getMass(), -fy*b.body:getMass())
+  end
+
   function l:update(dt)
     local leftD, rightD = love.keyboard.isDown(self.leftKey), love.keyboard.isDown(self.rightKey)
     self.turnKeyDown = leftD or rightD
@@ -91,7 +107,11 @@ function Lander(id, x, y, velx, vely, w, h, d)
     end
 
     if love.keyboard.isDown(self.fireKey) then
-      Bullet(self.body:getX(), self.body:getY()+self.h, BLT_VELOCITY, BLT_VELOCITY, BLT_DIMENSION, BLT_DIMENSION, BLT_DENSITY, self.body:getAngle())
+      local currTime = love.timer.getTime()
+      if currTime-self.lastFire > LD_FIRE_RATE then
+        self.lastFire = currTime
+        self:fireBullet()
+      end
     end
 
     self.fTotalX, self.fTotalY = 0, 0

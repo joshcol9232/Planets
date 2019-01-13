@@ -1,10 +1,10 @@
 require "constants"
 require "gravFuncs"
 
-function Bullet(x, y, velx, vely, w, h, d, rotation)
+function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   local b = {}
   b.w     = w
-  b.h     = h
+  b.h     = h*2
   b.d     = d*SCALE
   b.r     = math.max(w, h) -- For compatibilty with planet bois
 
@@ -39,7 +39,23 @@ function Bullet(x, y, velx, vely, w, h, d, rotation)
       lg.setColor({1, 0.2, 0})
       lg.rectangle("fill", -self.w/2, -self.h/2, self.w, self.h)
     lg.pop()
+
+
+    if VEL_DEBUG then
+      debugVel(self)
+    end
+
+    if FORCE_DEBUG then
+      debugForce(self)
+    end
   end
+
+  function b:getVelXY(vel, angle)
+    return math.sin(angle)*vel, -math.cos(angle)*vel
+  end
+
+  local velX, velY = b:getVelXY(vel, rotation)
+  b.body:setLinearVelocity(velX+parentVelX, velY+parentVelY)
 
   table.insert(bullets, b)
   return b
