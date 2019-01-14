@@ -3,7 +3,6 @@ require "debugFuncs"
 require "constants"
 
 function Planet(id, x, y, velx, vely, r, d)
-  print(id, x, y, velx, vely, r, d)
   local p = {}
   p.id    = id
   p.r     = r
@@ -16,7 +15,6 @@ function Planet(id, x, y, velx, vely, r, d)
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
 
-  print(velx, vely, "Start Velocity")
   p.body:setLinearVelocity(velx, vely)
 
   function p:update(dt)

@@ -22,7 +22,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
     l.rightKey = "right"
     l.upKey    = "up"
     l.downKey  = "down"
-    l.fireKey  = "kp0" -- Key pad 0
+    l.fireKey  = "pageup" -- Key pad 0
   end
 
   l.body    = love.physics.newBody(world, x, y, "dynamic")
@@ -89,14 +89,14 @@ function Lander(id, x, y, velx, vely, w, h, d)
     local b = Bullet(topX, topY, BLT_VELOCITY, BLT_DIMENSION, BLT_DIMENSION*2, BLT_DENSITY, angle, self.body:getLinearVelocity())
 
     local fx, fy = b.body:getLinearVelocity()
-    self.body:applyForce(-fx*b.body:getMass(), -fy*b.body:getMass())
+    self.body:applyForce(-fx*b.body:getMass()*BLT_RECOIL, -fy*b.body:getMass()*BLT_RECOIL)
   end
 
   function l:fireMissile()  -- x, y, vel, w, h, d, rotation, parentVelX, parentVelY, target, homing
     local angle = self.body:getAngle()
     local topX, topY = self:getXYTopOfObj(angle)
     local vX, vY = self.body:getLinearVelocity()
-    local m = Missile(topX, topY, 50, MS_DIMENSION_X, MS_DIMENSION_Y, MS_DENSITY, angle, vX, vY, self.otherPl, true)
+    local m = Missile(topX, topY, MS_VEL, MS_DIMENSION_X, MS_DIMENSION_Y, MS_DENSITY, angle, vX, vY, self.otherPl, true)
     local fx, fy = m.body:getLinearVelocity()
     self.body:applyForce(-fx*m.body:getMass(), -fy*m.body:getMass())
   end
@@ -127,7 +127,14 @@ function Lander(id, x, y, velx, vely, w, h, d)
     lg.line(otherX+20, otherY+20, otherX+10, otherY+20)
   end
 
+  function l:turn(x, y, oX, oY)  -- Current angle from target
+    local selfAngle = ((self.body:getAngle()+(math.pi/2)) % (2*math.pi))
+    local targAngle = ((getAngle(x, y, oX, oY)+(math.pi))%(2*math.pi))
+    print(targAngle-selfAngle, targAngle, selfAngle)--, selfAngle)--, targAngle-selfAngle)
+  end
+
   function l:update(dt)
+    --self:turn(self.body:getX(), self.body:getY(), 500, 350)
     local leftD, rightD = love.keyboard.isDown(self.leftKey), love.keyboard.isDown(self.rightKey)
     self.turnKeyDown = leftD or rightD
     if leftD then

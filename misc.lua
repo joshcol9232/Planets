@@ -7,7 +7,7 @@ function inTable(table, item)
 	return false
 end
 
-function getAngle(x1,y1, x2,y2)
+function getAngle(x1,y1, x2,y2) --Get angle from Top
 	return math.atan2(y2-y1, x2-x1)
 end
 

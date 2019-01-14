@@ -14,12 +14,14 @@ LD_FIRE_RATE = 0.1  -- Seconds between firing a bullet
 BLT_DENSITY = 11340 -- Density of lead
 BLT_DIMENSION = 2
 BLT_VELOCITY = 400--00
+BLT_RECOIL = 1 -- Multiplyer
 
 -- Missiles
 MS_DENSITY = 675 -- Same as lander density
 MS_DAMPENING = 65
 MS_DIMENSION_X = 2
 MS_DIMENSION_Y = 10
+MS_VEL = 100
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700

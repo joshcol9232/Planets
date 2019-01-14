@@ -16,6 +16,8 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   b.body:setAngle(rotation)
   b.body:setBullet(true)
 
+  b.fTotalX, b.fTotalY = 0, 0
+
   function b:update(dt)
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #bodies.planets do

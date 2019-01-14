@@ -156,10 +156,7 @@ function love.draw()
 end
 
 function drawGridOfPlanets(mouseX, mouseY, x, y, size)
-	local num = 30*(1/size)
-	if num > 10 then
-		num = num/2
-	end
+	local num = 10*(1/size)
 
   for i=0, num do
 		for j=0, num do
