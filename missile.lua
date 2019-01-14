@@ -15,8 +15,8 @@ function Missile(x, y, vel, w, h, d, rotation, parentVelX, parentVelY, target, h
   m.fixture:setRestitution(0.2)
   m.body:setAngle(rotation)
 
-  m.maxThrust = m.body:getMass()*2000  -- Maximum thrust
-  m.maxTurnTq = m.body:getMass()*1000 -- Maximum turning torque
+  m.maxThrust = m.body:getMass()*100  -- Maximum thrust
+  m.maxTurnTq = m.body:getMass()/10 -- Maximum turning torque
 
   m.fTotalX, m.fTotalY = 0, 0  -- Total force on body
 
@@ -25,34 +25,27 @@ function Missile(x, y, vel, w, h, d, rotation, parentVelX, parentVelY, target, h
   m.homing = homing
   m.target = target
 
-  function m:getAngleOfVel(vx, vy)
-    return ((math.atan2(vy, vx)+math.pi) % (2*math.pi))
-  end
 
   function m:tracking()
-    local distance, x, y, oX, oY = love.physics.getDistance(self.fixture, self.target.fixture)
-    local vx, vy = self.body:getLinearVelocity()
-    self:turn(x, y, oX, oY, vx, vy)
-    local fx, fy = self:thrust()
-    self.fTotalX, self.fTotalY = self.fTotalX + fx, self.fTotalY + fy
+    self:turn()
+    self:thrust()
   end
 
-  function m:turn(x, y, oX, oY, vx, vy)  -- Current angle from target
-    --local selfAngle = ((self.body:getAngle()+(math.pi/2)) % (2*math.pi)) --self:getAngleOfVel()
+  function m:turn()
+    local distance, x1, y1, x2, y2 = love.physics.getDistance(self.fixture, self.target.fixture)
+    local angle = self.body:getAngle() % math.pi
+    local theirAngle = getAngle(x1, y1, x2, y2)
 
-    local targAngle = ((getAngle(x, y, oX, oY)+(math.pi))%(2*math.pi))
-    --print(targAngle, selfAngle)--, selfAngle)--, targAngle-selfAngle)
+    local targAngle = angle-theirAngle
+    --local hmm =
+    self.body:setAngle(theirAngle+(math.pi/2))
 
-    local correction = targAngle---selfAngle  -- If negative, then turn right, (too far left), if pos then turn left
-    --+(self:getAngleOfVel()/targAngle)
-
-    --self.body:applyTorque(self.maxTurnTq*(correction-self.body:getAngularVelocity()))
-    self.body:setAngle(correction-(math.pi/2))
+    print(theirAngle, angle, angle-theirAngle)
   end
 
   function m:thrust()
     local angle = self.body:getAngle()
-    return math.sin(angle)*self.maxThrust, -math.cos(angle)*self.maxThrust
+    self.body:applyForce(math.sin(angle)*self.maxThrust, -math.cos(angle)*self.maxThrust)
   end
 
   function m:update(dt)

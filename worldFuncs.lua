@@ -30,3 +30,19 @@ function checkBulletsInBounds()
     end
   end
 end
+
+function getPlanet(idNum)
+  for i=1, #bodies.planets do
+    if bodies.planets[i].id.num == idNum then
+      return bodies.planets[i], i
+    end
+  end
+end
+
+function removePlanet(idNum)
+  pl, i = getPlanet(idNum)
+  if pl ~= nil then
+    pl.body:destroy()
+    table.remove(bodies.planets, i)
+  end
+end

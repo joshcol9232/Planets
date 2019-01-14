@@ -62,6 +62,10 @@ function love.keypressed(key)
     dampening = not dampening
   elseif key == "b" then
     clearBullets()
+  elseif key == "m" then
+    --for i=1, #bodies.planets do
+    bodies.planets[1]:destroy()
+    --end
 
   -- player 1 controls
   elseif key == "w" then
