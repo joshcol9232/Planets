@@ -15,6 +15,7 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   b.fixture:setRestitution(0.2)
   b.body:setAngle(rotation)
   b.body:setBullet(true)
+  b.fixture:setUserData({parentClass=b, userType="bullet"})
 
   b.fTotalX, b.fTotalY = 0, 0
 

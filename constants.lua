@@ -4,8 +4,10 @@ G = (2*(10^-3))*SCALE -- Gravitational constant, real value = 6.67*(10^-11)
 
 -- Planets
 PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
-PL_SPLIT_FACTOR = 3 -- The number of chunks the planet splits up into when broken.
-PL_SPLIT_SPEED = 10
+--PL_SPLIT_FACTOR = 2 -- The number of chunks the planet splits up into when broken.
+PL_SPLIT_SPEED = 100
+PL_DESTROY_IMP = 100000
+PL_DESTROY_RATE = 0.1 -- A planet can be destroyed every 0.1 seconds
 
 -- Landers
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.

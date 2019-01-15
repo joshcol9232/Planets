@@ -14,6 +14,7 @@ function Missile(x, y, vel, w, h, d, rotation, parentVelX, parentVelY, target, h
   m.fixture = love.physics.newFixture(m.body, m.shape, m.d)
   m.fixture:setRestitution(0.2)
   m.body:setAngle(rotation)
+  m.fixture:setUserData({parentClass=m, userType="missile"})
 
   m.maxThrust = m.body:getMass()*100  -- Maximum thrust
   m.maxTurnTq = m.body:getMass()/10 -- Maximum turning torque
@@ -39,8 +40,6 @@ function Missile(x, y, vel, w, h, d, rotation, parentVelX, parentVelY, target, h
     local targAngle = angle-theirAngle
     --local hmm =
     self.body:setAngle(theirAngle+(math.pi/2))
-
-    print(theirAngle, angle, angle-theirAngle)
   end
 
   function m:thrust()

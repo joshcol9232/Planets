@@ -30,6 +30,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
   l.fixture:setRestitution(0.2)
   l.mass = l.body:getMass()
+  l.fixture:setUserData({parentClass=l, userType="lander"})
 
   l.turnKeyDown = false
   l.targetOn = false
@@ -47,7 +48,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
 
   function l:destroySelf()
     self.body:destroy()
-    print(self, player1, "Self should be nil")
+
   end
 
   function l:thrust()

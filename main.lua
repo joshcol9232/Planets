@@ -18,14 +18,17 @@ function love.load()
   fpsGraph = debugGraph:new('fps', 0, 96)
   memGraph = debugGraph:new('mem', 0, 126)
 
-  dampening = false
+  dampening = true
   VEL_DEBUG = false
   FORCE_DEBUG = false
   mouseX, mouseY = 0, 0
   love.physics.setMeter(SCALE)
   world = love.physics.newWorld(0, 0, true)
+  world:setCallbacks(nil, nil, nil, postSolveCallback)
   bodies = {planets={}, players={}, bullets={}, missiles={}}
   bodies = loadLvl(1)
+  deadBodies = {}
+  timeOfLastPlCollision = love.timer.getTime()
 end
 
 function love.mousepressed(x, y, button)
@@ -96,6 +99,7 @@ end
 
 function love.update(dt)
   world:update(dt)
+  removeDeadBodies()
   checkBulletsInBounds()
 
   for _, j in pairs(bodies) do
@@ -113,6 +117,7 @@ function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
   lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
+  lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
 
 	if plSize > 0 then
 		lg.print("Size: "..plSize, 10, 82)
@@ -161,10 +166,26 @@ end
 
 function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 	local num = 10*(1/size)
-
   for i=0, num do
 		for j=0, num do
 			table.insert(bodies.planets, Planet({type="p", num=#bodies.planets+1}, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY))
 		end
   end
+end
+
+function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentImpulse) -- Box2D callback when collisions happen
+  local currTime = love.timer.getTime()
+  local data1, data2 = fixture1:getUserData(), fixture2:getUserData()
+  --if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
+  if normalImpulse >= PL_DESTROY_IMP then
+    if currTime - timeOfLastPlCollision > PL_DESTROY_RATE then
+      if data1.userType == "planet" then
+        table.insert(deadBodies, data1.parentClass)
+      elseif data2.userType == "planet" then
+        table.insert(deadBodies, data2.parentClass)
+      end
+    end
+    timeOfLastPlCollision = currTime
+  end
+  --end
 end
