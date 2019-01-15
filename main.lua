@@ -100,7 +100,7 @@ end
 function love.update(dt)
   world:update(dt)
   removeDeadBodies()
-  checkBulletsInBounds()
+  checkSmallObjectsInBounds()
 
   for _, j in pairs(bodies) do
     for x=1, #j do
@@ -117,7 +117,7 @@ function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
   lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
-  lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
+  --lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
 
 	if plSize > 0 then
 		lg.print("Size: "..plSize, 10, 82)
@@ -176,16 +176,20 @@ end
 function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentImpulse) -- Box2D callback when collisions happen
   local currTime = love.timer.getTime()
   local data1, data2 = fixture1:getUserData(), fixture2:getUserData()
-  --if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
-  if normalImpulse >= PL_DESTROY_IMP then
-    if currTime - timeOfLastPlCollision > PL_DESTROY_RATE then
-      if data1.userType == "planet" then
-        table.insert(deadBodies, data1.parentClass)
+  if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
+    if (normalImpulse >= PL_DESTROY_IMP) then
+      --if currTime - timeOfLastPlCollision > PL_DESTROY_RATE then
+      if (data1.userType == "planet") then
+        if not data1.parentClass.body:isDestroyed() then
+          table.insert(deadBodies, data1.parentClass)
+        end
       elseif data2.userType == "planet" then
-        table.insert(deadBodies, data2.parentClass)
+        if not data2.parentClass.body:isDestroyed() then
+          table.insert(deadBodies, data2.parentClass)
+        end
       end
+      --end
+      timeOfLastPlCollision = currTime
     end
-    timeOfLastPlCollision = currTime
   end
-  --end
 end

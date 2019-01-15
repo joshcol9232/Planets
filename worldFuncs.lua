@@ -17,12 +17,32 @@ function destroyBullet(i) -- index of bullet in bullet table
   table.remove(bodies.bullets, i)
 end
 
-function checkBulletsInBounds()
-  if #bodies.bullets > 0 then
-    local w, h = love.graphics.getDimensions() -- In case the window changes size
+function checkSmallObjectsInBounds()
+  local blt = bodies.bullets
+  local plt = bodies.planets
+
+  local w, h = love.graphics.getDimensions() -- In case the window changes size
+  if #plt > 0 then
     local i = 1
-    while i <= #bodies.bullets do
-      local x, y = bodies.bullets[i].body:getX(), bodies.bullets[i].body:getY()
+    while i <= #plt do
+      if plt[i].body:isDestroyed() then
+        table.remove(plt, i)
+      else
+        local x, y = plt[i].body:getX(), plt[i].body:getY()
+        if (plt[i].r < 3) and (x < 0 or x > w or y < 0 or y > h) then
+          plt[i].body:destroy()
+          table.remove(plt, i)
+        else
+          i = i + 1
+        end
+      end
+    end
+  end
+
+  if #blt > 0 then
+    local i = 1
+    while i <= #blt do
+      local x, y = blt[i].body:getX(), blt[i].body:getY()
       if x < 0 or x > w or y < 0 or y > h then
         destroyBullet(i)
       else
@@ -44,21 +64,24 @@ function getBodTable(type)
   end
 end
 
-function getBody(type, idNum)
-  local arr = getBodTable(type)
+function getBody(type, idNum, table)
+  if table == nil then
+    table = getBodTable(type)
+  end
 
-  for i=1, #arr do
-    if arr[i].id.num == idNum then
-      return arr[i], i
+  for i=1, #table do
+    if table[i].id.num == idNum then
+      return table[i], i
     end
   end
 end
 
 function removeBody(type, idNum)
-  local b, i = getBody(type, idNum)
+  tabl = getBodTable(type)
+  local b, i = getBody(type, idNum, tabl)
   if b ~= nil then
     b.body:destroy()
-    table.remove(getBodTable(type), i)
+    table.remove(tabl, i)
   end
 end
 
