@@ -30,7 +30,7 @@ function love.load()
   bodies = loadLvl(1)
   deadBodies = {}
   changeHpAfterCollision = {}
-  timeOfLastPlCollision = love.timer.getTime()
+  timeOfLastPlDestruction = 0
   drawLanderImg = false
 
   camera = Camera(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
@@ -197,22 +197,19 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size)
 end
 
 function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentImpulse) -- Box2D callback when collisions happen
-  local currTime = love.timer.getTime()
+  currTime = love.timer.getTime()
   local data1, data2 = fixture1:getUserData(), fixture2:getUserData()
   if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
     if (normalImpulse >= PL_DESTROY_IMP) then
-      if currTime - timeOfLastPlCollision > PL_DESTROY_RATE then
-        if (data1.userType == "planet") then
-          if not data1.parentClass.body:isDestroyed() then
-            table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
-          end
-        elseif data2.userType == "planet" then
-          if not data2.parentClass.body:isDestroyed() then
-            table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
-          end
+      if (data1.userType == "planet") then
+        if not data1.parentClass.body:isDestroyed() then
+          table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
+        end
+      elseif data2.userType == "planet" then
+        if not data2.parentClass.body:isDestroyed() then
+          table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
         end
       end
-      timeOfLastPlCollision = currTime
     end
   end
 

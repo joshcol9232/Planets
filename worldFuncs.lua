@@ -95,9 +95,10 @@ end
 function changeHpAfterCollisionFunc()
   local i = 1
   while i <= #changeHpAfterCollision do
-    if changeHpAfterCollision[i].bod:changeHp(changeHpAfterCollision[i].change) then
+    if changeHpAfterCollision[i].bod:changeHp(changeHpAfterCollision[i].change) then--and currTime - timeOfLastPlDestruction > PL_DESTROY_RATE then
       changeHpAfterCollision[i].bod:destroy()
       table.remove(changeHpAfterCollision, i)
+      timeOfLastPlDestruction = currTime
     else
       table.remove(changeHpAfterCollision, i)
     end
