@@ -19,6 +19,7 @@ BLT_DENSITY = 11340 -- Density of lead
 BLT_DIMENSION = 2
 BLT_VELOCITY = 400--00
 BLT_RECOIL = 1 -- Multiplyer
+BLT_HP_DAMAGE = 100
 
 -- Missiles
 MS_DENSITY = 675 -- Same as lander density
@@ -29,3 +30,8 @@ MS_VEL = 100
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
+
+CAMERA_SPEED = 10
+
+MAP_WIDTH = 4000
+MAP_HEIGHT = 4000

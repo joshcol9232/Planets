@@ -4,6 +4,7 @@ require "lander"
 require "misc"
 require "levels"
 require "worldFuncs"
+require "camera"
 
 debugGraph = require "debugGraph"
 
@@ -28,14 +29,18 @@ function love.load()
   bodies = {planets={}, players={}, bullets={}, missiles={}}
   bodies = loadLvl(1)
   deadBodies = {}
+  changeHpAfterCollision = {}
   timeOfLastPlCollision = love.timer.getTime()
+
+  camera = Camera(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 end
 
 function love.mousepressed(x, y, button)
-  mouseX, mouseY = x, y
+  mouseX, mouseY = camera:translateXY(x, y)
 end
 
 function love.mousereleased(x, y, button)
+  x, y = camera:translateXY(x, y)
   if button == 1 then
     table.insert(bodies.planets, Planet({type="p", num=#bodies.planets+1}, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY))
   end
@@ -99,8 +104,9 @@ end
 
 function love.update(dt)
   world:update(dt)
-  removeDeadBodies()
   checkSmallObjectsInBounds()
+  removeDeadBodies()
+  changeHpAfterCollisionFunc()
 
   for _, j in pairs(bodies) do
     for x=1, #j do
@@ -111,9 +117,22 @@ function love.update(dt)
   -- Update the graphs
   fpsGraph:update(dt)
   memGraph:update(dt)
+
+  camera:update()
 end
 
 function love.draw()
+  lg.push()
+    camera:centerOrigin()
+    camera:zoomDisplay()
+    camera:translateDisplay()
+    for _, j in pairs(bodies) do
+      for x=1, #j do
+        j[x]:draw()
+      end
+    end
+  lg.pop()
+
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
   lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
@@ -145,11 +164,6 @@ function love.draw()
   lg.print("T: Angular Dampeners", 10, 68)
   lg.setColor({1, 1, 1})
 
-  for _, j in pairs(bodies) do
-    for x=1, #j do
-      j[x]:draw()
-    end
-  end
 
   if #bodies.players < 1 then
 		lg.setColor({0, 1, 0})
@@ -181,11 +195,11 @@ function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentIm
       --if currTime - timeOfLastPlCollision > PL_DESTROY_RATE then
       if (data1.userType == "planet") then
         if not data1.parentClass.body:isDestroyed() then
-          table.insert(deadBodies, data1.parentClass)
+          table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-BLT_HP_DAMAGE)})
         end
       elseif data2.userType == "planet" then
         if not data2.parentClass.body:isDestroyed() then
-          table.insert(deadBodies, data2.parentClass)
+          table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-BLT_HP_DAMAGE)})
         end
       end
       --end

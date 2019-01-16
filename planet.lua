@@ -2,6 +2,7 @@ require "gravFuncs"
 require "debugFuncs"
 require "constants"
 require "misc"
+require "hpBar"
 
 function Planet(id, x, y, velx, vely, r, d)
   local p = {}
@@ -17,9 +18,23 @@ function Planet(id, x, y, velx, vely, r, d)
   p.fixture:setRestitution(0.4)
   p.fixture:setUserData({parentClass=p, userType="planet"})
 
+  p.hp = p.body:getMass()/SCALE
+  p.maxHp = p.hp
+  print(p.hp, "Planet hp")
+
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
 
   p.body:setLinearVelocity(velx, vely)
+
+  function p:changeHp(change)
+    self.hp = self.hp+change
+    if self.hp < 0 then
+      self.hp = 0
+      return true
+    elseif self.hp > self.maxHp then
+      self.hp = self.maxHp
+    end
+  end
 
   function p:getSplitVelocities(num)
     local vels = {}
@@ -90,7 +105,15 @@ function Planet(id, x, y, velx, vely, r, d)
     if FORCE_DEBUG then
       debugForce(self)
     end
+
+    if (self.hp < self.maxHp) and (self.hpBar ~= nil) then
+      self.hpBar:draw()
+    end
   end
 
+  --(parent, w, h, pW, pH)
+  if p.r > 4 then
+    p.hpBar = HpBar(p, 70, 10, p.r, p.r)
+  end
   return p
 end

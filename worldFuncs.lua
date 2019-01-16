@@ -21,7 +21,6 @@ function checkSmallObjectsInBounds()
   local blt = bodies.bullets
   local plt = bodies.planets
 
-  local w, h = love.graphics.getDimensions() -- In case the window changes size
   if #plt > 0 then
     local i = 1
     while i <= #plt do
@@ -29,7 +28,7 @@ function checkSmallObjectsInBounds()
         table.remove(plt, i)
       else
         local x, y = plt[i].body:getX(), plt[i].body:getY()
-        if (plt[i].r < 3) and (x < 0 or x > w or y < 0 or y > h) then
+        if (plt[i].r < 3) and (x < 0 or x > MAP_WIDTH or y < 0 or y > MAP_HEIGHT) then
           plt[i].body:destroy()
           table.remove(plt, i)
         else
@@ -43,7 +42,7 @@ function checkSmallObjectsInBounds()
     local i = 1
     while i <= #blt do
       local x, y = blt[i].body:getX(), blt[i].body:getY()
-      if x < 0 or x > w or y < 0 or y > h then
+      if x < 0 or x > MAP_WIDTH or y < 0 or y > MAP_HEIGHT then
         destroyBullet(i)
       else
         i = i + 1
@@ -90,6 +89,18 @@ function removeDeadBodies()  -- Quick, remove the evidence
   while i <= #deadBodies do
     deadBodies[i]:destroy()
     table.remove(deadBodies, i)
+  end
+end
+
+function changeHpAfterCollisionFunc()
+  local i = 1
+  while i <= #changeHpAfterCollision do
+    if changeHpAfterCollision[i].bod:changeHp(changeHpAfterCollision[i].change) then
+      changeHpAfterCollision[i].bod:destroy()
+      table.remove(changeHpAfterCollision, i)
+    else
+      table.remove(changeHpAfterCollision, i)
+    end
   end
 end
 
