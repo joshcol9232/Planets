@@ -3,6 +3,7 @@ require "debugFuncs"
 require "constants"
 require "misc"
 require "hpBar"
+require "splitFunctions"
 
 function Planet(id, x, y, velx, vely, r, d)
   local p = {}
@@ -18,7 +19,7 @@ function Planet(id, x, y, velx, vely, r, d)
   p.fixture:setRestitution(0.4)
   p.fixture:setUserData({parentClass=p, userType="planet"})
 
-  p.hp = p.body:getMass()/SCALE
+  p.hp = (p.body:getMass()/SCALE)*2000
   p.maxHp = p.hp
   print(p.hp, "Planet hp")
 
@@ -36,20 +37,6 @@ function Planet(id, x, y, velx, vely, r, d)
     end
   end
 
-  function p:getSplitVelocities(num)
-    local vels = {}
-    for i=1, math.ceil(num/2) do
-      local totalV = math.random(50, PL_SPLIT_SPEED)
-      local angle = math.random()*math.pi*2 -- Gets number between 0 and 1, then multiplies that by 2pi
-      local dx, dy = totalV*math.cos(angle), totalV*math.sin(angle)
-      table.insert(vels, {x=dx, y=dy})
-    end
-    for i=1, #vels do
-      table.insert(vels, {x=-vels[i].x, y=-vels[i].y})  -- To conserve momentum, half need to have opposite velocity
-    end
-    return vels
-  end
-
   function p:destroy(splitFactor)
     local r = self.shape:getRadius()
     if r > 1 then
@@ -61,7 +48,7 @@ function Planet(id, x, y, velx, vely, r, d)
       removeBody("planet", self.id.num)
       r = r/splitFactor
       local sep = r/2
-      local vels = self:getSplitVelocities(splitFactor^2)
+      local vels = getSplitVelocities(splitFactor^2)
       local a = 0
       for i=1, splitFactor do
         for j=1, splitFactor do
@@ -112,8 +99,6 @@ function Planet(id, x, y, velx, vely, r, d)
   end
 
   --(parent, w, h, pW, pH)
-  if p.r > 4 then
-    p.hpBar = HpBar(p, 70, 10, p.r, p.r)
-  end
+  p.hpBar = HpBar(p, 70, 10, p.r, p.r)
   return p
 end

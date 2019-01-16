@@ -31,8 +31,13 @@ function love.load()
   deadBodies = {}
   changeHpAfterCollision = {}
   timeOfLastPlCollision = love.timer.getTime()
+  drawLanderImg = false
 
   camera = Camera(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+end
+
+function love.wheelmoved(x, y)
+  camera:changeZoom(y/CAMERA_SCROLL_ZOOM_SPEED)
 end
 
 function love.mousepressed(x, y, button)
@@ -74,12 +79,16 @@ function love.keypressed(key)
     --for i=1, #bodies.planets do
     bodies.planets[1]:destroy()
     --end
+  elseif key == "p" then
+    drawLanderImg = not drawLanderImg
+  elseif key == "n" then
+    camera:reset()
 
   -- player 1 controls
   elseif key == "w" then
     if bodies.players[1] == nil then
-      local mX, mY = love.mouse.getPosition()
-      table.insert(bodies.players, Lander({type="l", num=1}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
+      local mX, mY = camera:translateXY(love.mouse.getPosition())
+      table.insert(bodies.players, Lander({type="l", num=1, team="capturer"}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
 
   elseif key == "x" then
@@ -96,8 +105,8 @@ function love.keypressed(key)
 	-- player 2 controls
   elseif key == "up" then
 		if bodies.players[2] == nil then
-			local mX, mY = love.mouse.getPosition()
-        table.insert(bodies.players, Lander({type="l", num=9999999}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
+			local mX, mY = camera:translateXY(love.mouse.getPosition())
+      table.insert(bodies.players, Lander({type="l", num=9999999, team="preventer"}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
 end
@@ -192,18 +201,20 @@ function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentIm
   local data1, data2 = fixture1:getUserData(), fixture2:getUserData()
   if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
     if (normalImpulse >= PL_DESTROY_IMP) then
-      --if currTime - timeOfLastPlCollision > PL_DESTROY_RATE then
-      if (data1.userType == "planet") then
-        if not data1.parentClass.body:isDestroyed() then
-          table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-BLT_HP_DAMAGE)})
-        end
-      elseif data2.userType == "planet" then
-        if not data2.parentClass.body:isDestroyed() then
-          table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-BLT_HP_DAMAGE)})
+      if currTime - timeOfLastPlCollision > PL_DESTROY_RATE then
+        if (data1.userType == "planet") then
+          if not data1.parentClass.body:isDestroyed() then
+            table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
+          end
+        elseif data2.userType == "planet" then
+          if not data2.parentClass.body:isDestroyed() then
+            table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
+          end
         end
       end
-      --end
       timeOfLastPlCollision = currTime
     end
   end
+
+--elseif data1.userType == "lander"
 end

@@ -7,12 +7,14 @@ PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
 PL_HP = 100
 PL_SPLIT_SPEED = 100
 PL_DESTROY_IMP = 100000
-PL_DESTROY_RATE = 0--.05 -- A planet can be destroyed every 0.1 seconds
+PL_DESTROY_RATE = 0.05 -- A planet can be destroyed every 0.1 seconds
 
 -- Landers
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.
-LD_DAMPENING = 65
+LD_DAMPENING = 70
 LD_FIRE_RATE = 0.1  -- Seconds between firing a bullet
+
+landerBody = {-8,-8, 8,-8, 12,8, -12,8}
 
 -- Bullets
 BLT_DENSITY = 11340 -- Density of lead
@@ -32,6 +34,7 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700
 
 CAMERA_SPEED = 10
+CAMERA_SCROLL_ZOOM_SPEED = 14
 
-MAP_WIDTH = 4000
-MAP_HEIGHT = 4000
+MAP_WIDTH = 2000 -- Actuall width goes from -2000 to 2000
+MAP_HEIGHT = 2000

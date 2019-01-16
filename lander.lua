@@ -26,7 +26,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   end
 
   l.body    = love.physics.newBody(world, x, y, "dynamic")
-  l.shape   = love.physics.newRectangleShape(w, h)
+  l.shape   = love.physics.newPolygonShape(landerBody)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
   l.fixture:setRestitution(0.2)
   l.mass = l.body:getMass()
@@ -36,19 +36,36 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.targetOn = false
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
-  l.rotationFactor = l.mass*1000
+  l.rotationFactor = l.mass*600
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
   l.thrustChange = 0.04       -- Amount the thrust changes when changing thrust
   l.maxThrust = l.mass*10000  -- Maximum thrust
+
+  l.captureColour = {0.9, 0.2, 0}
 
   l.body:setLinearVelocity(velx, vely)
 
   l.lastFire = love.timer.getTime()
   l.otherPl = nil
 
-  function l:destroySelf()
-    self.body:destroy()
-
+  function l:destroy()
+    local x, y = self.body:getPosition()
+    local vx, vy = self.body:getLinearVelocity()
+    removeBody("lander", self.id.num)
+    local r = self.r/splitFactor
+    local sep = r/2
+    local vels = getSplitVelocities(splitFactor^2)
+    local a = 0
+    for i=1, splitFactor do
+      for j=1, splitFactor do
+        a = a + 1
+        local p = Planet({type="planet", num=#bodies.planets+1}, (x+(i*sep)), (y+(j*sep)), vx+vels[a].x, vy+vels[a].y, r, PL_DENSITY)
+        table.insert(bodies.planets, p)
+        if math.random(0, 10) == 1 then
+          p:destroy(2)
+        end
+      end
+    end
   end
 
   function l:thrust()
@@ -179,6 +196,13 @@ function Lander(id, x, y, velx, vely, w, h, d)
     end
   end
 
+  function l:drawBody()
+    --lg.push()
+      --lg.translate(-self.w/2, -self.h/2)
+      lg.polygon("line", landerBody)
+    --lg.pop()
+  end
+
   function l:draw()
     lg.setColor({1, 1, 1})
 		lg.push()
@@ -188,7 +212,10 @@ function Lander(id, x, y, velx, vely, w, h, d)
       end
 			lg.rotate(self.body:getAngle())
 			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
-			lg.draw(landerImg, -self.w/2, -self.h/2)
+      if drawLanderImg then
+  			lg.draw(landerImg, -self.w/2, -self.h/2)
+      end
+      self:drawBody()
 			lg.setColor({1, 0, 0})
 		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*20))
 		lg.pop()

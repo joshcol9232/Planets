@@ -28,7 +28,7 @@ function checkSmallObjectsInBounds()
         table.remove(plt, i)
       else
         local x, y = plt[i].body:getX(), plt[i].body:getY()
-        if (plt[i].r < 3) and (x < 0 or x > MAP_WIDTH or y < 0 or y > MAP_HEIGHT) then
+        if (plt[i].r < 3) and (x < -MAP_WIDTH or x > MAP_WIDTH or y < -MAP_HEIGHT or y > MAP_HEIGHT) then
           plt[i].body:destroy()
           table.remove(plt, i)
         else
@@ -42,7 +42,7 @@ function checkSmallObjectsInBounds()
     local i = 1
     while i <= #blt do
       local x, y = blt[i].body:getX(), blt[i].body:getY()
-      if x < 0 or x > MAP_WIDTH or y < 0 or y > MAP_HEIGHT then
+      if x <-MAP_WIDTH or x > MAP_WIDTH or y < -MAP_HEIGHT or y > MAP_HEIGHT then
         destroyBullet(i)
       else
         i = i + 1

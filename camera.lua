@@ -4,6 +4,12 @@ function Camera(x, y)
 	c.y    				= y
 	c.zoom = 1
 
+	function c:reset()
+		self.zoom = 1
+		self:centerOrigin()
+		self.x, self.y = SCREEN_WIDTH/2, SCREEN_HEIGHT/2
+	end
+
 	function c:translateXY(x, y)
 		return (x-SCREEN_WIDTH/2)/self.zoom + self.x, (y-SCREEN_HEIGHT/2)/self.zoom + self.y
 	end
@@ -20,12 +26,9 @@ function Camera(x, y)
 		love.graphics.scale(self.zoom)
 	end
 
-	function c:changeZoom()
-		if love.keyboard.isDown("+", "=") then
-			self.zoom = self.zoom + 0.05
-		end
-		if love.keyboard.isDown("-", "_") then
-			self.zoom = self.zoom - 0.05
+	function c:changeZoom(amount)
+		if self.zoom+amount > 0.2 and self.zoom+amount < 3 then
+			self.zoom = self.zoom + amount
 		end
 	end
 
@@ -46,7 +49,6 @@ function Camera(x, y)
 
 	function c:update()
 		self:move()
-		self:changeZoom()
 	end
 
 	return c
