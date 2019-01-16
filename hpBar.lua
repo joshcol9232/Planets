@@ -23,8 +23,9 @@ function HpBar(parent, width, height, pW, pH)
 
     self:drawFrame(x, y)
 
-    lg.setColor({1, 0, 0})
-    lg.rectangle("fill", x+1, y+1, self.width*(self.parent.hp/self.parent.maxHp)-2, self.height-2) -- -2 for the frame width
+    local normHp = self.parent.hp/self.parent.maxHp
+    lg.setColor({1-normHp, normHp, 0})
+    lg.rectangle("fill", x+1, y+1, self.width*(normHp)-2, self.height-2) -- -2 for the frame width
   end
 
   return h
