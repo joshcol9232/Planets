@@ -80,9 +80,9 @@ function removeBody(type, idNum)
   local b, i = getBody(type, idNum, tabl)
   if b ~= nil then
     b.body:destroy()
-    print("Len before:", #bodies.bullets)
+    --print("Len before:", #bodies.bullets)
     table.remove(tabl, i)
-    print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.bullets)
+    --print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.bullets)
   end
 end
 
@@ -97,7 +97,7 @@ end
 function changeHpAfterCollisionFunc()
   local i = 1
   while i <= #changeHpAfterCollision do
-    if changeHpAfterCollision[i].bod:changeHp(changeHpAfterCollision[i].change) and (not changeHpAfterCollision[i].bod.destroyed) then--and currTime - timeOfLastPlDestruction > PL_DESTROY_RATE then
+    if changeHpAfterCollision[i].bod:changeHp(changeHpAfterCollision[i].change) and (not changeHpAfterCollision[i].bod.body:isDestroyed()) then--and currTime - timeOfLastPlDestruction > PL_DESTROY_RATE then
       changeHpAfterCollision[i].bod:destroy()
       table.remove(changeHpAfterCollision, i)
       --timeOfLastPlDestruction = currTime

@@ -5,7 +5,6 @@ require "misc"
 function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   local b = {}
   b.id    = id
-  print("NEW BULLET ID:", id.num)
   b.w     = w
   b.h     = h
   b.d     = d*SCALE

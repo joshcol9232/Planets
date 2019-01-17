@@ -15,7 +15,8 @@ LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a land
 LD_DAMPENING = 70
 LD_FIRE_RATE = 0.1  -- Seconds between firing a bullet
 
-landerBody = {-8,-8, 8,-8, 12,8, -12,8}
+landerBodyDraw = {-5,-5, 5,-5, 12,8, 13,15, 8,9, 0,10, -8,9, -13,15, -12,8} -- For drawing only
+landerBodyP1 =   {-5,-5, 5,-5, 12,8, 13,15, 8,9,       -8,9, -13,15, -12,8}  -- Physics objects - max of 8 verticies
 
 -- Bullets
 BLT_DENSITY = 11340 -- Density of lead

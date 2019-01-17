@@ -26,7 +26,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   end
 
   l.body    = love.physics.newBody(world, x, y, "dynamic")
-  l.shape   = love.physics.newPolygonShape(landerBody)
+  l.shape   = love.physics.newPolygonShape(landerBodyP1)
   l.fixture = love.physics.newFixture(l.body, l.shape, l.d)
   l.fixture:setRestitution(0.2)
   l.mass = l.body:getMass()
@@ -199,7 +199,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   function l:drawBody()
     --lg.push()
       --lg.translate(-self.w/2, -self.h/2)
-      lg.polygon("line", landerBody)
+      lg.polygon("line", landerBodyDraw)
     --lg.pop()
   end
 
