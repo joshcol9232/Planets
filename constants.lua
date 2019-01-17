@@ -8,6 +8,7 @@ PL_HP = 100
 PL_SPLIT_SPEED = 100
 PL_DESTROY_IMP = 100000
 PL_DESTROY_RATE = 0.01 -- A planet can be destroyed every x seconds
+PL_CHANCE_OF_SECOND_SPLIT = 10  -- 1/x chance of planet splitting again after it has been split already. -- more realistic splitting.
 
 -- Landers
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.

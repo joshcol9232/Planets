@@ -31,7 +31,7 @@ function love.load()
   deadBodies = {}
   changeHpAfterCollision = {}
   timeOfLastPlDestruction = 0
-  drawLanderImg = false
+  paused = false
 
   camera = Camera(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 end
@@ -80,7 +80,7 @@ function love.keypressed(key)
     bodies.planets[1]:destroy()
     --end
   elseif key == "p" then
-    drawLanderImg = not drawLanderImg
+    paused = not paused
   elseif key == "n" then
     camera:reset()
 
@@ -112,14 +112,16 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-  world:update(dt)
-  checkSmallObjectsInBounds()
-  removeDeadBodies()
-  changeHpAfterCollisionFunc()
+  if not paused then
+    world:update(dt)
+    checkSmallObjectsInBounds()
+    removeDeadBodies()
+    changeHpAfterCollisionFunc()
 
-  for _, j in pairs(bodies) do
-    for x=1, #j do
-      j[x]:update(dt)
+    for _, j in pairs(bodies) do
+      for x=1, #j do
+        j[x]:update(dt)
+      end
     end
   end
 
@@ -185,6 +187,11 @@ function love.draw()
   lg.setColor({1, 1, 1})
   fpsGraph:draw()
   memGraph:draw()
+
+  if paused then
+    lg.rectangle("fill", SCREEN_WIDTH-30, 10, 10, 30)
+    lg.rectangle("fill", SCREEN_WIDTH-50, 10, 10, 30)
+  end
 end
 
 function drawGridOfPlanets(mouseX, mouseY, x, y, size)

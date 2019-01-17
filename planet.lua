@@ -54,7 +54,7 @@ function Planet(id, x, y, velx, vely, r, d)
         for j=1, splitFactor do
           a = a + 1
           local p = Planet({type="planet", num=#bodies.planets+1}, (x+(i*sep)), (y+(j*sep)), vx+vels[a].x, vy+vels[a].y, r, PL_DENSITY)
-          if math.random(0, 10) == 1 then
+          if math.random(0, PL_CHANCE_OF_SECOND_SPLIT) == 1 then
             p:destroy(2)
           end
           table.insert(bodies.planets, p)
