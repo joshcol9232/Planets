@@ -76,9 +76,7 @@ function love.keypressed(key)
   elseif key == "b" then
     clearBullets()
   elseif key == "m" then
-    --for i=1, #bodies.planets do
     bodies.planets[1]:destroy()
-    --end
   elseif key == "p" then
     paused = not paused
   elseif key == "n" then
@@ -117,6 +115,7 @@ function love.update(dt)
     checkSmallObjectsInBounds()
     removeDeadBodies()
     changeHpAfterCollisionFunc()
+    checkBulletTimeouts()
 
     for _, j in pairs(bodies) do
       for x=1, #j do

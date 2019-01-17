@@ -2,8 +2,10 @@ require "constants"
 require "gravFuncs"
 require "misc"
 
-function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
+function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   local b = {}
+  b.id    = id
+  print("NEW BULLET ID:", id.num)
   b.w     = w
   b.h     = h
   b.d     = d*SCALE
@@ -17,7 +19,21 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   b.body:setBullet(true)
   b.fixture:setUserData({parentClass=b, userType="bullet"})
 
+  b.totalTime = 0
+
   b.fTotalX, b.fTotalY = 0, 0
+
+  function b:destroy()
+    removeBody("bullet", self.id.num)
+  end
+
+  function b:checkTimeout()
+    if self.totalTime >= BLT_TIMEOUT then
+      self:destroy()
+      return true
+    end
+    return false
+  end
 
   function b:update(dt)
     self.fTotalX, self.fTotalY = 0, 0
@@ -31,6 +47,8 @@ function Bullet(x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
     end
 
     self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
+
+    self.totalTime = self.totalTime + dt
   end
 
   function b:draw()

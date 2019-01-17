@@ -7,13 +7,13 @@ PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
 PL_HP = 100
 PL_SPLIT_SPEED = 100
 PL_DESTROY_IMP = 100000
-PL_DESTROY_RATE = 0.01 -- A planet can be destroyed every x seconds
+PL_DESTROY_RATE = 0--.01 -- A planet can be destroyed every x seconds
 PL_CHANCE_OF_SECOND_SPLIT = 10  -- 1/x chance of planet splitting again after it has been split already. -- more realistic splitting.
 
 -- Landers
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.
 LD_DAMPENING = 70
-LD_FIRE_RATE = 0.01  -- Seconds between firing a bullet
+LD_FIRE_RATE = 0.1  -- Seconds between firing a bullet
 
 landerBody = {-8,-8, 8,-8, 12,8, -12,8}
 
@@ -23,6 +23,7 @@ BLT_DIMENSION = 2
 BLT_VELOCITY = 800--00
 BLT_RECOIL = 1 -- Multiplyer
 BLT_HP_DAMAGE = 100
+BLT_TIMEOUT = 10 -- Number in seconds before bullets despawn.
 
 -- Missiles
 MS_DENSITY = 675 -- Same as lander density

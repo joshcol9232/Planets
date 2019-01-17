@@ -104,7 +104,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   function l:fireBullet()
     local angle = self.body:getAngle()
     local topX, topY = self:getXYTopOfObj(angle)
-    local b = Bullet(topX, topY, BLT_VELOCITY, BLT_DIMENSION, BLT_DIMENSION*2, BLT_DENSITY, angle, self.body:getLinearVelocity())
+    local b = Bullet({type="b", num=#bodies.bullets+1}, topX, topY, BLT_VELOCITY, BLT_DIMENSION, BLT_DIMENSION*2, BLT_DENSITY, angle, self.body:getLinearVelocity())
 
     local fx, fy = b.body:getLinearVelocity()
     self.body:applyForce(-fx*b.body:getMass()*BLT_RECOIL, -fy*b.body:getMass()*BLT_RECOIL)

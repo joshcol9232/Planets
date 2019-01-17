@@ -20,7 +20,7 @@ function Planet(id, x, y, velx, vely, r, d)
   p.fixture:setRestitution(0.4)
   p.fixture:setUserData({parentClass=p, userType="planet"})
 
-  p.hp = (p.r/SCALE)*20000000
+  p.hp = (p.r/SCALE)*30000000
   p.maxHp = p.hp
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body

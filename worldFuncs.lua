@@ -80,9 +80,9 @@ function removeBody(type, idNum)
   local b, i = getBody(type, idNum, tabl)
   if b ~= nil then
     b.body:destroy()
-    print("Len before:", #bodies.planets)
+    print("Len before:", #bodies.bullets)
     table.remove(tabl, i)
-    print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.planets)
+    print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.bullets)
   end
 end
 
@@ -114,4 +114,13 @@ function getTotalMassInWorld()
     total = total + bods[i]:getMass()
   end
   return total
+end
+
+function checkBulletTimeouts()
+  local i = 1
+  while i <= #bodies.bullets do
+    if not bodies.bullets[i]:checkTimeout() then
+      i = i + 1
+    end
+  end
 end
