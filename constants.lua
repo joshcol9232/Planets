@@ -12,7 +12,7 @@ PL_DESTROY_RATE = 0.01 -- A planet can be destroyed every x seconds
 -- Landers
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.
 LD_DAMPENING = 70
-LD_FIRE_RATE = 0.1  -- Seconds between firing a bullet
+LD_FIRE_RATE = 0.01  -- Seconds between firing a bullet
 
 landerBody = {-8,-8, 8,-8, 12,8, -12,8}
 

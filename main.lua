@@ -14,7 +14,7 @@ function love.load()
   love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
 	plSize = 1
 	love.keyboard.setKeyRepeat(true)
-	landerImg = lg.newImage("assets/lander.png")    -- Load lander image
+	--landerImg = lg.newImage("assets/lander.png")    -- Load lander image
 
   fpsGraph = debugGraph:new('fps', 0, 96)
   memGraph = debugGraph:new('mem', 0, 126)

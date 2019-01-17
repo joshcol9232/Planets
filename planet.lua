@@ -12,6 +12,7 @@ function Planet(id, x, y, velx, vely, r, d)
   p.d     = d*SCALE
 
   p.captures = {}
+  p.destroyed = false
 
   p.body    = love.physics.newBody(world, x, y, "dynamic")
   p.shape   = love.physics.newCircleShape(r)
@@ -19,9 +20,8 @@ function Planet(id, x, y, velx, vely, r, d)
   p.fixture:setRestitution(0.4)
   p.fixture:setUserData({parentClass=p, userType="planet"})
 
-  p.hp = (p.body:getMass()/SCALE)*2000
+  p.hp = (p.r/SCALE)*20000000
   p.maxHp = p.hp
-  print(p.hp, "Planet hp")
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
 
@@ -54,13 +54,13 @@ function Planet(id, x, y, velx, vely, r, d)
         for j=1, splitFactor do
           a = a + 1
           local p = Planet({type="planet", num=#bodies.planets+1}, (x+(i*sep)), (y+(j*sep)), vx+vels[a].x, vy+vels[a].y, r, PL_DENSITY)
-          table.insert(bodies.planets, p)
           if math.random(0, 10) == 1 then
             p:destroy(2)
           end
+          table.insert(bodies.planets, p)
         end
       end
-      print("Total mass:", getTotalMassInWorld())
+      self.destroyed = true
     end
   end
 
