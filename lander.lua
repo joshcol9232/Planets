@@ -36,7 +36,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
   l.targetOn = false
 
   l.fTotalX, l.fTotalY = 0, 0  -- Total force on body
-  l.rotationFactor = l.mass*600
+  l.rotationFactor = l.mass*500
   l.thrustLevel = 0.0         -- Thrust level from 0 to 1
   l.thrustChange = 0.04       -- Amount the thrust changes when changing thrust
   l.maxThrust = l.mass*10000  -- Maximum thrust

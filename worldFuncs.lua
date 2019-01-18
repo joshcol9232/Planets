@@ -3,6 +3,7 @@ function resetWorld()
   world = love.physics.newWorld(0, 0, true)
   world:setCallbacks(nil, nil, nil, postSolveCallback)
   bodies = {planets={}, players={}, bullets={}, missiles={}}
+  areas = {}
 end
 
 function clearBullets()

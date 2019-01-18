@@ -1,19 +1,7 @@
+require "statusBar"
+
 function HpBar(parent, width, height, pW, pH)
-  local h = {}
-  h.width = width
-  h.height = height
-  h.pW = pW
-  h.pH = pH
-  h.parent = parent
-
-  h.parentX, h.parentY = parent.body:getX(), parent.body:getY()
-
-  function h:drawFrame(x, y)
-    lg.line(x, y, x+self.width, y) -- Top line
-    lg.line(x, y, x, y+self.height) -- Left line
-    lg.line(x+self.width, y, x+self.width, y+self.height) -- Right line
-    lg.line(x, y+self.height, x+self.width, y+self.height) -- Bottom line
-  end
+  local h = StatusBar(parent, width, height, pW, pH) -- Inherits
 
   function h:draw()
     lg.setColor({1, 1, 1})

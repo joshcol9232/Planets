@@ -5,6 +5,7 @@ require "misc"
 require "levels"
 require "worldFuncs"
 require "camera"
+require "area"
 
 debugGraph = require "debugGraph"
 
@@ -27,7 +28,8 @@ function love.load()
   world = love.physics.newWorld(0, 0, true)
   world:setCallbacks(nil, nil, nil, postSolveCallback)
   bodies = {planets={}, players={}, bullets={}, missiles={}}
-  bodies = loadLvl(1)
+  areas = {}
+  bodies, areas = loadLvl(1)
   deadBodies = {}
   changeHpAfterCollision = {}
   timeOfLastPlDestruction = 0
@@ -51,7 +53,8 @@ function love.mousereleased(x, y, button)
   end
 
   if button == 2 then
-		drawGridOfPlanets(mouseX, mouseY, x, y, plSize)
+		--drawGridOfPlanets(mouseX, mouseY, x, y, plSize)
+    table.insert(areas, Area({num=#areas+1}, mouseX, mouseY, {r=1, g=0.3, b=0}, "Egg", 100, 1))
   end
 end
 
@@ -122,6 +125,10 @@ function love.update(dt)
         j[x]:update(dt)
       end
     end
+
+    for i=1, #areas do -- Update areas
+      areas[i]:update(dt)
+    end
   end
 
   -- Update the graphs
@@ -140,6 +147,10 @@ function love.draw()
       for x=1, #j do
         j[x]:draw()
       end
+    end
+
+    for i=1, #areas do
+      areas[i]:draw()
     end
   lg.pop()
 

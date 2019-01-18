@@ -1,10 +1,10 @@
 function inTable(table, item)
 	for i=1, #table do
 		if table[i] == item then
-			return true
+			return true, i
 		end
 	end
-	return false
+	return false, -1
 end
 
 -- Vectors

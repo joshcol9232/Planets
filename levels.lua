@@ -109,10 +109,18 @@ levelNames = {"1", "2", "3"} -- Active levels
 function loadLvl(num)
   local lvl = levels[num]
   local bodies = {planets={}, players={}, bullets={}, missiles={}}
+  local areas = {}
 
   for i=1, #lvl.planets do
     pl = lvl.planets[i]
     table.insert(bodies.planets, Planet(pl.id, pl.posx, pl.posy, pl.vx, pl.vy, pl.r, pl.d))
+  end
+
+  if lvl.areas ~= nil then
+    for i=1, #lvl.areas do
+      ar = lvl.areas[i]
+      table.insert(areas, Planet(ar.id, ar.x, ar.y, ar.col, ar.teamName, ar.r, ar.time))
+    end
   end
 
   if lvl.landers ~= nil then
@@ -122,7 +130,7 @@ function loadLvl(num)
     end
   end
 
-  return bodies
+  return bodies, areas
 end
 
 
