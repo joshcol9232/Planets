@@ -1,5 +1,3 @@
-require "timerBar"
-
 function Area(id, x, y, col, teamName, r, time)
   local a = {}
   a.id  = {} -- Id containing num
@@ -26,16 +24,10 @@ function Area(id, x, y, col, teamName, r, time)
         local isInTable, index = inTable(self.planetsInside, bodies.planets[i])
         if not isInTable then
           table.insert(self.planetsInside, bodies.planets[i])
-          table.insert(self.times, TimerBar(bodies.planets[i],
-                                                           50,
-                                                            8,
-                                          bodies.planets[i].r,
-                                          bodies.planets[i].r,
-                                          self.timeLim))
+          table.insert(self.times, 0)
         end
         if index > -1 then
-          self.times[index]:incrementTime(dt)
-          print(self.times[index].currTime)
+          self.times[index] = self.times[index] + dt
         end
       else
         local isInTable, index = inTable(self.planetsInside, bodies.planets[i])
@@ -55,10 +47,6 @@ function Area(id, x, y, col, teamName, r, time)
 
     lg.setColor(self.col.r, self.col.g, self.col.b, 1)
     lg.print(self.teamName, self.x, self.y)
-
-    for i=1, #self.times do
-      self.times[i]:draw()
-    end
   end
 
   function a:update(dt)
