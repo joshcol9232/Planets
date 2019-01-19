@@ -33,14 +33,6 @@ function Planet(id, x, y, velx, vely, r, d)
 
   p.body:setLinearVelocity(velx, vely)
 
-  function p:checkTimeout()
-    if self.totalTime >= PL_TIMEOUT then
-      removeBody("planet", self.id.num)
-      return true
-    end
-    return false
-  end
-
   function p:changeHp(change)
     self.hp = self.hp+change
     self.hpBar:showEnable()

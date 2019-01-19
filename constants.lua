@@ -9,7 +9,7 @@ PL_SPLIT_SPEED = 100
 PL_DESTROY_RATE = 0--.01 -- A planet can be destroyed every x seconds
 PL_CHANCE_OF_SECOND_SPLIT = 10  -- 1/x chance of planet splitting again after it has been split already. -- more realistic splitting.
 PL_TIMEOUT_THRESHOLD_R = 2 -- If a planet has a radius below or equal to this number then it despawns after a certain amount of time.
-PL_TIMEOUT = 10
+PL_TIMEOUT = 4
 
 -- Landers
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.

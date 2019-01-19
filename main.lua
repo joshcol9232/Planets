@@ -17,8 +17,8 @@ function love.load()
 	love.keyboard.setKeyRepeat(true)
 	--landerImg = lg.newImage("assets/lander.png")    -- Load lander image
 
-  fpsGraph = debugGraph:new('fps', 0, 96)
-  memGraph = debugGraph:new('mem', 0, 126)
+  fpsGraph = debugGraph:new('fps', 0, SCREEN_HEIGHT-80)
+  memGraph = debugGraph:new('mem', 0, SCREEN_HEIGHT-40)
 
   dampening = true
   VEL_DEBUG = false
@@ -83,6 +83,8 @@ function love.keypressed(key)
     paused = not paused
   elseif key == "n" then
     camera:reset()
+  elseif key == "y" then
+    camera.followPlayer = not camera.followPlayer
 
   -- player 1 controls
   elseif key == "w" then
@@ -157,9 +159,14 @@ function love.draw()
   lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
   --lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
 
-	if plSize > 0 then
-		lg.print("Size: "..plSize, 10, 82)
-	end
+	lg.print("Size: "..plSize, 10, 96)
+
+  if camera.followPlayer then
+    lg.setColor({1, 1, 1})
+  else
+    lg.setColor({0.3, 0.3, 0.3})
+  end
+  lg.print("Y: Follow player", 10, 82)
 
   if FORCE_DEBUG then
     lg.setColor({1, 0, 0})

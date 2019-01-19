@@ -3,6 +3,13 @@ function Camera(x, y)
 	c.x    				= x
 	c.y    				= y
 	c.zoom = 1
+	c.followPlayer = true
+	c.playerIDToFollow = 1
+	c.playerBody = nil
+
+	function c:trackPlayer(playerBody)
+		self.x, self.y = playerBody:getPosition()
+	end
 
 	function c:reset()
 		self.zoom = 1
@@ -48,6 +55,16 @@ function Camera(x, y)
 	end
 
 	function c:update()
+		if self.followPlayer then
+			if self.playerBody == nil then
+				self.playerBody = getBody("player", self.playerIDToFollow, bodies.players)
+				if self.playerBody ~= nil then
+					self.playerBody = self.playerBody.body
+				end
+			else
+				self:trackPlayer(self.playerBody)
+			end
+		end
 		self:move()
 	end
 
