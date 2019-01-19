@@ -26,14 +26,6 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
     removeBody("bullet", self.id.num)
   end
 
-  function b:checkTimeout()
-    if self.totalTime >= BLT_TIMEOUT then
-      self:destroy()
-      return true
-    end
-    return false
-  end
-
   function b:update(dt)
     self.fTotalX, self.fTotalY = 0, 0
     for i=1, #bodies.planets do

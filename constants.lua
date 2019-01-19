@@ -6,9 +6,10 @@ G = (2*(10^-3))*SCALE -- Gravitational constant, real value = 6.67*(10^-11)
 PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
 PL_HP = 100
 PL_SPLIT_SPEED = 100
-PL_DESTROY_IMP = 100000
 PL_DESTROY_RATE = 0--.01 -- A planet can be destroyed every x seconds
 PL_CHANCE_OF_SECOND_SPLIT = 10  -- 1/x chance of planet splitting again after it has been split already. -- more realistic splitting.
+PL_TIMEOUT_THRESHOLD_R = 2 -- If a planet has a radius below or equal to this number then it despawns after a certain amount of time.
+PL_TIMEOUT = 10
 
 -- Landers
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.
@@ -21,9 +22,8 @@ landerBodyP1 =   {-5,-5, 5,-5, 12,8, 13,15, 8,9,       -8,9, -13,15, -12,8}  -- 
 -- Bullets
 BLT_DENSITY = 11340 -- Density of lead
 BLT_DIMENSION = 2
-BLT_VELOCITY = 800--00
+BLT_VELOCITY = 400--00
 BLT_RECOIL = 1 -- Multiplyer
-BLT_HP_DAMAGE = 100
 BLT_TIMEOUT = 10 -- Number in seconds before bullets despawn.
 
 -- Missiles
@@ -32,6 +32,10 @@ MS_DAMPENING = 65
 MS_DIMENSION_X = 2
 MS_DIMENSION_Y = 10
 MS_VEL = 100
+
+-- HP bar
+HPBAR_OPEN_TIME = 5
+HPBAR_FADE_RATE = 1  -- How much the transparency (alpha) changes per second when fading
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 700

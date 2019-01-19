@@ -30,7 +30,6 @@ function love.load()
   bodies = {planets={}, players={}, bullets={}, missiles={}}
   areas = {}
   bodies, areas = loadLvl(1)
-  deadBodies = {}
   changeHpAfterCollision = {}
   timeOfLastPlDestruction = 0
   paused = false
@@ -54,7 +53,7 @@ function love.mousereleased(x, y, button)
 
   if button == 2 then
 		--drawGridOfPlanets(mouseX, mouseY, x, y, plSize)
-    table.insert(areas, Area({num=#areas+1}, mouseX, mouseY, {r=1, g=0.3, b=0}, "Egg", 100, 1))
+    table.insert(areas, Area({num=#areas+1}, mouseX, mouseY, {r=0.2, g=0.8, b=0}, "Egg", 100, 1))
   end
 end
 
@@ -115,10 +114,9 @@ end
 function love.update(dt)
   if not paused then
     world:update(dt)
-    checkSmallObjectsInBounds()
-    removeDeadBodies()
     changeHpAfterCollisionFunc()
     checkBulletTimeouts()
+    checkSmallPlanetTimeouts()
 
     for _, j in pairs(bodies) do
       for x=1, #j do
@@ -217,17 +215,17 @@ function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentIm
   currTime = love.timer.getTime()
   local data1, data2 = fixture1:getUserData(), fixture2:getUserData()
   if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
-    if (normalImpulse >= PL_DESTROY_IMP) then
-      if (data1.userType == "planet") then
-        if not data1.parentClass.body:isDestroyed() then
-          table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
-        end
-      elseif data2.userType == "planet" then
-        if not data2.parentClass.body:isDestroyed() then
-          table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
-        end
+    --if (normalImpulse >= PL_DESTROY_IMP) then
+    if (data1.userType == "planet") then
+      if not data1.parentClass.body:isDestroyed() then
+        table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
+      end
+    elseif data2.userType == "planet" then
+      if not data2.parentClass.body:isDestroyed() then
+        table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
       end
     end
+    --end
   end
 
 --elseif data1.userType == "lander"

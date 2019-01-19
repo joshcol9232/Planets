@@ -20,18 +20,33 @@ function Planet(id, x, y, velx, vely, r, d)
   p.fixture:setRestitution(0.4)
   p.fixture:setUserData({parentClass=p, userType="planet"})
 
-  p.hp = (p.r/SCALE)*30000000
+  p.hp = (p.r/SCALE)*10000000
   p.maxHp = p.hp
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
+  p.hasTimeout = (r <= PL_TIMEOUT_THRESHOLD_R)
+
+  if p.hasTimeout then
+    p.timeLimit = math.random()+math.random(PL_TIMEOUT/1.5, PL_TIMEOUT)  -- Increases randomness of despawning, rather than them all despawning at once, if they were all created at once.
+    p.totalTime = 0
+  end
 
   p.body:setLinearVelocity(velx, vely)
 
+  function p:checkTimeout()
+    if self.totalTime >= PL_TIMEOUT then
+      removeBody("planet", self.id.num)
+      return true
+    end
+    return false
+  end
+
   function p:changeHp(change)
     self.hp = self.hp+change
-    if self.hp < 0 then
+    self.hpBar:showEnable()
+    if self.hp <= 0 then
       self.hp = 0
-      return true
+      self:destroy()
     elseif self.hp > self.maxHp then
       self.hp = self.maxHp
     end
@@ -55,7 +70,7 @@ function Planet(id, x, y, velx, vely, r, d)
           a = a + 1
           local p = Planet({type="planet", num=#bodies.planets+1}, (x+(i*sep)), (y+(j*sep)), vx+vels[a].x, vy+vels[a].y, r, PL_DENSITY)
           if math.random(0, PL_CHANCE_OF_SECOND_SPLIT) == 1 then
-            p:destroy(2)
+					  p:destroy(2)
           end
           table.insert(bodies.planets, p)
         end
@@ -80,6 +95,10 @@ function Planet(id, x, y, velx, vely, r, d)
     self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
 
     --local contacts = self.body:getContactList()
+    if self.hasTimeout then
+      self.totalTime = self.totalTime + dt
+    end
+    self.hpBar:update(dt)
   end
 
   function p:draw()
@@ -93,9 +112,7 @@ function Planet(id, x, y, velx, vely, r, d)
       debugForce(self)
     end
 
-    if (self.hp < self.maxHp) and (self.hpBar ~= nil) then
-      self.hpBar:draw()
-    end
+    self.hpBar:draw()
   end
 
   --(parent, w, h, pW, pH)

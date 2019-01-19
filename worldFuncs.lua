@@ -19,7 +19,7 @@ function destroyBullet(i) -- index of bullet in bullet table
 end
 
 function checkSmallObjectsInBounds()
-  local blt = bodies.bullets
+  -- local blt = bodies.bullets
   local plt = bodies.planets
 
   if #plt > 0 then
@@ -39,17 +39,17 @@ function checkSmallObjectsInBounds()
     end
   end
 
-  if #blt > 0 then
-    local i = 1
-    while i <= #blt do
-      local x, y = blt[i].body:getX(), blt[i].body:getY()
-      if x <-MAP_WIDTH or x > MAP_WIDTH or y < -MAP_HEIGHT or y > MAP_HEIGHT then
-        destroyBullet(i)
-      else
-        i = i + 1
-      end
-    end
-  end
+  -- if #blt > 0 then
+  --   local i = 1
+  --   while i <= #blt do
+  --     local x, y = blt[i].body:getX(), blt[i].body:getY()
+  --     if x <-MAP_WIDTH or x > MAP_WIDTH or y < -MAP_HEIGHT or y > MAP_HEIGHT then
+  --       destroyBullet(i)
+  --     else
+  --       i = i + 1
+  --     end
+  --   end
+  -- end
 end
 
 function getBodTable(type)
@@ -87,23 +87,14 @@ function removeBody(type, idNum)
   end
 end
 
-function removeDeadBodies()  -- Quick, remove the evidence
-  local i = 1
-  while i <= #deadBodies do
-    deadBodies[i]:destroy()
-    table.remove(deadBodies, i)
-  end
-end
-
 function changeHpAfterCollisionFunc()
   local i = 1
   while i <= #changeHpAfterCollision do
-    if changeHpAfterCollision[i].bod:changeHp(changeHpAfterCollision[i].change) and (not changeHpAfterCollision[i].bod.body:isDestroyed()) then--and currTime - timeOfLastPlDestruction > PL_DESTROY_RATE then
-      changeHpAfterCollision[i].bod:destroy()
+    if not changeHpAfterCollision[i].bod.destroyed then
+      changeHpAfterCollision[i].bod:changeHp(changeHpAfterCollision[i].change)
       table.remove(changeHpAfterCollision, i)
-      --timeOfLastPlDestruction = currTime
     else
-      table.remove(changeHpAfterCollision, i)
+      i = i + 1
     end
   end
 end
@@ -117,11 +108,27 @@ function getTotalMassInWorld()
   return total
 end
 
-function checkBulletTimeouts()
+function checkBulletTimeouts()  -- Needs to be separate from bullet:update due to loop in main update
   local i = 1
   while i <= #bodies.bullets do
-    if not bodies.bullets[i]:checkTimeout() then
+    if bodies.bullets[i].totalTime >= BLT_TIMEOUT then
+      bodies.bullets[i].body:destroy()
+      table.remove(bodies.bullets, i)
+    else
       i = i + 1
     end
+  end
+end
+
+function checkSmallPlanetTimeouts()  -- Needs to be separate from bullet:update due to loop in main update
+  local i = 1
+  while i <= #bodies.planets do
+    if bodies.planets[i].hasTimeout then
+      if bodies.planets[i].totalTime >= bodies.planets[i].timeLimit then
+        bodies.planets[i].body:destroy()
+        table.remove(bodies.planets, i)
+      end
+    end
+    i = i + 1
   end
 end
