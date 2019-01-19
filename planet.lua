@@ -20,11 +20,11 @@ function Planet(id, x, y, velx, vely, r, d)
   p.fixture:setRestitution(0.4)
   p.fixture:setUserData({parentClass=p, userType="planet"})
 
-  p.hp = (p.r/SCALE)*10000000
-  p.maxHp = p.hp
-
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
   p.hasTimeout = (r <= PL_TIMEOUT_THRESHOLD_R)
+
+  p.hp = (p.r/SCALE)*10000000
+  p.maxHp = p.hp
 
   if p.hasTimeout then
     p.timeLimit = math.random()+math.random(PL_TIMEOUT/1.5, PL_TIMEOUT)  -- Increases randomness of despawning, rather than them all despawning at once, if they were all created at once.

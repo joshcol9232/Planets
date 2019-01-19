@@ -143,6 +143,10 @@ function love.draw()
     camera:centerOrigin()
     camera:zoomDisplay()
     camera:translateDisplay()
+
+    -- local mx, my = love.mouse.getPosition()
+    -- mx, my = camera:translateXY(mx, my)
+    -- lg.circle("fill", mx, my, 10)
     for _, j in pairs(bodies) do
       for x=1, #j do
         j[x]:draw()
@@ -222,17 +226,17 @@ function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentIm
   currTime = love.timer.getTime()
   local data1, data2 = fixture1:getUserData(), fixture2:getUserData()
   if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
-    --if (normalImpulse >= PL_DESTROY_IMP) then
-    if (data1.userType == "planet") then
-      if not data1.parentClass.body:isDestroyed() then
-        table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
-      end
-    elseif data2.userType == "planet" then
-      if not data2.parentClass.body:isDestroyed() then
-        table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
+    if (normalImpulse >= PL_MIN_IMP_TO_DAMAGE) then
+      if (data1.userType == "planet") then
+        if not data1.parentClass.body:isDestroyed() then
+          table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
+        end
+      elseif data2.userType == "planet" then
+        if not data2.parentClass.body:isDestroyed() then
+          table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
+        end
       end
     end
-    --end
   end
 
 --elseif data1.userType == "lander"

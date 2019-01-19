@@ -21,6 +21,14 @@ function HpBar(parent, width, height, pW, pH)
     self.open = true
     self.timeOpen = 0
     self.alpha = 1
+    self.doingFade = false
+  end
+
+  function h:getXY()
+    local x = self.parentX - (self.width/2)
+    local y = self.parentY + (self.pH+10)
+
+    return x, y--camera:translateXY(x, y)
   end
 
   function h:update(dt)
@@ -38,11 +46,9 @@ function HpBar(parent, width, height, pW, pH)
     if self.open then
       lg.setColor(1, 1, 1, self.alpha)
       self.parentX, self.parentY = self.parent.body:getX(), self.parent.body:getY()
-      local x = self.parentX - (self.width/2)
-      local y = self.parentY + (self.pH*(6/5))
+      local x, y = self:getXY()
 
       self:drawFrame(x, y)
-
       local normHp = self.parent.hp/self.parent.maxHp
       lg.setColor(1-normHp, normHp, 0, self.alpha)
       lg.rectangle("fill", x+1, y+1, self.width*(normHp)-2, self.height-2) -- -2 for the frame width

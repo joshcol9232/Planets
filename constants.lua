@@ -5,6 +5,7 @@ G = (2*(10^-3))*SCALE -- Gravitational constant, real value = 6.67*(10^-11)
 -- Planets
 PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
 PL_HP = 100
+PL_MIN_IMP_TO_DAMAGE = 10000 -- minimum impulse required to do damage. This prevents bullets in-between planets causing them to split repeatedly.
 PL_SPLIT_SPEED = 100
 PL_DESTROY_RATE = 0--.01 -- A planet can be destroyed every x seconds
 PL_CHANCE_OF_SECOND_SPLIT = 10  -- 1/x chance of planet splitting again after it has been split already. -- more realistic splitting.
@@ -24,7 +25,7 @@ BLT_DENSITY = 11340 -- Density of lead
 BLT_DIMENSION = 2
 BLT_VELOCITY = 400--00
 BLT_RECOIL = 1 -- Multiplyer
-BLT_TIMEOUT = 10 -- Number in seconds before bullets despawn.
+BLT_TIMEOUT = 4 -- Number in seconds before bullets despawn.
 
 -- Missiles
 MS_DENSITY = 675 -- Same as lander density
@@ -42,6 +43,7 @@ SCREEN_HEIGHT = 700
 
 CAMERA_SPEED = 10
 CAMERA_SCROLL_ZOOM_SPEED = 14
+CAMERA_ROTATE_SPEED = math.pi/200
 
 MAP_WIDTH = 2000 -- Actuall width goes from -2000 to 2000
 MAP_HEIGHT = 2000

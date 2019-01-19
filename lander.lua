@@ -207,15 +207,15 @@ function Lander(id, x, y, velx, vely, w, h, d)
     lg.setColor({1, 1, 1})
 		lg.push()
 			lg.translate(self.body:getX(), self.body:getY())
-      if self.id.num == 9999999 then lg.print("2", 0, -25) else
-        lg.print(self.id.num, 0, -25)
-      end
 			lg.rotate(self.body:getAngle())
 			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
       if drawLanderImg then
   			lg.draw(landerImg, -self.w/2, -self.h/2)
       end
       self:drawBody()
+      if self.id.num == 9999999 then lg.print("2", 0, -25) else -- Special case
+        lg.print(self.id.num, 0, -25)
+      end
 			lg.setColor({1, 0, 0})
 		  lg.line(0, self.h/2, 0, (self.h/2)+(self.thrustLevel*20))
 		lg.pop()

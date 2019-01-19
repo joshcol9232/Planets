@@ -19,40 +19,6 @@ function destroyBullet(i) -- index of bullet in bullet table
   table.remove(bodies.bullets, i)
 end
 
-function checkSmallObjectsInBounds()
-  -- local blt = bodies.bullets
-  local plt = bodies.planets
-
-  if #plt > 0 then
-    local i = 1
-    while i <= #plt do
-      if plt[i].body:isDestroyed() then
-        table.remove(plt, i)
-      else
-        local x, y = plt[i].body:getX(), plt[i].body:getY()
-        if (plt[i].r < 3) and (x < -MAP_WIDTH or x > MAP_WIDTH or y < -MAP_HEIGHT or y > MAP_HEIGHT) then
-          plt[i].body:destroy()
-          table.remove(plt, i)
-        else
-          i = i + 1
-        end
-      end
-    end
-  end
-
-  -- if #blt > 0 then
-  --   local i = 1
-  --   while i <= #blt do
-  --     local x, y = blt[i].body:getX(), blt[i].body:getY()
-  --     if x <-MAP_WIDTH or x > MAP_WIDTH or y < -MAP_HEIGHT or y > MAP_HEIGHT then
-  --       destroyBullet(i)
-  --     else
-  --       i = i + 1
-  --     end
-  --   end
-  -- end
-end
-
 function getBodTable(type)
   if type == "planet" then
     return bodies.planets

@@ -1,14 +1,19 @@
 function Camera(x, y)
 	local c = {}
-	c.x    				= x
-	c.y    				= y
+	c.x    	= x
+	c.y    	= y
+	c.angle = 0 -- From directly up
 	c.zoom = 1
 	c.followPlayer = true
+	c.followPlayerAngle = true
 	c.playerIDToFollow = 1
 	c.playerBody = nil
 
 	function c:trackPlayer(playerBody)
 		self.x, self.y = playerBody:getPosition()
+		if self.followPlayerAngle then
+			self.angle = -playerBody:getAngle()
+		end
 	end
 
 	function c:reset()
@@ -18,19 +23,23 @@ function Camera(x, y)
 	end
 
 	function c:translateXY(x, y)
-		return (x-SCREEN_WIDTH/2)/self.zoom + self.x, (y-SCREEN_HEIGHT/2)/self.zoom + self.y
+		local nx = (x-SCREEN_WIDTH/2)/self.zoom + self.x
+		local ny = (y-SCREEN_HEIGHT/2)/self.zoom + self.y
+
+		return nx, ny
 	end
 
 	function c:centerOrigin()
-		love.graphics.translate(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+		lg.translate(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 	end
 
 	function c:translateDisplay()
-		love.graphics.translate(-self.x, -self.y)
+		lg.rotate(self.angle)
+		lg.translate(-self.x, -self.y)
 	end
 
 	function c:zoomDisplay()
-		love.graphics.scale(self.zoom)
+		lg.scale(self.zoom)
 	end
 
 	function c:changeZoom(amount)
@@ -51,6 +60,12 @@ function Camera(x, y)
 		end
 		if love.keyboard.isDown("k") then
 			self.y = self.y + CAMERA_SPEED
+		end
+		if love.keyboard.isDown("u") then
+			self.angle = self.angle + CAMERA_ROTATE_SPEED
+		end
+		if love.keyboard.isDown("o") then
+			self.angle = self.angle - CAMERA_ROTATE_SPEED
 		end
 	end
 

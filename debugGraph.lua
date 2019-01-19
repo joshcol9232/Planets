@@ -35,7 +35,7 @@ function debugGraph:new(type, x, y, width, height, delay, label, font)
     height = height or 30, -- Graph height
     delay = delay or 0.5, -- Update delay
     label = label or type, -- Graph label
-    font = font or love.graphics.newFont(8),
+    font = font or lg.newFont(8),
     data = {},
     _max = 0,
     _time = 0,
@@ -90,8 +90,8 @@ function debugGraph:new(type, x, y, width, height, delay, label, font)
 
   function instance:draw()
     -- Store the currently set font and change the font to our own
-    local fontCache = love.graphics.getFont()
-    love.graphics.setFont(self.font)
+    local fontCache = lg.getFont()
+    lg.setFont(self.font)
 
     local max = math.ceil(self._max/10) * 10 + 20
     local len = #self.data
@@ -110,15 +110,15 @@ function debugGraph:new(type, x, y, width, height, delay, label, font)
     end
 
     -- Draw the line
-    love.graphics.line(unpack(lineData))
+    lg.line(unpack(lineData))
 
     -- Print the label
     if self.label ~= '' then
-      love.graphics.print(self.label, self.x, self.y + self.height - self.font:getHeight())
+      lg.print(self.label, self.x, self.y + self.height - self.font:getHeight())
     end
 
     -- Reset the font
-    love.graphics.setFont(fontCache)
+    lg.setFont(fontCache)
   end
 
   return instance
