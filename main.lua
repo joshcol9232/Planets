@@ -45,11 +45,11 @@ function love.wheelmoved(x, y)
 end
 
 function love.mousepressed(x, y, button)
-  mouseX, mouseY = camera:translateXY(x, y)
+  mouseX, mouseY = lg.inverseTransformPoint(x, y)
 end
 
 function love.mousereleased(x, y, button)
-  x, y = camera:translateXY(x, y)
+  x, y = lg.inverseTransformPoint(x, y)
   if button == 1 then
     table.insert(bodies.planets, Planet({type="p", num=#bodies.planets+1}, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY))
   end
@@ -99,7 +99,7 @@ function love.keypressed(key)
   -- player 1 controls
   elseif key == "w" then
     if bodies.players[1] == nil then
-      local mX, mY = camera:translateXY(love.mouse.getPosition())
+      local mX, mY = lg.inverseTransformPoint(love.mouse.getPosition())
       table.insert(bodies.players, Lander({type="l", num=1, team="capturer"}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
 
@@ -117,7 +117,7 @@ function love.keypressed(key)
 	-- player 2 controls
   elseif key == "up" then
 		if bodies.players[2] == nil then
-			local mX, mY = camera:translateXY(love.mouse.getPosition())
+			local mX, mY = lg.inverseTransformPoint(love.mouse.getPosition())
       table.insert(bodies.players, Lander({type="l", num=9999999, team="preventer"}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
@@ -154,9 +154,6 @@ function love.draw()
     camera:zoomDisplay()
     camera:translateDisplay()
 
-    local mx, my = love.mouse.getPosition()
-    mx, my = camera:translateXY(mx, my)
-    lg.circle("fill", mx, my, 10)
     for _, j in pairs(bodies) do
       for x=1, #j do
         j[x]:draw()
@@ -172,6 +169,8 @@ function love.draw()
   lg.print(love.timer.getFPS(), 10, 10)
   lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
   --lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
+  lg.print("Camera Zoom: "..camera.zoom, 10, 110)
+  --lg.print("Camera Angle: "..camera.angle%(2*math.pi), 10, 124)
 
 	lg.print("Size: "..plSize, 10, 96)
 

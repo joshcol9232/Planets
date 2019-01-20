@@ -28,7 +28,7 @@ function HpBar(parent, width, height, pW, pH)
     local x = self.parentX - (self.width/2)
     local y = self.parentY + (self.pH+10)
 
-    return x, y--camera:translateXY(x, y)
+    return x, y
   end
 
   function h:update(dt)

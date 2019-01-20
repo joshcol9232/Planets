@@ -23,13 +23,6 @@ function Camera(x, y)
 		self.angle = 0
 	end
 
-	function c:translateXY(x, y)
-		local nx = (x-SCREEN_WIDTH/2)/self.zoom + self.x
-		local ny = (y-SCREEN_HEIGHT/2)/self.zoom + self.y
-
-		return nx, ny
-	end
-
 	function c:centerOrigin()
 		lg.translate(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 	end
