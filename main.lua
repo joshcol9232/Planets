@@ -33,6 +33,7 @@ function love.load()
   changeHpAfterCollision = {}
   timeOfLastPlDestruction = 0
   paused = false
+  fullScreen = false
 
   camera = Camera(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 end
@@ -66,7 +67,14 @@ function love.keypressed(key)
       bodies = loadLvl(tonumber(key))
 		end
   elseif key == "f" then
-    FORCE_DEBUG = not FORCE_DEBUG
+    if love.keyboard.isDown("lctrl") then
+      if love.window.setFullscreen(not fullScreen) then -- Returns true if it was a success
+        fullScreen = not fullScreen
+        SCREEN_WIDTH, SCREEN_HEIGHT = lg.getDimensions()
+      end
+    else
+      FORCE_DEBUG = not FORCE_DEBUG
+    end
   elseif key == "v" then
     VEL_DEBUG = not VEL_DEBUG
 	elseif key == "=" then
@@ -144,9 +152,9 @@ function love.draw()
     camera:zoomDisplay()
     camera:translateDisplay()
 
-    -- local mx, my = love.mouse.getPosition()
-    -- mx, my = camera:translateXY(mx, my)
-    -- lg.circle("fill", mx, my, 10)
+    local mx, my = love.mouse.getPosition()
+    mx, my = camera:translateXY(mx, my)
+    lg.circle("fill", mx, my, 10)
     for _, j in pairs(bodies) do
       for x=1, #j do
         j[x]:draw()
