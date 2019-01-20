@@ -5,35 +5,25 @@ function Camera(x, y)
 	c.angle = 0 -- From directly up
 	c.zoom = 1
 	c.followPlayer = true
-	c.followPlayerAngle = true
+	--c.followPlayerAngle = true
 	c.playerIDToFollow = 1
 	c.playerBody = nil
+	c.transformation = love.math.newTransform(-c.x, -c.y, c.angle, c.zoom, c.zoom, 0, 0, 0, 0)
+
+	function c:inverseTransformPoint(x, y)
+		return self.transformation:inverseTransformPoint(x, y)
+	end
 
 	function c:trackPlayer(playerBody)
 		self.x, self.y = playerBody:getPosition()
-		if self.followPlayerAngle then
-			self.angle = -playerBody:getAngle()
-		end
+		--self.angle = -playerBody:getAngle()
 	end
 
 	function c:reset()
 		self.zoom = 1
-		self:centerOrigin()
+		-- self:centerOrigin()
 		self.x, self.y = SCREEN_WIDTH/2, SCREEN_HEIGHT/2
 		self.angle = 0
-	end
-
-	function c:centerOrigin()
-		lg.translate(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
-	end
-
-	function c:translateDisplay()
-		lg.rotate(self.angle)
-		lg.translate(-self.x, -self.y)
-	end
-
-	function c:zoomDisplay()
-		lg.scale(self.zoom)
 	end
 
 	function c:changeZoom(amount)
@@ -61,6 +51,10 @@ function Camera(x, y)
 		if love.keyboard.isDown("o") then
 			self.angle = self.angle - CAMERA_ROTATE_SPEED
 		end
+	end
+
+	function c:updateTransform()
+		self.transformation:setTransformation(-self.x, -self.y, self.angle, self.zoom, self.zoom, -(SCREEN_WIDTH/2), -(SCREEN_HEIGHT/2))
 	end
 
 	function c:update()

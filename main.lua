@@ -45,11 +45,11 @@ function love.wheelmoved(x, y)
 end
 
 function love.mousepressed(x, y, button)
-  mouseX, mouseY = lg.inverseTransformPoint(x, y)
+  mouseX, mouseY = camera:inverseTransformPoint(x, y)
 end
 
 function love.mousereleased(x, y, button)
-  x, y = lg.inverseTransformPoint(x, y)
+  x, y = camera:inverseTransformPoint(x, y)
   if button == 1 then
     table.insert(bodies.planets, Planet({type="p", num=#bodies.planets+1}, mouseX, mouseY, mouseX-x, mouseY-y, plSize, PL_DENSITY))
   end
@@ -149,10 +149,12 @@ function love.update(dt)
 end
 
 function love.draw()
+  camera:updateTransform()
   lg.push()
-    camera:centerOrigin()
-    camera:zoomDisplay()
-    camera:translateDisplay()
+    -- camera:centerOrigin()
+    -- camera:zoomDisplay()
+    -- camera:translateDisplay()
+    lg.applyTransform(camera.transformation)
 
     for _, j in pairs(bodies) do
       for x=1, #j do
