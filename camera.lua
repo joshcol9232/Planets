@@ -20,6 +20,7 @@ function Camera(x, y)
 		self.zoom = 1
 		self:centerOrigin()
 		self.x, self.y = SCREEN_WIDTH/2, SCREEN_HEIGHT/2
+		self.angle = 0
 	end
 
 	function c:translateXY(x, y)

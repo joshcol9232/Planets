@@ -12,6 +12,8 @@ debugGraph = require "debugGraph"
 lg = love.graphics
 
 function love.load()
+  SCREEN_WIDTH = 1000
+  SCREEN_HEIGHT = 700
   love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT)
 	plSize = 1
 	love.keyboard.setKeyRepeat(true)
