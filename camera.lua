@@ -9,6 +9,7 @@ function Camera(x, y)
 	c.playerIDToFollow = 1
 	c.playerBody = nil
 	c.transformation = love.math.newTransform(-c.x, -c.y, c.angle, c.zoom, c.zoom, 0, 0, 0, 0)
+	c.angleTransform = love.math.newTransform(-SCREEN_WIDTH/2, -SCREEN_HEIGHT/2, c.angle)
 
 	function c:inverseTransformPoint(x, y)
 		return self.transformation:inverseTransformPoint(x, y)
@@ -16,7 +17,7 @@ function Camera(x, y)
 
 	function c:trackPlayer(playerBody)
 		self.x, self.y = playerBody:getPosition()
-		--self.angle = -playerBody:getAngle()
+		self.angle = -playerBody:getAngle()
 	end
 
 	function c:reset()
@@ -45,16 +46,26 @@ function Camera(x, y)
 		if love.keyboard.isDown("k") then
 			self.y = self.y + CAMERA_SPEED
 		end
-		if love.keyboard.isDown("u") then
-			self.angle = self.angle + CAMERA_ROTATE_SPEED
-		end
-		if love.keyboard.isDown("o") then
-			self.angle = self.angle - CAMERA_ROTATE_SPEED
-		end
+		-- if love.keyboard.isDown("u") then
+		-- 	self.angle = self.angle - CAMERA_ROTATE_SPEED
+		-- end
+		-- if love.keyboard.isDown("o") then
+		-- 	self.angle = self.angle + CAMERA_ROTATE_SPEED
+		-- end
 	end
 
 	function c:updateTransform()
-		self.transformation:setTransformation(-self.x, -self.y, self.angle, self.zoom, self.zoom, -(SCREEN_WIDTH/2), -(SCREEN_HEIGHT/2))
+		self.transformation:setTransformation((-self.x)+SCREEN_WIDTH/2, (-self.y)+SCREEN_HEIGHT/2) --(SCREEN_WIDTH/2), -(SCREEN_HEIGHT/2))
+		local dx, dy = self.transformation:inverseTransformPoint(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+		self.transformation:translate(dx, dy)
+		self.transformation:rotate(self.angle)
+		self.transformation:scale(self.zoom)
+		self.transformation:translate(-dx, -dy)
+	end
+
+	function c:applyTransform()
+		lg.applyTransform(self.transformation)
+		--lg.applyTransform(self.angleTransform)
 	end
 
 	function c:update()

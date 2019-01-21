@@ -154,7 +154,7 @@ function love.draw()
     -- camera:centerOrigin()
     -- camera:zoomDisplay()
     -- camera:translateDisplay()
-    lg.applyTransform(camera.transformation)
+    camera:applyTransform(camera.transformation)
 
     for _, j in pairs(bodies) do
       for x=1, #j do
