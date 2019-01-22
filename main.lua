@@ -134,7 +134,6 @@ function love.update(dt)
   if not paused then
     world:update(dt)
     changeHpAfterCollisionFunc()
-    mergeAfterCollision()
     checkBulletTimeouts()
     checkSmallPlanetTimeouts()
 
