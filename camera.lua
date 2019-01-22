@@ -28,7 +28,7 @@ function Camera(x, y)
 	end
 
 	function c:changeZoom(amount)
-		if self.zoom+amount > 0.2 and self.zoom+amount < 3 then
+		if self.zoom+amount >= 0.2 and self.zoom+amount <= 3 then
 			self.zoom = self.zoom + amount
 		end
 	end

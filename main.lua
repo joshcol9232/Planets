@@ -33,6 +33,8 @@ function love.load()
   areas = {}
   bodies, areas = loadLvl(1)
   changeHpAfterCollision = {}
+  plToMerge = {}
+  idsToMerge = {}
   timeOfLastPlDestruction = 0
   paused = false
   fullScreen = false
@@ -95,6 +97,11 @@ function love.keypressed(key)
     camera:reset()
   elseif key == "y" then
     camera.followPlayer = not camera.followPlayer
+    if not camera.followPlayer then
+      camera.angle = 0
+    end
+  elseif key == "escape" then
+    love.event.quit()
 
   -- player 1 controls
   elseif key == "w" then
@@ -127,6 +134,7 @@ function love.update(dt)
   if not paused then
     world:update(dt)
     changeHpAfterCollisionFunc()
+    mergeAfterCollision()
     checkBulletTimeouts()
     checkSmallPlanetTimeouts()
 
@@ -170,7 +178,7 @@ function love.draw()
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
   lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
-  --lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
+  lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
   lg.print("Camera Zoom: "..camera.zoom, 10, 110)
   --lg.print("Camera Angle: "..camera.angle%(2*math.pi), 10, 124)
 
@@ -236,6 +244,8 @@ end
 function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentImpulse) -- Box2D callback when collisions happen
   currTime = love.timer.getTime()
   local data1, data2 = fixture1:getUserData(), fixture2:getUserData()
+
+  -- Planets colliding with bullets
   if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
     if (normalImpulse >= PL_MIN_IMP_TO_DAMAGE) then
       if (data1.userType == "planet") then
@@ -248,6 +258,11 @@ function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentIm
         end
       end
     end
+  end
+
+  -- Planets colliding with other planets
+  if data1.userType == "planet" and data2.userType == "planet" then
+    table.insert(plToMerge, {data1.parentClass, data2.parentClass, time=love.timer.getTime()})
   end
 
 --elseif data1.userType == "lander"

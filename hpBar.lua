@@ -27,7 +27,6 @@ function HpBar(parent, width, height, pW, pH)
   function h:getXY()
     local x = self.parentX - (self.width/2)
     local y = self.parentY + (self.pH+10)
-
     return x, y
   end
 
@@ -47,7 +46,6 @@ function HpBar(parent, width, height, pW, pH)
       lg.setColor(1, 1, 1, self.alpha)
       self.parentX, self.parentY = self.parent.body:getX(), self.parent.body:getY()
       local x, y = self:getXY()
-
       self:drawFrame(x, y)
       local normHp = self.parent.hp/self.parent.maxHp
       lg.setColor(1-normHp, normHp, 0, self.alpha)

@@ -1,4 +1,4 @@
-function inTable(table, item)
+function inTable(table, item) -- Returns if the element is in the table, and if it is returns the index.
 	for i=1, #table do
 		if table[i] == item then
 			return true, i
