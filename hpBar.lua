@@ -1,4 +1,5 @@
 require "statusBar"
+require "animation"
 
 function HpBar(parent, width, height, pW, pH)
   local h = StatusBar(parent, width, height, pW, pH) -- Inherits
@@ -7,15 +8,6 @@ function HpBar(parent, width, height, pW, pH)
   h.doingFade = false
 
   h.alpha = 1
-
-  function h:fade(dt)
-    self.alpha = self.alpha - dt*HPBAR_FADE_RATE
-    if self.alpha <= 0 then
-      self.doingFade = false
-      self.open = false
-      self.timeOpen = 0
-    end
-  end
 
   function h:showEnable()
     self.open = true
@@ -37,7 +29,13 @@ function HpBar(parent, width, height, pW, pH)
     end
 
     if self.doingFade then
-      self:fade(dt)
+      fade(self, dt)
+    end
+    if self.parent == nil then
+      self = nil
+    end
+    if self.parent.fading then
+      self.alpha = self.parent.alpha
     end
   end
 

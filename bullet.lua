@@ -9,6 +9,8 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   b.h     = h
   b.d     = d*SCALE
   b.r     = math.max(w, h) -- For compatibilty with planet bois
+  b.alpha = 1 -- Transparency
+  b.fading = false
 
   b.body    = love.physics.newBody(world, x, y, "dynamic")
   b.shape   = love.physics.newRectangleShape(w, h)
@@ -22,8 +24,9 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
 
   b.fTotalX, b.fTotalY = 0, 0
 
-  function b:destroy()
-    removeBody("bullet", self.id.num)
+  function b:destroy(index)
+    self.body:destroy()
+    table.remove(bodies.bullets, index)
   end
 
   function b:update(dt)
@@ -40,6 +43,10 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
     self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
 
     self.totalTime = self.totalTime + dt
+
+    if self.fading then
+      fade(self, dt)
+    end
   end
 
   function b:draw()

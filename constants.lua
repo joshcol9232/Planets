@@ -36,7 +36,6 @@ MS_VEL = 100
 
 -- HP bar
 HPBAR_OPEN_TIME = 5
-HPBAR_FADE_RATE = 1  -- How much the transparency (alpha) changes per second when fading
 
 CAMERA_SPEED = 10
 CAMERA_SCROLL_ZOOM_SPEED = 14
@@ -47,3 +46,5 @@ MAP_HEIGHT = 2000
 
 DEFAULT_SCREEN_WIDTH = 1000
 DEFAULT_SCREEN_HEIGHT = 700
+
+FADE_RATE = 1  -- How much the transparency (alpha) changes per second when fading

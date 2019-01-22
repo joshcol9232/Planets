@@ -43,14 +43,18 @@ function getBody(type, idNum, table)
   end
 end
 
-function removeBody(type, idNum)
-  tabl = getBodTable(type)
+function removeBody(type, idNum, tabl)
+  if tabl == nil then
+    tabl = getBodTable(type)
+  end
   local b, i = getBody(type, idNum, tabl)
   if b ~= nil then
     b.body:destroy()
     --print("Len before:", #bodies.bullets)
     table.remove(tabl, i)
     --print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.bullets)
+  else
+    print("Can't remove body:", idNum, type, tabl)
   end
 end
 
@@ -91,9 +95,12 @@ function checkSmallPlanetTimeouts()  -- Needs to be separate from bullet:update 
   local i = 1
   while i <= #bodies.planets do
     if bodies.planets[i].hasTimeout then
-      if bodies.planets[i].totalTime >= bodies.planets[i].timeLimit then
-        bodies.planets[i].body:destroy()
-        table.remove(bodies.planets, i)
+      if bodies.planets[i].alpha <= 0 then
+        removeBody("planet", bodies.planets[i].id.num, bodies.planets)
+      elseif (bodies.planets[i].totalTime >= bodies.planets[i].timeLimit) and (not bodies.planets[i].fading) then
+        -- bodies.planets[i].body:destroy()
+        -- table.remove(bodies.bullets, i)
+        bodies.planets[i].fading = true
       end
     end
     i = i + 1

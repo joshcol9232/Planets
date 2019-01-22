@@ -4,12 +4,14 @@ require "constants"
 require "misc"
 require "hpBar"
 require "splitFunctions"
+require "animation"
 
 function Planet(id, x, y, velx, vely, r, d)
   local p = {}
   p.id    = id
   p.r     = r
   p.d     = d*SCALE
+  p.alpha = 1 -- Transparency
 
   p.captures = {}
   p.destroyed = false
@@ -22,6 +24,8 @@ function Planet(id, x, y, velx, vely, r, d)
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
   p.hasTimeout = (r <= PL_TIMEOUT_THRESHOLD_R)
+
+  p.fading = false
 
   p.hp = (p.r/SCALE)*10000000
   p.maxHp = p.hp
@@ -52,7 +56,6 @@ function Planet(id, x, y, velx, vely, r, d)
       end
       local x, y = self.body:getX(), self.body:getY()
       local vx, vy = self.body:getLinearVelocity()
-      removeBody("planet", self.id.num)
       r = r/splitFactor
       local sep = r/2
       local vels = getSplitVelocities(splitFactor^2)
@@ -67,6 +70,7 @@ function Planet(id, x, y, velx, vely, r, d)
           table.insert(bodies.planets, p)
         end
       end
+      removeBody("planet", self.id.num)
       self.destroyed = true
     end
   end
@@ -90,11 +94,15 @@ function Planet(id, x, y, velx, vely, r, d)
     if self.hasTimeout then
       self.totalTime = self.totalTime + dt
     end
+
+    if self.fading then
+      fade(self, dt)
+    end
     self.hpBar:update(dt)
   end
 
   function p:draw()
-    lg.setColor({1, 1, 1})
+    lg.setColor(1, 1, 1, self.alpha)
     lg.circle("line", self.body:getX(), self.body:getY(), self.r)
     if VEL_DEBUG then
       debugVel(self)
