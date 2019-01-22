@@ -6,6 +6,7 @@ require "levels"
 require "worldFuncs"
 require "camera"
 require "area"
+require "collisionFuncs"
 
 debugGraph = require "debugGraph"
 
@@ -31,10 +32,8 @@ function love.load()
   world:setCallbacks(nil, nil, nil, postSolveCallback)
   bodies = {planets={}, players={}, bullets={}, missiles={}}
   areas = {}
-  bodies, areas = loadLvl(1)
   changeHpAfterCollision = {}
-  plToMerge = {}
-  idsToMerge = {}
+  bodies, areas = loadLvl(1)
   timeOfLastPlDestruction = 0
   paused = false
   fullScreen = false
@@ -133,9 +132,9 @@ end
 function love.update(dt)
   if not paused then
     world:update(dt)
-    changeHpAfterCollisionFunc()
     checkBulletTimeouts()
     checkSmallPlanetTimeouts()
+    changeHpAfterCollisionFunc()
 
     for _, j in pairs(bodies) do
       for x=1, #j do
@@ -148,19 +147,16 @@ function love.update(dt)
     end
   end
 
+  camera:update()
+
   -- Update the graphs
   fpsGraph:update(dt)
   memGraph:update(dt)
-
-  camera:update()
 end
 
 function love.draw()
   camera:updateTransform()
   lg.push()
-    -- camera:centerOrigin()
-    -- camera:zoomDisplay()
-    -- camera:translateDisplay()
     camera:applyTransform(camera.transformation)
 
     for _, j in pairs(bodies) do
@@ -231,7 +227,7 @@ function love.draw()
   end
 end
 
-function drawGridOfPlanets(mouseX, mouseY, x, y, size)
+function drawGridOfPlanets(mouseX, mouseY, x, y, size) -- Mostly for testing
 	local num = 10*(1/size)
   for i=0, num do
 		for j=0, num do
@@ -246,22 +242,14 @@ function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentIm
 
   -- Planets colliding with bullets
   if (data1.userType == "planet" and data2.userType == "bullet") or (data1.userType == "bullet" and data2.userType == "planet") then
-    if (normalImpulse >= PL_MIN_IMP_TO_DAMAGE) then
-      if (data1.userType == "planet") then
-        if not data1.parentClass.body:isDestroyed() then
-          table.insert(changeHpAfterCollision, {bod=data1.parentClass, change=(-normalImpulse)})
-        end
-      elseif data2.userType == "planet" then
-        if not data2.parentClass.body:isDestroyed() then
-          table.insert(changeHpAfterCollision, {bod=data2.parentClass, change=(-normalImpulse)})
-        end
-      end
-    end
+    bltOnPltCollision(data1, data2, normalImpulse)
   end
 
-  -- -- Planets colliding with other planets
+  -- Fun
   -- if data1.userType == "planet" and data2.userType == "planet" then
-  --   table.insert(plToMerge, {data1.parentClass, data2.parentClass, time=love.timer.getTime()})
+  --   if normalImpulse >= 2000000 then
+  --     pltOnPltCollision(data1, data2, normalImpulse)
+  --   end
   -- end
 
 end

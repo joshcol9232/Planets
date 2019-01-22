@@ -2,6 +2,8 @@ SCALE = 100
 
 G = (2*(10^-3))*SCALE -- Gravitational constant, real value = 6.67*(10^-11)
 
+FADE_RATE = 1  -- How much the transparency (alpha) changes per second when fading
+
 -- Planets
 PL_DENSITY = 5514 -- Planet density: 5514 is density of earth (kg/m^-3)
 PL_HP = 100
@@ -25,7 +27,7 @@ BLT_DENSITY = 11340 -- Density of lead
 BLT_DIMENSION = 2
 BLT_VELOCITY = 400--00
 BLT_RECOIL = 1 -- Multiplyer
-BLT_TIMEOUT = 4 -- Number in seconds before bullets despawn.
+BLT_TIMEOUT = 4 -- Number in seconds before bullets start to fade and then despawn.
 
 -- Missiles
 MS_DENSITY = 675 -- Same as lander density
@@ -46,5 +48,3 @@ MAP_HEIGHT = 2000
 
 DEFAULT_SCREEN_WIDTH = 1000
 DEFAULT_SCREEN_HEIGHT = 700
-
-FADE_RATE = 1  -- How much the transparency (alpha) changes per second when fading

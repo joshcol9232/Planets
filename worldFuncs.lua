@@ -82,9 +82,10 @@ end
 function checkBulletTimeouts()  -- Needs to be separate from bullet:update due to loop in main update
   local i = 1
   while i <= #bodies.bullets do
-    if bodies.bullets[i].totalTime >= BLT_TIMEOUT then
-      bodies.bullets[i].body:destroy()
-      table.remove(bodies.bullets, i)
+    if bodies.bullets[i].alpha <= 0 then
+      removeBody("bullet", bodies.bullets[i].id.num, bodies.bullets)
+    elseif (bodies.bullets[i].totalTime >= BLT_TIMEOUT) and (not bodies.bullets[i].fading) then
+      bodies.bullets[i].fading = true
     else
       i = i + 1
     end
@@ -98,8 +99,6 @@ function checkSmallPlanetTimeouts()  -- Needs to be separate from bullet:update 
       if bodies.planets[i].alpha <= 0 then
         removeBody("planet", bodies.planets[i].id.num, bodies.planets)
       elseif (bodies.planets[i].totalTime >= bodies.planets[i].timeLimit) and (not bodies.planets[i].fading) then
-        -- bodies.planets[i].body:destroy()
-        -- table.remove(bodies.bullets, i)
         bodies.planets[i].fading = true
       end
     end

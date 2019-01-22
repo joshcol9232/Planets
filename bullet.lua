@@ -53,7 +53,7 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
     lg.push()
       lg.translate(self.body:getX(), self.body:getY())
       lg.rotate(self.body:getAngle())
-      lg.setColor({1, 0.2, 0})
+      lg.setColor(1, 0.2, 0, self.alpha)
       lg.rectangle("fill", -self.w/2, -self.h/2, self.w, self.h)
     lg.pop()
 

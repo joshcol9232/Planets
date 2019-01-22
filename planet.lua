@@ -53,6 +53,7 @@ function Planet(id, x, y, velx, vely, r, d)
     if r > 1 then
       if splitFactor == nil then
         splitFactor = math.random(2, 6)
+        if splitFactor % 2 ~= 0 then splitFactor = splitFactor + 1 end
       end
       local x, y = self.body:getX(), self.body:getY()
       local vx, vy = self.body:getLinearVelocity()
@@ -70,7 +71,7 @@ function Planet(id, x, y, velx, vely, r, d)
           table.insert(bodies.planets, p)
         end
       end
-      removeBody("planet", self.id.num)
+      removeBody("planet", self.id.num, bodies.planets)
       self.destroyed = true
     end
   end

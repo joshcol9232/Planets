@@ -28,7 +28,7 @@ function HpBar(parent, width, height, pW, pH)
       self.doingFade = true
     end
 
-    if self.doingFade then
+    if self.doingFade and not self.parent.fading then
       fade(self, dt)
     end
     if self.parent == nil then
