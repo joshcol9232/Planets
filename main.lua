@@ -105,7 +105,7 @@ function love.keypressed(key)
   -- player 1 controls
   elseif key == "w" then
     if bodies.players[1] == nil then
-      local mX, mY = lg.inverseTransformPoint(love.mouse.getPosition())
+      local mX, mY = camera.transformation:inverseTransformPoint(love.mouse.getPosition())
       table.insert(bodies.players, Lander({type="l", num=1, team="capturer"}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
 
@@ -123,7 +123,7 @@ function love.keypressed(key)
 	-- player 2 controls
   elseif key == "up" then
 		if bodies.players[2] == nil then
-			local mX, mY = lg.inverseTransformPoint(love.mouse.getPosition())
+			local mX, mY = camera.transformation:inverseTransformPoint(love.mouse.getPosition())
       table.insert(bodies.players, Lander({type="l", num=9999999, team="preventer"}, mX, mY, 0, 0, 20, 20, LD_DENSITY))
     end
   end
