@@ -66,21 +66,6 @@ function changeHpAfterCollisionFunc()
   end
 end
 
-function mergeAfterCollision()
-  local i = 1
-  while i <= #plToMerge do
-    print(love.timer.getTime()-plToMerge[i].time)
-    if love.timer.getTime()-plToMerge[i].time >= PL_JOIN_TIME then
-      print("Merging")
-      mergePlanets(plToMerge[i][1], plToMerge[i][2])
-      table.remove(plToMerge, i)
-    else
-      i = i + 1
-    end
-  end
-  plToMerge = {}
-end
-
 function getTotalMassInWorld()
   local bods = world:getBodies()
   total = 0

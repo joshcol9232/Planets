@@ -260,10 +260,9 @@ function postSolveCallback(fixture1, fixture2, contact, normalImpulse, tangentIm
     end
   end
 
-  -- Planets colliding with other planets
-  if data1.userType == "planet" and data2.userType == "planet" then
-    table.insert(plToMerge, {data1.parentClass, data2.parentClass, time=love.timer.getTime()})
-  end
+  -- -- Planets colliding with other planets
+  -- if data1.userType == "planet" and data2.userType == "planet" then
+  --   table.insert(plToMerge, {data1.parentClass, data2.parentClass, time=love.timer.getTime()})
+  -- end
 
---elseif data1.userType == "lander"
 end
