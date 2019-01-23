@@ -30,7 +30,7 @@ function love.load()
   love.physics.setMeter(SCALE)
   world = love.physics.newWorld(0, 0, true)
   world:setCallbacks(nil, nil, nil, postSolveCallback)
-  bodies = {planets={}, players={}, bullets={}, missiles={}}
+  bodies = {planets={}, players={}, bullets={}, debris={}, missiles={}}
   areas = {}
   changeHpAfterCollision = {}
   bodies, areas = loadLvl(1)
@@ -89,7 +89,7 @@ function love.keypressed(key)
   elseif key == "b" then
     clearBullets()
   elseif key == "m" then
-    bodies.planets[1]:destroy()
+    bodies.players[1]:destroy()
   elseif key == "p" then
     paused = not paused
   elseif key == "n" then
@@ -147,7 +147,7 @@ function love.update(dt)
     end
   end
 
-  camera:update()
+  camera:update(dt)
 
   -- Update the graphs
   fpsGraph:update(dt)
@@ -172,7 +172,7 @@ function love.draw()
 
   lg.setColor({1, 1, 1})
   lg.print(love.timer.getFPS(), 10, 10)
-  lg.print("Object Count: "..#bodies.planets+#bodies.players+#bodies.bullets+#bodies.missiles, 10, 24)
+  lg.print("Object Count: "..getBodyCount(), 10, 24)
   lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
   lg.print("Camera Zoom: "..camera.zoom, 10, 110)
   --lg.print("Camera Angle: "..camera.angle%(2*math.pi), 10, 124)

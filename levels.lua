@@ -108,12 +108,16 @@ levelNames = {"1", "2", "3"} -- Active levels
 
 function loadLvl(num)
   local lvl = levels[num]
-  local bodies = {planets={}, players={}, bullets={}, missiles={}}
+  local bodies = {planets={}, players={}, bullets={}, debris={}, missiles={}}
   local areas = {}
 
   for i=1, #lvl.planets do
     pl = lvl.planets[i]
-    table.insert(bodies.planets, Planet(pl.id, pl.posx, pl.posy, pl.vx, pl.vy, pl.r, pl.d))
+    local partOfLvl = pl.pol
+    if partOfLvl == nil then -- Allows for it to be set to false in a level, but can be left empty if it is true.
+      partOfLvl = true
+    end
+    table.insert(bodies.planets, Planet(pl.id, pl.posx, pl.posy, pl.vx, pl.vy, pl.r, pl.d, partOfLvl))
   end
 
   if lvl.areas ~= nil then

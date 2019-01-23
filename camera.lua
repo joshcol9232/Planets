@@ -5,7 +5,7 @@ function Camera(x, y)
 	c.angle = 0 -- From directly up
 	c.zoom = 1
 	c.followPlayer = true
-	--c.followPlayerAngle = true
+	c.followPlayerAngle = false
 	c.playerIDToFollow = 1
 	c.playerBody = nil
 	c.transformation = love.math.newTransform(-c.x, -c.y, c.angle, c.zoom, c.zoom, 0, 0, 0, 0)
@@ -17,8 +17,66 @@ function Camera(x, y)
 
 	function c:trackPlayer(playerBody)
 		self.x, self.y = playerBody:getPosition()
-		self.angle = -playerBody:getAngle()
+		if self.followPlayerAngle then
+			self.angle = -playerBody:getAngle()
+		end
 	end
+
+	-- function c:getMaxMinXY(table)
+	-- 	local maxX, maxY = self.transformation:transformPoint(table[1].body:getPosition())
+	-- 	local minX, minY = maxX, maxY  -- Set start values as first item
+	--
+	-- 	for i=2, #table do
+	-- 		local plx, ply = self.transformation:transformPoint(table[i].body:getPosition()) -- Get position relative to camera
+	-- 		print(plx, ply, "PLTXY")
+	-- 		if plx > maxX then
+	-- 			maxX = plx
+	-- 		elseif plx < minX then
+	-- 			minX = plx
+	-- 		end
+	--
+	-- 		if ply > maxY then
+	-- 			maxY = ply
+	-- 		elseif ply < minY then
+	-- 			minY = ply
+	-- 			print("NEW MINY", minY)
+	-- 		end
+	-- 	end
+	--
+	-- 	return maxX, maxY, minX, minY
+	-- end
+	--
+	-- function c:lerp(a, b, dt)
+	-- 	return a + (b-a)*dt
+	-- end
+
+	-- function c:getInclusiveZoom(maxX, maxY, minX, minY, borderSize)
+	-- 	local extraZmFactor = 1
+	-- 	local w, h = SCREEN_WIDTH, SCREEN_HEIGHT
+	-- 	print(maxY, minY, "Y")
+	-- 	while (maxX/extraZmFactor > w-borderSize) or (maxY/extraZmFactor > h-borderSize) or (minX/extraZmFactor < borderSize) or (minY + (extraZmFactor*minY) < borderSize) do
+	-- 		--print((maxX/extraZmFactor > w-borderSize), (maxY/extraZmFactor > h-borderSize), (minX < borderSize), (minY < -borderSize))
+	-- 		extraZmFactor = extraZmFactor + 0.02
+	-- 	end
+	-- 	self.zoom = self.zoom/extraZmFactor
+	-- 	print(extraZmFactor)
+	-- end
+
+	-- function c:captureAllPl() -- all planets and players in shot
+	-- 	local maxX, maxY, minX, minY = self:getMaxMinXY(bodies.planets)
+	-- 	local oMaxX, oMaxY, oMinX, oMinY = maxX, maxY, minX, minY
+	-- 	if #bodies.players > 1 then
+	-- 		oMaxX, oMaxY, oMinX, oMinY = self:getMaxMinXY(bodies.players)
+	-- 	end
+	--
+	-- 	maxX = math.max(maxX, oMaxX)
+	-- 	maxY = math.max(maxY, oMaxY)
+	-- 	minX = math.min(minX, oMinX)
+	-- 	minY = math.min(minY, oMinY)
+	--
+	-- 	print(maxX, maxY, minX, minY, "HMM")
+	-- 	self:getInclusiveZoom(maxX, maxY, minX, minY, 1)
+	-- end
 
 	function c:reset()
 		self.zoom = 1
@@ -33,24 +91,24 @@ function Camera(x, y)
 		end
 	end
 
-	function c:move()
+	function c:move(dt)
 		if love.keyboard.isDown("j") then
-			self.x = self.x - CAMERA_SPEED
+			self.x = self.x - CAMERA_SPEED*dt
 		end
 		if love.keyboard.isDown("l") then
-			self.x = self.x + CAMERA_SPEED
+			self.x = self.x + CAMERA_SPEED*dt
 		end
 		if love.keyboard.isDown("i") then
-			self.y = self.y - CAMERA_SPEED
+			self.y = self.y - CAMERA_SPEED*dt
 		end
 		if love.keyboard.isDown("k") then
-			self.y = self.y + CAMERA_SPEED
+			self.y = self.y + CAMERA_SPEED*dt
 		end
 		-- if love.keyboard.isDown("u") then
-		-- 	self.angle = self.angle - CAMERA_ROTATE_SPEED
+		-- 	self.angle = self.angle - CAMERA_ROTATE_SPEED*dt
 		-- end
 		-- if love.keyboard.isDown("o") then
-		-- 	self.angle = self.angle + CAMERA_ROTATE_SPEED
+		-- 	self.angle = self.angle + CAMERA_ROTATE_SPEED*dt
 		-- end
 	end
 
@@ -68,18 +126,21 @@ function Camera(x, y)
 		--lg.applyTransform(self.angleTransform)
 	end
 
-	function c:update()
+	function c:update(dt)
 		if self.followPlayer then
 			if self.playerBody == nil then
 				self.playerBody = getBody("player", self.playerIDToFollow, bodies.players)
 				if self.playerBody ~= nil then
 					self.playerBody = self.playerBody.body
 				end
-			else
+			elseif not self.playerBody:isDestroyed() then
 				self:trackPlayer(self.playerBody)
+			else
+				self.playerBody = nil
 			end
 		end
-		self:move()
+		--self:captureAllPl()
+		self:move(dt)
 	end
 
 	return c

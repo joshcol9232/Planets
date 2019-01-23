@@ -27,6 +27,7 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   function b:destroy(index)
     self.body:destroy()
     table.remove(bodies.bullets, index)
+    self = nil
   end
 
   function b:update(dt)

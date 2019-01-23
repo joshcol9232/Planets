@@ -3,6 +3,7 @@ require "gravFuncs"
 require "constants"
 require "bullet"
 require "missile"
+require "landerDebris"
 
 function Lander(id, x, y, velx, vely, w, h, d)
   local l = {}
@@ -51,21 +52,16 @@ function Lander(id, x, y, velx, vely, w, h, d)
   function l:destroy()
     local x, y = self.body:getPosition()
     local vx, vy = self.body:getLinearVelocity()
-    removeBody("lander", self.id.num)
-    local r = self.r/splitFactor
-    local sep = r/2
-    local vels = getSplitVelocities(splitFactor^2)
-    local a = 0
-    for i=1, splitFactor do
-      for j=1, splitFactor do
-        a = a + 1
-        local p = Planet({type="planet", num=#bodies.planets+1}, (x+(i*sep)), (y+(j*sep)), vx+vels[a].x, vy+vels[a].y, r, PL_DENSITY)
-        table.insert(bodies.planets, p)
-        if math.random(0, 10) == 1 then
-          p:destroy(2)
-        end
-      end
-    end
+    local ang = self.body:getAngle()
+    local angV = self.body:getAngularVelocity()
+    vels = getSplitVelocities(#landerDebris, 50, 10)
+
+    LanderDebris({type="debris", num=#bodies.debris+1}, x, y, vx+vels[1].x, vy+vels[1].y, ang, angV, LD_DEB_TIMEOUT, 1)
+    LanderDebris({type="debris", num=#bodies.debris+1}, x+10, y+12, vx+vels[2].x, vy+vels[2].y, ang, angV, LD_DEB_TIMEOUT, 2)
+    LanderDebris({type="debris", num=#bodies.debris+1}, x-10, y+12, vx+vels[3].x, vy+vels[3].y, ang, angV, LD_DEB_TIMEOUT, 3)
+
+    removeBody("lander", self.id.num, bodies.players)
+    self = nil
   end
 
   function l:thrust()
@@ -208,10 +204,7 @@ function Lander(id, x, y, velx, vely, w, h, d)
 		lg.push()
 			lg.translate(self.body:getX(), self.body:getY())
 			lg.rotate(self.body:getAngle())
-			--lg.rectangle("line", -self.w/2, -self.h/2, self.w, self.h)
-      if drawLanderImg then
-  			lg.draw(landerImg, -self.w/2, -self.h/2)
-      end
+
       self:drawBody()
       if self.id.num == 9999999 then lg.print("2", 0, -25) else -- Special case
         lg.print(self.id.num, 0, -25)

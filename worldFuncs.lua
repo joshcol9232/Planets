@@ -52,7 +52,7 @@ function removeBody(type, idNum, tabl)
     b.body:destroy()
     --print("Len before:", #bodies.bullets)
     table.remove(tabl, i)
-    --print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.bullets)
+    print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.players)
   else
     print("Can't remove body:", idNum, type, tabl)
   end
@@ -104,4 +104,12 @@ function checkSmallPlanetTimeouts()  -- Needs to be separate from bullet:update 
     end
     i = i + 1
   end
+end
+
+function getBodyCount()
+  local count = 0
+  for _, j in pairs(bodies) do
+    count = count + #j
+  end
+  return count
 end

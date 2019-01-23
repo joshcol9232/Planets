@@ -18,9 +18,13 @@ PL_TIMEOUT = 4
 LD_DENSITY = 675    -- Lander density = density of alumnium (2700) /4, as a lander isn't a solid block of aluminium.
 LD_DAMPENING = 70
 LD_FIRE_RATE = 0.1  -- Seconds between firing a bullet
-
+LD_DEB_TIMEOUT = 0.1
 landerBodyDraw = {-5,-5, 5,-5, 12,8, 13,15, 8,9, 0,10, -8,9, -13,15, -12,8} -- For drawing only
 landerBodyP1 =   {-5,-5, 5,-5, 12,8, 13,15, 8,9,       -8,9, -13,15, -12,8}  -- Physics objects - max of 8 verticies
+
+landerDebris = {{-5,-5, 5,-5, 12,8, 0,10, -12,8}, -- Head of
+                {2,-2, 3,5, -2,-1}, -- Right leg
+                {-2,-2, -3,5, 2,-1}} -- Left leg
 
 -- Bullets
 BLT_DENSITY = 11340 -- Density of lead
@@ -37,9 +41,9 @@ MS_DIMENSION_Y = 10
 MS_VEL = 100
 
 -- HP bar
-HPBAR_OPEN_TIME = 5
+HPBAR_OPEN_TIME = 2
 
-CAMERA_SPEED = 10
+CAMERA_SPEED = 500 -- Pixels per second
 CAMERA_SCROLL_ZOOM_SPEED = 14
 CAMERA_ROTATE_SPEED = math.pi/200
 

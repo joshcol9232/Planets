@@ -6,7 +6,7 @@ require "hpBar"
 require "splitFunctions"
 require "animation"
 
-function Planet(id, x, y, velx, vely, r, d)
+function Planet(id, x, y, velx, vely, r, d, pol) -- pol stands for part of level.
   local p = {}
   p.id    = id
   p.r     = r
@@ -14,7 +14,6 @@ function Planet(id, x, y, velx, vely, r, d)
   p.alpha = 1 -- Transparency
 
   p.captures = {}
-  p.destroyed = false
 
   p.body    = love.physics.newBody(world, x, y, "dynamic")
   p.shape   = love.physics.newCircleShape(r)
@@ -23,7 +22,7 @@ function Planet(id, x, y, velx, vely, r, d)
   p.fixture:setUserData({parentClass=p, userType="planet"})
 
   p.fTotalX, p.fTotalY = 0, 0  -- Total force on body
-  p.hasTimeout = (r <= PL_TIMEOUT_THRESHOLD_R)
+  p.hasTimeout = (r <= PL_TIMEOUT_THRESHOLD_R and (not pol))
 
   p.fading = false
 
@@ -59,7 +58,7 @@ function Planet(id, x, y, velx, vely, r, d)
       local vx, vy = self.body:getLinearVelocity()
       r = r/splitFactor
       local sep = r/2
-      local vels = getSplitVelocities(splitFactor^2)
+      local vels = getSplitVelocities(splitFactor^2, PL_SPLIT_SPEED, 50)
       local a = 0
       for i=1, splitFactor do
         for j=1, splitFactor do
@@ -72,7 +71,7 @@ function Planet(id, x, y, velx, vely, r, d)
         end
       end
       removeBody("planet", self.id.num, bodies.planets)
-      self.destroyed = true
+      self = nil
     end
   end
 
