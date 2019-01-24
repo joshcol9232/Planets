@@ -148,7 +148,6 @@ function Lander(id, x, y, velx, vely, w, h, d)
   end
 
   function l:update(dt)
-    --self:turn(self.body:getX(), self.body:getY(), 500, 350)
     local leftD, rightD = love.keyboard.isDown(self.leftKey), love.keyboard.isDown(self.rightKey)
     self.turnKeyDown = leftD or rightD
     if leftD then

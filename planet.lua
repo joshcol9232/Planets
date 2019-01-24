@@ -93,6 +93,11 @@ function Planet(id, x, y, velx, vely, r, d, pol) -- pol stands for part of level
     --local contacts = self.body:getContactList()
     if self.hasTimeout then
       self.totalTime = self.totalTime + dt
+      if (self.totalTime >= self.timeLimit) and (not self.fading) then
+        self.fading = true
+      elseif self.alpha <= 0 then
+        removeBody("planet", self.id.num, bodies.planets)
+      end
     end
 
     if self.fading then

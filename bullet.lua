@@ -25,9 +25,13 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
   b.fTotalX, b.fTotalY = 0, 0
 
   function b:destroy(index)
-    self.body:destroy()
-    table.remove(bodies.bullets, index)
-    self = nil
+    if index == nil then
+      removeBody("bullet", self.id.num, bodies.bullets)
+    else
+      self.body:destroy()
+      table.remove(bodies.bullets, index)
+      self = nil
+    end
   end
 
   function b:update(dt)
@@ -44,6 +48,12 @@ function Bullet(id, x, y, vel, w, h, d, rotation, parentVelX, parentVelY)
     self.body:applyForce(self.fTotalX/SCALE, self.fTotalY/SCALE)
 
     self.totalTime = self.totalTime + dt
+
+    if self.alpha <= 0 then
+      self:destroy()
+    elseif (self.totalTime >= BLT_TIMEOUT) and (not self.fading) then
+      self.fading = true
+    end
 
     if self.fading then
       fade(self, dt)

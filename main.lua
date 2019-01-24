@@ -132,13 +132,13 @@ end
 function love.update(dt)
   if not paused then
     world:update(dt)
-    checkBulletTimeouts()
-    checkSmallPlanetTimeouts()
     changeHpAfterCollisionFunc()
 
     for _, j in pairs(bodies) do
-      for x=1, #j do
+      local x = 1
+      while x <= #j do -- in case length of j changes (due to destroying bodies)
         j[x]:update(dt)
+        x = x + 1
       end
     end
 

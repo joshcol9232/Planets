@@ -14,11 +14,6 @@ function clearBullets()
   bodies.bullets = {}
 end
 
-function destroyBullet(i) -- index of bullet in bullet table
-  bodies.bullets[i].body:destroy()
-  table.remove(bodies.bullets, i)
-end
-
 function getBodTable(type)
   if type == "planet" then
     return bodies.planets
@@ -50,9 +45,8 @@ function removeBody(type, idNum, tabl)
   local b, i = getBody(type, idNum, tabl)
   if b ~= nil then
     b.body:destroy()
-    --print("Len before:", #bodies.bullets)
     table.remove(tabl, i)
-    print("Removed body at:", i, "id:", b.id.num, "Len bodies:", #bodies.players)
+    --print("Removed body at:", i, "id:", b.id.num, "Len of table:", #tabl, "Type:", type)
   else
     print("Can't remove body:", idNum, type, tabl)
   end
@@ -77,33 +71,6 @@ function getTotalMassInWorld()
     total = total + bods[i]:getMass()
   end
   return total
-end
-
-function checkBulletTimeouts()  -- Needs to be separate from bullet:update due to loop in main update
-  local i = 1
-  while i <= #bodies.bullets do
-    if bodies.bullets[i].alpha <= 0 then
-      removeBody("bullet", bodies.bullets[i].id.num, bodies.bullets)
-    elseif (bodies.bullets[i].totalTime >= BLT_TIMEOUT) and (not bodies.bullets[i].fading) then
-      bodies.bullets[i].fading = true
-    else
-      i = i + 1
-    end
-  end
-end
-
-function checkSmallPlanetTimeouts()  -- Needs to be separate from bullet:update due to loop in main update
-  local i = 1
-  while i <= #bodies.planets do
-    if bodies.planets[i].hasTimeout then
-      if bodies.planets[i].alpha <= 0 then
-        removeBody("planet", bodies.planets[i].id.num, bodies.planets)
-      elseif (bodies.planets[i].totalTime >= bodies.planets[i].timeLimit) and (not bodies.planets[i].fading) then
-        bodies.planets[i].fading = true
-      end
-    end
-    i = i + 1
-  end
 end
 
 function getBodyCount()
