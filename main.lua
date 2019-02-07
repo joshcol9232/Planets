@@ -5,7 +5,6 @@ require "misc"
 require "levels"
 require "worldFuncs"
 require "camera"
-require "area"
 require "collisionFuncs"
 
 debugGraph = require "debugGraph"
@@ -31,9 +30,8 @@ function love.load()
   world = love.physics.newWorld(0, 0, true)
   world:setCallbacks(nil, nil, nil, postSolveCallback)
   bodies = {planets={}, players={}, bullets={}, debris={}, missiles={}}
-  areas = {}
   changeHpAfterCollision = {}
-  bodies, areas = loadLvl(1)
+  bodies = loadLvl(1)
   timeOfLastPlDestruction = 0
   paused = false
   fullScreen = false
@@ -56,8 +54,7 @@ function love.mousereleased(x, y, button)
   end
 
   if button == 2 then
-		--drawGridOfPlanets(mouseX, mouseY, x, y, plSize)
-    table.insert(areas, Area({num=#areas+1}, mouseX, mouseY, {r=0.2, g=0.8, b=0}, "Egg", 100, 1))
+	drawGridOfPlanets(mouseX, mouseY, x, y, plSize)
   end
 end
 
@@ -89,7 +86,9 @@ function love.keypressed(key)
   elseif key == "b" then
     clearBullets()
   elseif key == "m" then
-    bodies.players[1]:destroy()
+    for i=1, #bodies.planets/2 do
+      bodies.planets[i]:destroy()
+    end
   elseif key == "p" then
     paused = not paused
   elseif key == "n" then
@@ -131,6 +130,7 @@ end
 
 function love.update(dt)
   if not paused then
+    dt = dt * 2
     world:update(dt)
     changeHpAfterCollisionFunc()
 
@@ -140,10 +140,6 @@ function love.update(dt)
         j[x]:update(dt)
         x = x + 1
       end
-    end
-
-    for i=1, #areas do -- Update areas
-      areas[i]:update(dt)
     end
   end
 
@@ -165,9 +161,6 @@ function love.draw()
       end
     end
 
-    for i=1, #areas do
-      areas[i]:draw()
-    end
   lg.pop()
 
   lg.setColor({1, 1, 1})
@@ -175,7 +168,6 @@ function love.draw()
   lg.print("Object Count: "..getBodyCount(), 10, 24)
   lg.print("Total mass in world: "..tostring(getTotalMassInWorld()), 10, 160)
   lg.print("Camera Zoom: "..camera.zoom, 10, 110)
-  --lg.print("Camera Angle: "..camera.angle%(2*math.pi), 10, 124)
 
 	lg.print("Size: "..plSize, 10, 96)
 
@@ -231,7 +223,7 @@ function drawGridOfPlanets(mouseX, mouseY, x, y, size) -- Mostly for testing
 	local num = 10*(1/size)
   for i=0, num do
 		for j=0, num do
-			table.insert(bodies.planets, Planet({type="p", num=#bodies.planets+1}, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY))
+			table.insert(bodies.planets, Planet({type="p", num=#bodies.planets+1}, mouseX+(i*size*2), mouseY+(j*size*2), mouseX-x, mouseY-y, size, PL_DENSITY, true))
 		end
   end
 end
