@@ -1,2 +1,0 @@
-# Planets
-Idk planet boi
