@@ -1,2 +1,2 @@
 # Planets
-Idk planet boi
+n-body sim
