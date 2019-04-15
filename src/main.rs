@@ -6,7 +6,6 @@ use planet::{Planet, PLANET_DENSITY, TrailNode};
 use field_vis::{FieldVisual};
 
 const G: f32 = 0.001;
-const FIELD_UPDATE_PERIOD: f32 = 0.5;
 
 struct Prediction {
 	body: Planet,
@@ -52,7 +51,7 @@ struct App {
 	paused: bool,
 	planet_spawn_size: f32,
 	unpaused_time: f32,
-	trails_enabled: bool,
+	show_trails: bool,
 
 	prediction: Prediction,
 }
@@ -72,7 +71,7 @@ impl App {
 			paused: true,
 			planet_spawn_size: 5.0,
 			unpaused_time: 0.0,
-			trails_enabled: false,
+			show_trails: true,
 
 			prediction: Prediction::default()
 		}
@@ -99,6 +98,7 @@ impl App {
 	}
 	
 	pub fn update(&mut self, dt: f32) {
+		self.field_v_update_timer += dt;
 		if self.pl_id_count >= 4294967294 {
 			self.pl_id_count = 0;
 		}
@@ -109,7 +109,6 @@ impl App {
 
 		if !self.paused {
 			self.unpaused_time += dt;
-			self.field_v_update_timer += dt;
 
 			for i in 0..self.planets.len() {   // For each planet
 				for j in i..self.planets.len() {  // For every other planet
@@ -124,10 +123,10 @@ impl App {
 					}
 				}
 
-				self.planets[i].update(dt, self.unpaused_time, self.trails_enabled);
+				self.planets[i].update(dt, self.unpaused_time, self.show_trails);
 			}
 
-			if self.show_field && self.field_v_update_timer <= FIELD_UPDATE_PERIOD {
+			if self.show_field {
 				self.update_field_vis();
 				self.field_v_update_timer = 0.0;
 			}
@@ -140,7 +139,7 @@ impl App {
 		}
 
 		for p in self.planets.iter() {
-			p.draw(&self.rl, self.unpaused_time, self.trails_enabled);
+			p.draw(&self.rl, self.unpaused_time, self.show_trails);
 		}
 
 		if self.rl.is_mouse_button_down(0) {
@@ -185,10 +184,12 @@ impl App {
 			self.add_planet(self.rl.get_mouse_position(), Vector2::zero(), self.planet_spawn_size, true);
 		}
 
-		if self.rl.is_key_pressed(consts::KEY_UP as i32) {
-			self.planet_spawn_size += 1.0;
-		} else if self.rl.is_key_pressed(consts::KEY_DOWN as i32) {
-			if self.planet_spawn_size > 1.0 {
+		if self.rl.get_mouse_wheel_move() != 0 {
+			let dm = self.rl.get_mouse_wheel_move();
+
+			if dm > 0 {
+				self.planet_spawn_size += 1.0;
+			} else if self.planet_spawn_size > 1.0 {
 				self.planet_spawn_size -= 1.0;
 			}
 		}
@@ -199,6 +200,10 @@ impl App {
 
 		if self.rl.is_key_pressed(consts::KEY_F as i32) {
 			self.show_field = !self.show_field;
+		}
+
+		if self.rl.is_key_pressed(consts::KEY_T as i32) {
+			self.show_trails = !self.show_trails;
 		}
 	}
 
@@ -295,7 +300,7 @@ impl App {
 	}
 
 	pub fn update_field_vis(&mut self) {  // Doesn't need time
-		println!("Updating");
+		
 		for n in self.field_v.nodes.iter_mut() {
 			n.force = Vector2::zero();
 			for p in self.planets.iter() {
@@ -335,7 +340,7 @@ fn main() {
 	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 
-	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
+	//a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 6);
 	
 
 	//a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
