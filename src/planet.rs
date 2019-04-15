@@ -108,7 +108,9 @@ impl Planet {
 
 	#[inline]
 	fn place_trail(&mut self, time: f32) {
+		//if self.vel.length() > self.radius/2.0 {
 		self.trail_nodes.push(TrailNode { pos: self.pos, time_created: time });
+		//}
 	}
 
 	#[inline]

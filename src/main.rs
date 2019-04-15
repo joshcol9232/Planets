@@ -209,31 +209,21 @@ impl App {
 		let new_rad = (((3.0/4.0) * (p1_volume + p2_volume))/consts::PI as f32).powf(1.0/3.0);
 		let total_mass = self.planets[p1].mass + self.planets[p2].mass;
 
-		let considerable_diference = (self.planets[p1].radius.max(self.planets[p2].radius)/self.planets[p1].radius.min(self.planets[p2].radius)).powi(3) > 2.0; // If largest more than x times more volume (proportionaly)
+		let (big, small) = if self.planets[p1].radius > self.planets[p2].radius { (p1, p2) } else if self.planets[p1].radius < self.planets[p2].radius { (p2, p1) } else { (p1, p2) };
 
-		self.planets.push(Planet::new(
-			self.pl_id_count,
-			if !considerable_diference {
-				(self.planets[p1].pos + self.planets[p2].pos)/2.0
-			} else if self.planets[p1].radius > self.planets[p2].radius {
-				self.planets[p1].pos
-			} else {
-				self.planets[p2].pos
-			},
-			total_momentum/total_mass,
-			new_rad,
-			total_mass,
-			if self.planets[p1].radius > self.planets[p2].radius {
-				self.planets[p1].stationary
-			} else {
-				self.planets[p2].stationary
-			}
-		));
+		let considerable_diference = (self.planets[big].radius/self.planets[small].radius).powi(3) > 2.0; // If largest more than x times more volume (proportionaly)
 
-		self.pl_id_count += 1;
+		self.planets[big].pos = if !considerable_diference {
+											(self.planets[big].pos + self.planets[small].pos)/2.0
+										} else {
+											self.planets[big].pos
+										};
 
-		self.collided_bodies.push(self.planets[p1].id);
-		self.collided_bodies.push(self.planets[p2].id);
+		self.planets[big].vel = total_momentum/total_mass;
+		self.planets[big].radius = new_rad;
+		self.planets[big].mass = total_mass;
+
+		self.collided_bodies.push(self.planets[small].id);
 	}
 
 	pub fn get_grav_force_between_two_planets(&self, p1: &Planet, p2: &Planet) -> (Vector2, Vector2) {   // returns force on pl1 and pl2
@@ -275,10 +265,14 @@ fn main() {
 
 	let mut a = App::new(rl);
 	
-	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, true);
-	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
+	/*
+	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, false);
+	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, false);
 
 	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
+	*/
+
+	a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
 
 	a.main_loop();
 }
