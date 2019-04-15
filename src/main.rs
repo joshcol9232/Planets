@@ -1,9 +1,12 @@
 use raylib::{Color, Vector2, RaylibHandle, consts};
 
 mod planet;
+mod field_vis;
 use planet::{Planet, PLANET_DENSITY, TrailNode};
+use field_vis::{FieldVisual};
 
 const G: f32 = 0.001;
+const FIELD_UPDATE_PERIOD: f32 = 0.5;
 
 struct Prediction {
 	body: Planet,
@@ -29,20 +32,27 @@ impl Prediction {
 	}
 
 	pub fn draw(&self, rl: &RaylibHandle, time: f32) {
-		self.body.draw(rl, time);
+		self.body.draw(rl, time, true);
 	}
 }
+
 
 struct App {
 	rl: RaylibHandle,
 	planets: Vec<Planet>,
 	collided_bodies: Vec<u32>, // ID's
+
+	field_v: FieldVisual,
+	field_v_update_timer: f32,
+	show_field: bool,
+
 	pl_id_count: u32,
 	mouse_click_pos: Vector2,
 	last_mouse_pos: Vector2,
 	paused: bool,
 	planet_spawn_size: f32,
 	unpaused_time: f32,
+	trails_enabled: bool,
 
 	prediction: Prediction,
 }
@@ -53,12 +63,16 @@ impl App {
 			rl: ray,
 			planets: vec![],
 			collided_bodies: vec![],
+			field_v: FieldVisual::new(30, 1920, 1080),
+			field_v_update_timer: 0.0,
+			show_field: true,
 			pl_id_count: 0,
 			mouse_click_pos: Vector2::zero(),
 			last_mouse_pos: Vector2::zero(),
 			paused: true,
 			planet_spawn_size: 5.0,
 			unpaused_time: 0.0,
+			trails_enabled: false,
 
 			prediction: Prediction::default()
 		}
@@ -95,6 +109,8 @@ impl App {
 
 		if !self.paused {
 			self.unpaused_time += dt;
+			self.field_v_update_timer += dt;
+
 			for i in 0..self.planets.len() {   // For each planet
 				for j in i..self.planets.len() {  // For every other planet
 					if i != j && !self.collided_bodies.contains(&self.planets[j].id) {
@@ -108,14 +124,23 @@ impl App {
 					}
 				}
 
-				self.planets[i].update(dt, self.unpaused_time);
+				self.planets[i].update(dt, self.unpaused_time, self.trails_enabled);
+			}
+
+			if self.show_field && self.field_v_update_timer <= FIELD_UPDATE_PERIOD {
+				self.update_field_vis();
+				self.field_v_update_timer = 0.0;
 			}
 		}
 	}
 
 	pub fn draw(&self) {
+		if self.show_field {
+			self.field_v.draw(&self.rl)
+		}
+
 		for p in self.planets.iter() {
-			p.draw(&self.rl, self.unpaused_time);
+			p.draw(&self.rl, self.unpaused_time, self.trails_enabled);
 		}
 
 		if self.rl.is_mouse_button_down(0) {
@@ -125,7 +150,8 @@ impl App {
 
 		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, Color::RAYWHITE);
 		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, Color::RAYWHITE);
-		self.rl.draw_text(format!("Trail nodes: {}", self.get_trail_node_total()).as_str(), 10, 80, 20, Color::RAYWHITE);
+		//self.rl.draw_text(format!("Total mass: {}", self.get_total_mass()).as_str(), 10, 80, 20, Color::RAYWHITE);
+		//self.rl.draw_text(format!("Trail nodes: {}", self.get_trail_node_total()).as_str(), 10, 96, 20, Color::RAYWHITE);
 	}
 
 	fn get_input(&mut self, dt: f32) {
@@ -152,19 +178,27 @@ impl App {
 		}
 
 		if self.rl.is_mouse_button_pressed(1) {
+			self.make_square(self.rl.get_mouse_position(), false, self.planet_spawn_size, 5.0, 10, 10);
+		}
+
+		if self.rl.is_mouse_button_pressed(2) {
 			self.add_planet(self.rl.get_mouse_position(), Vector2::zero(), self.planet_spawn_size, true);
 		}
 
 		if self.rl.is_key_pressed(consts::KEY_UP as i32) {
 			self.planet_spawn_size += 1.0;
 		} else if self.rl.is_key_pressed(consts::KEY_DOWN as i32) {
-			if self.planet_spawn_size >= 1.0 {
+			if self.planet_spawn_size > 1.0 {
 				self.planet_spawn_size -= 1.0;
 			}
 		}
 
 		if self.rl.is_key_pressed(consts::KEY_P as i32) {
 			self.paused = !self.paused;
+		}
+
+		if self.rl.is_key_pressed(consts::KEY_F as i32) {
+			self.show_field = !self.show_field;
 		}
 	}
 
@@ -179,13 +213,21 @@ impl App {
 			}
 		}
 
-		self.prediction.body.update(dt, 0.0);
+		self.prediction.body.update(dt, 0.0, true);
 	}
 
 	fn get_trail_node_total(&self) -> usize {
 		let mut total = 0;
 		for p in self.planets.iter() {
 			total += p.trail_nodes.len();
+		}
+		total
+	}
+
+	fn get_total_mass(&self) -> f32 {
+		let mut total = 0.0;
+		for p in self.planets.iter() {
+			total += p.mass;
 		}
 		total
 	}
@@ -227,18 +269,17 @@ impl App {
 	}
 
 	pub fn get_grav_force_between_two_planets(&self, p1: &Planet, p2: &Planet) -> (Vector2, Vector2) {   // returns force on pl1 and pl2
-		let pos = p2.pos - p1.pos;
+		let dist = (p2.pos - p1.pos).length();
 		let angle = p1.pos.angle_to(p2.pos);
-		let angle2 = angle + consts::PI as f32;
-		let dist = pos.length();
-		if dist > p1.radius + p2.radius {
-			let f_mag = (G * p1.mass * p2.mass)/(dist.powi(2));
-			
-			(Vector2 { x: f_mag * angle.cos(), y: f_mag * angle.sin() }, Vector2 { x: f_mag * angle2.cos(), y: f_mag * angle2.sin() })
+
+		if dist > p1.radius + p2.radius {  // If colliding then don't bother
+			let vec1 = get_grav_force(dist, angle, p1.mass, p2.mass);
+			(vec1, Vector2 { x: -vec1.x, y: -vec1.y })
 		} else {
 			(Vector2::zero(), Vector2::zero())
 		}
 	}
+
 
 	pub fn make_square(&mut self, pos: Vector2, stat: bool, rad: f32, sep: f32, w: u32, h: u32) {
 		for i in 0..w {
@@ -252,6 +293,31 @@ impl App {
 			}
 		}
 	}
+
+	pub fn update_field_vis(&mut self) {  // Doesn't need time
+		println!("Updating");
+		for n in self.field_v.nodes.iter_mut() {
+			n.force = Vector2::zero();
+			for p in self.planets.iter() {
+				let dist = (p.pos - n.pos).length();
+				if dist > p.radius {  // If inside then don't bother
+					n.force += get_grav_force(dist, n.pos.angle_to(p.pos), 1.0, p.mass);
+				}
+			}
+		}
+		self.field_v.update_scales();
+	}
+}
+
+#[inline]
+fn grav_equ(M: f32, m: f32, distance: f32) -> f32 { // gets magnitude of gravitational force
+	(G * m * M)/(distance.powi(2))
+}
+
+#[inline]
+fn get_grav_force(dist: f32, angle: f32, m1: f32, m2: f32) -> Vector2 {
+	let f_mag = grav_equ(m1, m2, dist);
+	Vector2 { x: f_mag * angle.cos(), y: f_mag * angle.sin() }
 }
 
 fn main() {
@@ -265,14 +331,14 @@ fn main() {
 
 	let mut a = App::new(rl);
 	
-	/*
-	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, false);
-	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, false);
+	
+	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, true);
+	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 
 	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
-	*/
+	
 
-	a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
+	//a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
 
 	a.main_loop();
 }

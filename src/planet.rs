@@ -62,29 +62,33 @@ impl Planet {
 		}
 	}
 
-	pub fn draw(&self, rl: &RaylibHandle, time: f32) {
-		self.draw_trail(rl, time);
+	pub fn draw(&self, rl: &RaylibHandle, time: f32, trails: bool) {
+		if trails {
+			self.draw_trail(rl, time);
+		}
 		let col = if self.is_prediction { Color::RED } else { Color::RAYWHITE };
 		
 		rl.draw_circle_v(self.pos, self.radius, col);
 		//self.draw_debug(rl);
 	}
 
-	pub fn update(&mut self, dt: f32, time: f32) {
+	pub fn update(&mut self, dt: f32, time: f32, trails: bool) {
 		if !self.is_prediction {
 			self.kill_dead_trails(time);
 		}
 
 		if !self.stationary {
-			self.trail_timer += dt;
-			if self.trail_timer >= TRAIL_PLACEMENT_INTERVAL {
-				self.place_trail(time);
-				self.trail_timer = 0.0;
-			}
+			if trails {
+				self.trail_timer += dt;
+				if self.trail_timer >= TRAIL_PLACEMENT_INTERVAL {
+					self.place_trail(time);
+					self.trail_timer = 0.0;
+				}
 
-			let len = self.trail_nodes.len();
-			if len > 0 {
-				self.trail_nodes[len-1].pos = self.pos;
+				let len = self.trail_nodes.len();
+				if len > 0 {
+					self.trail_nodes[len-1].pos = self.pos;
+				}
 			}
 
 			self.vel += self.res_force.scale_by(dt/self.mass);  // F = ma, a = F / m, a * dt = vel increase, f * dt/mass = vel change
