@@ -1,4 +1,4 @@
-use raylib::{Vector2, RaylibHandle, Color};
+use raylib::{Vector2, RaylibHandle, Color, Shader};
 
 pub struct FieldNode {
 	pub pos: Vector2,
@@ -10,15 +10,19 @@ pub struct FieldNode {
 pub struct FieldVisual {  // Shows field lines
 	pub nodes: Vec<FieldNode>,
 	max_line_len: f32,
-	pub directional: bool
+	pub directional: bool,
+	field_shader: Shader,
+	pub draw_using_shader: bool
 }
 
 impl FieldVisual {
-	pub fn new(spacing: u32, w: u32, h: u32) -> FieldVisual {
+	pub fn new(rl: &RaylibHandle, spacing: u32, w: u32, h: u32) -> FieldVisual {
 		FieldVisual {
 			nodes: FieldVisual::generate_nodes(spacing, w, h),
 			max_line_len: spacing as f32/2.0,
-			directional: true
+			directional: false,
+			field_shader: rl.load_shader("", "src/field_shader.fs"),
+			draw_using_shader: true
 		}
 	}
 
@@ -36,8 +40,10 @@ impl FieldVisual {
 		}
 	}
 
-	pub fn draw_as_background() {
-
+	pub fn draw_with_shader(&self, rl: &RaylibHandle, w: i32, h: i32) {
+		rl.begin_shader_mode(&self.field_shader);
+		rl.draw_rectangle(0, 0, w, h, Color::BLACK);  // Acts as a canvas since the binding is broken
+		rl.end_shader_mode();
 	}
 
 	pub fn update_scales(&mut self) {
