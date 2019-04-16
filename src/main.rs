@@ -205,6 +205,15 @@ impl App {
 		if self.rl.is_key_pressed(consts::KEY_T as i32) {
 			self.show_trails = !self.show_trails;
 		}
+
+		if self.rl.is_key_pressed(consts::KEY_R as i32) {
+			self.reset();
+		}
+	}
+
+	#[inline]
+	fn reset(&mut self) {
+		self.planets = vec![];
 	}
 
 	fn update_prediction(&mut self, dt: f32) {
