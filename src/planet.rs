@@ -127,7 +127,8 @@ impl Planet {
 		4.0/3.0 * consts::PI as f32 * radius.powi(3) * PLANET_DENSITY
 	}
 
-	#[inline]
+	#[inline] 
+	#[allow(dead_code)]
 	fn draw_debug(&self, rl: &RaylibHandle) {
 		rl.draw_line_ex(self.pos, self.vel + self.pos, 2.0, Color::LIME);
 	}

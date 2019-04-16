@@ -60,10 +60,10 @@ struct App {
 impl App {
 	pub fn new(ray: RaylibHandle) -> App {
 		App {
+			rl: ray,
 			planets: vec![],
 			collided_bodies: vec![],
-			field_v: FieldVisual::new(&ray, 30, 1920, 1080),
-			rl: ray,
+			field_v: FieldVisual::new(30, 1920, 1080),
 			field_v_update_timer: 0.0,
 			show_field: true,
 			pl_id_count: 0,
@@ -84,11 +84,7 @@ impl App {
 			self.update(dt);
 
 			self.rl.begin_drawing();
-			if self.field_v.draw_using_shader {
-				self.field_v.draw_with_shader(&self.rl, 1920, 1080);
-			} else {
-				self.rl.clear_background(Color::BLACK);
-			}
+			self.rl.clear_background(Color::BLACK);
 
 			self.draw();
 
@@ -139,7 +135,7 @@ impl App {
 	}
 
 	pub fn draw(&self) {
-		if self.show_field && !self.field_v.draw_using_shader {
+		if self.show_field {
 			self.field_v.draw(&self.rl)
 		}
 
@@ -215,7 +211,7 @@ impl App {
 			self.reset();
 		}
 
-		if self.show_field && !self.field_v.draw_using_shader && self.rl.is_key_pressed(consts::KEY_D as i32) {
+		if self.show_field && self.rl.is_key_pressed(consts::KEY_D as i32) {
 			self.field_v.directional = !self.field_v.directional;
 		}
 	}
@@ -239,6 +235,7 @@ impl App {
 		self.prediction.body.update(dt, 0.0, true);
 	}
 
+	#[allow(dead_code)]
 	fn get_trail_node_total(&self) -> usize {
 		let mut total = 0;
 		for p in self.planets.iter() {
@@ -247,6 +244,7 @@ impl App {
 		total
 	}
 
+	#[allow(dead_code)]
 	fn get_total_mass(&self) -> f32 {
 		let mut total = 0.0;
 		for p in self.planets.iter() {
@@ -333,8 +331,8 @@ impl App {
 }
 
 #[inline]
-fn grav_equ(M: f32, m: f32, distance: f32) -> f32 { // gets magnitude of gravitational force
-	(G * m * M)/(distance.powi(2))
+fn grav_equ(m1: f32, m2: f32, distance: f32) -> f32 { // gets magnitude of gravitational force
+	(G * m1 * m2)/(distance.powi(2))
 }
 
 #[inline]
@@ -358,7 +356,7 @@ fn main() {
 	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 
-	//a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 6);
+	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 6);
 	
 
 	//a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
