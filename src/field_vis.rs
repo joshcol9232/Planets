@@ -9,22 +9,35 @@ pub struct FieldNode {
 
 pub struct FieldVisual {  // Shows field lines
 	pub nodes: Vec<FieldNode>,
-	max_line_len: f32
+	max_line_len: f32,
+	pub directional: bool
 }
 
 impl FieldVisual {
 	pub fn new(spacing: u32, w: u32, h: u32) -> FieldVisual {
 		FieldVisual {
 			nodes: FieldVisual::generate_nodes(spacing, w, h),
-			max_line_len: spacing as f32/2.0
+			max_line_len: spacing as f32/2.0,
+			directional: true
 		}
 	}
 
 	pub fn draw(&self, rl: &RaylibHandle) {
 		for n in self.nodes.iter() {
 			rl.draw_pixel_v(n.pos, n.col);
-			rl.draw_line_ex(n.pos, (n.normalized * self.max_line_len) + n.pos, 1.0, n.col);
+			if self.directional {
+				rl.draw_line_ex(n.pos, ((n.normalized/n.normalized.length()) * self.max_line_len) + n.pos, 2.0, n.col);
+			} else {
+				let draw_line = n.normalized * self.max_line_len;
+				if draw_line.length() > 1.0 {
+					rl.draw_line_ex(n.pos, draw_line + n.pos, 2.0, n.col);
+				}
+			}
 		}
+	}
+
+	pub fn draw_as_background() {
+
 	}
 
 	pub fn update_scales(&mut self) {
@@ -64,8 +77,9 @@ impl FieldVisual {
 
 		for i in 0..num_hor {
 			for j in 0..num_ver {
+				let offset = spacing as f32/2.0;
 				out.push(FieldNode {
-					pos: Vector2 { x: i as f32 * spacing as f32, y: j as f32 * spacing as f32 },
+					pos: Vector2 { x: (i as f32 * spacing as f32) + offset, y: (j as f32 * spacing as f32) + offset },
 					force: Vector2::zero(),
 					col: Color::RED,
 					normalized: Vector2::zero()

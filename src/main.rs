@@ -6,6 +6,7 @@ use planet::{Planet, PLANET_DENSITY, TrailNode};
 use field_vis::{FieldVisual};
 
 const G: f32 = 0.001;
+const FIELD_UPDATE_PERIOD: f32 = 0.05;
 
 struct Prediction {
 	body: Planet,
@@ -126,7 +127,7 @@ impl App {
 				self.planets[i].update(dt, self.unpaused_time, self.show_trails);
 			}
 
-			if self.show_field {
+			if self.show_field && self.field_v_update_timer >= FIELD_UPDATE_PERIOD {
 				self.update_field_vis();
 				self.field_v_update_timer = 0.0;
 			}
@@ -208,6 +209,10 @@ impl App {
 
 		if self.rl.is_key_pressed(consts::KEY_R as i32) {
 			self.reset();
+		}
+
+		if self.show_field && self.rl.is_key_pressed(consts::KEY_D as i32) {
+			self.field_v.directional = !self.field_v.directional;
 		}
 	}
 
