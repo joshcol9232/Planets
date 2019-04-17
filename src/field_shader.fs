@@ -2,7 +2,7 @@
 
 #define G 0.001
 
-uniform vec3 bodies[512]; // pos.x, pos.y, mass : x, y, z respectively
+uniform vec4 bodies[512]; // pos.x, pos.y, mass, radius : x, y, z, w respectively
 uniform int body_num;
 uniform int screen_height;
 
@@ -18,12 +18,15 @@ void main() {
 		float angle = atan(dist_vec.y, dist_vec.x);
 		float dist = sqrt(pow(dist_vec.x, 2) + pow(dist_vec.y, 2));
 
-		float force_mag = G * bodies[i].z/pow(dist, 2);
-		force.x += force_mag * sin(angle);
-		force.y += force_mag * cos(angle);
+		if (dist + 1 >= bodies[i].w) {
+			float force_mag = G * bodies[i].z/pow(dist, 2);
+			force.x += force_mag * sin(angle);
+			force.y += force_mag * cos(angle);
+		}
 	}
 
 	float force_mag = sqrt(pow(force.r, 2) + pow(force.g, 2));
 
-	finalColor = vec4(0.0, force_mag/1000, 0.0, 1.0);
+	float norm = force_mag/1500;
+	finalColor = vec4(0.0, norm, 0.0, 1.0);
 }

@@ -326,7 +326,7 @@ impl App {
 
 			self.rl.set_shader_value(&mut self.field_v.field_shader,
 											 bod_loc,
-											 &[p.pos.x, p.pos.y, p.mass]
+											 &[p.pos.x, p.pos.y, p.mass, p.radius]
 			);
 		}
 	}
@@ -380,7 +380,9 @@ fn main() {
 	let mut a = App::new(rl, 1000, 800);
 	
 	
-	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, false);
+	a.add_planet(Vector2 { x: 400.0, y: 340.0 }, Vector2::zero(), 40.0, false);
+
+	//a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, false);
 	//a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 
 	//a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
