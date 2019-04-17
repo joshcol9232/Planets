@@ -11,7 +11,7 @@ pub struct FieldVisual {  // Shows field lines
 	pub nodes: Vec<FieldNode>,
 	max_line_len: f32,
 	pub directional: bool,
-	field_shader: Shader,
+	pub field_shader: Shader,
 	pub draw_using_shader: bool
 }
 
@@ -50,6 +50,7 @@ impl FieldVisual {
 
 	pub fn update_scales(&mut self) {
 		let largest = self.get_max_force_magnitude();
+		println!("Largest: {}", largest);
 		for n in self.nodes.iter_mut() {
 			n.normalized = n.force/largest;
 			n.col = FieldVisual::get_line_color(n.normalized.length().powf(1.0/3.0));

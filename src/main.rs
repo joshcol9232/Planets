@@ -318,9 +318,28 @@ impl App {
 		}
 	}
 
+	fn send_planets_to_shader(&mut self) {
+		for (i, p) in self.planets.iter().enumerate() {
+			let bod_loc = self.rl.get_shader_location(&self.field_v.field_shader, format!("bodies[{}]", i).as_str());
+
+			self.rl.set_shader_value(&mut self.field_v.field_shader,
+											 bod_loc,
+											 &[p.pos.x, p.pos.y, p.mass, p.radius]
+			);
+		}
+	}
+
 	pub fn update_field_vis(&mut self) {  // Doesn't need time
 		if self.field_v.draw_using_shader {
 			// Update shader
+			let body_num = self.rl.get_shader_location(&self.field_v.field_shader, "body_num");
+			self.rl.set_shader_value(&mut self.field_v.field_shader,
+											 body_num,
+											 &[self.planets.len() as f32]
+			);
+
+			self.send_planets_to_shader();
+
 		} else {
 			for n in self.field_v.nodes.iter_mut() {
 				n.force = Vector2::zero();
@@ -359,10 +378,10 @@ fn main() {
 	let mut a = App::new(rl);
 	
 	
-	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, true);
-	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
+	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, false);
+	//a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 
-	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
+	//a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
 	
 
 	//a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
