@@ -39,6 +39,7 @@ impl Prediction {
 
 struct App {
 	rl: RaylibHandle,
+	screen_dim: Vector2,
 	planets: Vec<Planet>,
 	collided_bodies: Vec<u32>, // ID's
 
@@ -58,11 +59,12 @@ struct App {
 }
 
 impl App {
-	pub fn new(ray: RaylibHandle) -> App {
+	pub fn new(ray: RaylibHandle, w: u32, h: u32) -> App {
 		App {
+			screen_dim: Vector2 { x: w as f32, y: h as f32 },
 			planets: vec![],
 			collided_bodies: vec![],
-			field_v: FieldVisual::new(&ray, 30, 1920, 1080),
+			field_v: FieldVisual::new(&ray, 30, w, h),
 			field_v_update_timer: 0.0,
 			rl: ray,
 			show_field: true,
@@ -86,7 +88,7 @@ impl App {
 			self.rl.begin_drawing();
 			self.rl.clear_background(Color::BLACK);
 			if self.field_v.draw_using_shader && self.show_field {
-				self.field_v.draw_with_shader(&self.rl, 1920, 1080);
+				self.field_v.draw_with_shader(&self.rl, self.screen_dim.x as i32, self.screen_dim.y as i32);
 			}
 
 			self.draw();
@@ -142,10 +144,8 @@ impl App {
 			self.field_v.draw(&self.rl)
 		}
 
-		if !self.field_v.draw_using_shader {
-			for p in self.planets.iter() {
-				p.draw(&self.rl, self.unpaused_time, self.show_trails);
-			}
+		for p in self.planets.iter() {
+			p.draw(&self.rl, self.unpaused_time, self.show_trails);
 		}
 
 		if self.rl.is_mouse_button_down(0) {
@@ -326,7 +326,7 @@ impl App {
 
 			self.rl.set_shader_value(&mut self.field_v.field_shader,
 											 bod_loc,
-											 &[p.pos.x, p.pos.y, p.mass, p.radius]
+											 &[p.pos.x, p.pos.y, p.mass]
 			);
 		}
 	}
@@ -335,9 +335,9 @@ impl App {
 		if self.field_v.draw_using_shader {
 			// Update shader
 			let body_num = self.rl.get_shader_location(&self.field_v.field_shader, "body_num");
-			self.rl.set_shader_value(&mut self.field_v.field_shader,
+			self.rl.set_shader_value_i(&mut self.field_v.field_shader,
 											 body_num,
-											 &[self.planets.len() as f32]
+											 &[self.planets.len() as i32]
 			);
 
 			self.send_planets_to_shader();
@@ -370,14 +370,14 @@ fn get_grav_force(dist: f32, angle: f32, m1: f32, m2: f32) -> Vector2 {
 
 fn main() {
 	let rl = raylib::init()
-		.size(1920, 1080)
+		.size(1000, 800)
 		.title("N-body")
 		.msaa_4x()
 		.build();
 
-	rl.set_target_fps(144 * 2);
+	rl.set_target_fps(144);
 
-	let mut a = App::new(rl);
+	let mut a = App::new(rl, 1000, 800);
 	
 	
 	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, false);

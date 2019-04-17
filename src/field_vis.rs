@@ -17,13 +17,21 @@ pub struct FieldVisual {  // Shows field lines
 
 impl FieldVisual {
 	pub fn new(rl: &RaylibHandle, spacing: u32, w: u32, h: u32) -> FieldVisual {
-		FieldVisual {
+		let mut f = FieldVisual {
 			nodes: FieldVisual::generate_nodes(spacing, w, h),
 			max_line_len: spacing as f32/2.0,
 			directional: false,
 			field_shader: rl.load_shader("", "src/field_shader.fs"),
 			draw_using_shader: true
-		}
+		};
+
+		let scrn_height = rl.get_shader_location(&f.field_shader, "screen_height");
+		rl.set_shader_value_i(&mut f.field_shader,
+										 scrn_height,
+										 &[h as i32]
+		);
+
+		f
 	}
 
 	pub fn draw(&self, rl: &RaylibHandle) {
