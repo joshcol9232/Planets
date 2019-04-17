@@ -60,11 +60,11 @@ struct App {
 impl App {
 	pub fn new(ray: RaylibHandle) -> App {
 		App {
-			rl: ray,
 			planets: vec![],
 			collided_bodies: vec![],
-			field_v: FieldVisual::new(30, 1920, 1080),
+			field_v: FieldVisual::new(&ray, 30, 1920, 1080),
 			field_v_update_timer: 0.0,
+			rl: ray,
 			show_field: true,
 			pl_id_count: 0,
 			mouse_click_pos: Vector2::zero(),
@@ -85,6 +85,9 @@ impl App {
 
 			self.rl.begin_drawing();
 			self.rl.clear_background(Color::BLACK);
+			if self.field_v.draw_using_shader && self.show_field {
+				self.field_v.draw_with_shader(&self.rl, 1920, 1080);
+			}
 
 			self.draw();
 
@@ -135,7 +138,7 @@ impl App {
 	}
 
 	pub fn draw(&self) {
-		if self.show_field {
+		if self.show_field && !self.field_v.draw_using_shader {
 			self.field_v.draw(&self.rl)
 		}
 
@@ -316,17 +319,20 @@ impl App {
 	}
 
 	pub fn update_field_vis(&mut self) {  // Doesn't need time
-		
-		for n in self.field_v.nodes.iter_mut() {
-			n.force = Vector2::zero();
-			for p in self.planets.iter() {
-				let dist = (p.pos - n.pos).length();
-				if dist > p.radius {  // If inside then don't bother
-					n.force += get_grav_force(dist, n.pos.angle_to(p.pos), 1.0, p.mass);
+		if self.field_v.draw_using_shader {
+			// Update shader
+		} else {
+			for n in self.field_v.nodes.iter_mut() {
+				n.force = Vector2::zero();
+				for p in self.planets.iter() {
+					let dist = (p.pos - n.pos).length();
+					if dist > p.radius {  // If inside then don't bother
+						n.force += get_grav_force(dist, n.pos.angle_to(p.pos), 1.0, p.mass);
+					}
 				}
 			}
+			self.field_v.update_scales();
 		}
-		self.field_v.update_scales();
 	}
 }
 
@@ -356,7 +362,7 @@ fn main() {
 	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 
-	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 6);
+	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
 	
 
 	//a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
