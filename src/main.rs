@@ -142,8 +142,10 @@ impl App {
 			self.field_v.draw(&self.rl)
 		}
 
-		for p in self.planets.iter() {
-			p.draw(&self.rl, self.unpaused_time, self.show_trails);
+		if !self.field_v.draw_using_shader {
+			for p in self.planets.iter() {
+				p.draw(&self.rl, self.unpaused_time, self.show_trails);
+			}
 		}
 
 		if self.rl.is_mouse_button_down(0) {

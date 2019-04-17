@@ -19,29 +19,33 @@ float get_gfs(float m, float distance) { // Gravitational field strength
 void main() {
 	vec2 force;
 	for (int i = 0; i < body_num; i++) {
-		vec4 body = bodies[i];
-		if (body.b > 0) {
-			vec2 dist_vec = (fragTexCoord - fragTexCoord);
-			float angle = atan(dist_vec.g, dist_vec.r);
-			float distance = sqrt(pow(dist_vec.r, 2) + pow(dist_vec.g, 2));
+		vec2 dist_vec;
+		dist_vec.r = bodies[i].r - fragTexCoord.r;
+		dist_vec.g = bodies[i].g - fragTexCoord.g;
 
-			if (distance > body.a) {
-				float f_mag = get_gfs(body.b, distance);
-				force.r += f_mag * sin(angle);
-				force.g += f_mag * cos(angle);
-			}
+		float angle = atan(dist_vec.g, dist_vec.r);
+		float distance = sqrt(pow(dist_vec.r, 2) + pow(dist_vec.g, 2));
+
+		if (distance > bodies[i].a) {
+			float f_mag = get_gfs(bodies[i].b, distance);
+			force.r += f_mag * sin(angle);
+			force.g += f_mag * cos(angle);
 		}
 	}
 
 	float force_mag = sqrt(pow(force.r, 2) + pow(force.g, 2));
 
-	//finalColor = vec4(1.0, force_mag/1500, 0.0, 1.0);
+	finalColor = vec4(1.0, force_mag/2000, 0.0, 1.0);
 
-	if (force_mag > 1000) {
+	/*
+	if (force_mag > 100) {
 		finalColor = vec4(0.0, 0.0, 1.0, 1.0);
 	} else if (force_mag > 500) {
 		finalColor = vec4(0.0, 1.0, 0.0, 1.0);
-	} else {
+	} else if (force_mag < 10) {
 		finalColor = vec4(1.0, 0.0, 0.0, 1.0);
+	} else {
+		finalColor = vec4(1.0, 1.0, 1.0, 1.0);
 	}
+	*/
 }
