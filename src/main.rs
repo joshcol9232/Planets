@@ -132,7 +132,7 @@ impl App {
 				self.planets[i].update(dt, self.unpaused_time, self.show_trails);
 			}
 
-			if self.show_field && self.field_v_update_timer >= FIELD_UPDATE_PERIOD {
+			if self.show_field && (self.field_v.draw_using_shader || self.field_v_update_timer >= FIELD_UPDATE_PERIOD) {
 				self.update_field_vis();
 				self.field_v_update_timer = 0.0;
 			}
