@@ -22,7 +22,7 @@ impl FieldVisual {
 			max_line_len: spacing as f32/2.0,
 			directional: false,
 			field_shader: rl.load_shader("", "src/field_shader.fs"),
-			draw_using_shader: true
+			draw_using_shader: false
 		};
 
 		let scrn_height = rl.get_shader_location(&f.field_shader, "screen_height");
