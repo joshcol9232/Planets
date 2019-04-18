@@ -105,7 +105,7 @@ impl Planet {
 				if !self.is_prediction {
 					col.a = ((1.0 - ((time - self.trail_nodes[i].time_created)/TRAIL_LIFESPAN)).powi(2) * 255.0).min(255.0) as u8;
 				}
-				rl.draw_line_ex(self.trail_nodes[i-1].pos, self.trail_nodes[i].pos, 1.0, col);
+				rl.draw_line_ex(self.trail_nodes[i-1].pos, self.trail_nodes[i].pos, 2.0, col);
 			}
 		}
 	}

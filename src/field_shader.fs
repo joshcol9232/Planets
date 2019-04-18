@@ -28,8 +28,14 @@ void main() {
 		}
 	}
 
-	float force_mag = sqrt(pow(force.x, 2) + pow(force.y, 2));
-	float norm = force_mag/(largest_rad * 22);
+	if (body_num > 0) {
+		float force_mag = sqrt(pow(force.x, 2) + pow(force.y, 2));
+		float norm = force_mag/(largest_rad * 22);
 
-	finalColor = vec4(0.0, norm, 0.0, 1.0);
+		//finalColor = vec4(0.0, norm, 0.0, 1.0);
+		float anti_norm = 1.0 - norm;
+		finalColor = vec4(anti_norm, anti_norm, anti_norm, 1.0);
+	} else {
+		finalColor = vec4(1.0, 1.0, 1.0, 1.0);
+	}
 }

@@ -5,6 +5,9 @@ mod field_vis;
 use planet::{Planet, PLANET_DENSITY, TrailNode};
 use field_vis::{FieldVisual};
 
+const SCREEN_W: u32 = 1920;
+const SCREEN_H: u32 = 1080;
+
 const G: f32 = 0.001;
 const FIELD_UPDATE_PERIOD: f32 = 0.05;
 
@@ -164,11 +167,10 @@ impl App {
 			self.prediction.draw(&self.rl, self.unpaused_time);
 		}
 
-		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, Color::RAYWHITE);
-		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, Color::RAYWHITE);
-		self.rl.draw_text(format!("Time multiplier: {:.2}", self.time_multiplier).as_str(), 10, 80, 20, Color::RAYWHITE);
-		//self.rl.draw_text(format!("Total mass: {}", self.get_total_mass()).as_str(), 10, 80, 20, Color::RAYWHITE);
-		//self.rl.draw_text(format!("Trail nodes: {}", self.get_trail_node_total()).as_str(), 10, 96, 20, Color::RAYWHITE);
+		let col = if self.field_v.draw_using_shader { Color::BLACK } else { Color::RAYWHITE };
+		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, col);
+		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, col);
+		self.rl.draw_text(format!("Time multiplier: {:.2}", self.time_multiplier).as_str(), 10, 80, 20, col);
 	}
 
 	fn get_input(&mut self, dt: f32) {
@@ -425,14 +427,14 @@ fn get_grav_force(dist: f32, angle: f32, m1: f32, m2: f32) -> Vector2 {
 
 fn main() {
 	let rl = raylib::init()
-		.size(1000, 800)
+		.size(SCREEN_W as i32, SCREEN_H as i32)
 		.title("N-body")
 		.msaa_4x()
 		.build();
 
 	rl.set_target_fps(144);
 
-	let mut a = App::new(rl, 1000, 800);
+	let mut a = App::new(rl, SCREEN_W, SCREEN_H);
 	
 	
 	a.add_planet(Vector2 { x: 400.0, y: 340.0 }, Vector2::zero(), 40.0, false);
