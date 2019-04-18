@@ -48,17 +48,14 @@ impl FieldVisual {
 		}
 	}
 
-	
 	pub fn draw_with_shader(&self, rl: &RaylibHandle, w: i32, h: i32) {
 		rl.begin_shader_mode(&self.field_shader);
 		rl.draw_rectangle(0, 0, w, h, Color::WHITE);
 		rl.end_shader_mode();
 	}
-	
 
 	pub fn update_scales(&mut self) {
 		let largest = self.get_max_force_magnitude();
-		println!("Largest: {}", largest);
 		for n in self.nodes.iter_mut() {
 			n.normalized = n.force/largest;
 			n.col = FieldVisual::get_line_color(n.normalized.length().powf(1.0/3.0));

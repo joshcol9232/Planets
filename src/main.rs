@@ -8,6 +8,11 @@ use field_vis::{FieldVisual};
 const G: f32 = 0.001;
 const FIELD_UPDATE_PERIOD: f32 = 0.05;
 
+// Shader uniform locations:
+const SHADER_BODY_NUM_LOC: i32 = 0;
+const SHADER_LARGEST_RAD_LOC: i32 = 2;
+const SHADER_BODIES_LOC: i32 = 3;
+
 struct Prediction {
 	body: Planet,
 	colliding: bool
@@ -46,6 +51,8 @@ struct App {
 	field_v: FieldVisual,
 	field_v_update_timer: f32,
 	show_field: bool,
+	last_largest: f32,
+	last_body_num: usize,
 
 	pl_id_count: u32,
 	mouse_click_pos: Vector2,
@@ -68,6 +75,8 @@ impl App {
 			field_v_update_timer: 0.0,
 			rl: ray,
 			show_field: true,
+			last_largest: 0.0,
+			last_body_num: 0,
 			pl_id_count: 0,
 			mouse_click_pos: Vector2::zero(),
 			last_mouse_pos: Vector2::zero(),
@@ -216,8 +225,14 @@ impl App {
 			self.reset();
 		}
 
-		if self.show_field && self.rl.is_key_pressed(consts::KEY_D as i32) {
-			self.field_v.directional = !self.field_v.directional;
+		if self.show_field {
+			if !self.field_v.draw_using_shader && self.rl.is_key_pressed(consts::KEY_D as i32) {
+				self.field_v.directional = !self.field_v.directional;
+			}
+
+			if self.rl.is_key_pressed(consts::KEY_S as i32) {
+				self.field_v.draw_using_shader = !self.field_v.draw_using_shader;
+			}
 		}
 	}
 
@@ -322,10 +337,8 @@ impl App {
 
 	fn send_planets_to_shader(&mut self) {
 		for (i, p) in self.planets.iter().enumerate() {
-			let bod_loc = self.rl.get_shader_location(&self.field_v.field_shader, format!("bodies[{}]", i).as_str());
-
 			self.rl.set_shader_value(&mut self.field_v.field_shader,
-											 bod_loc,
+											 SHADER_BODIES_LOC + i as i32,
 											 &[p.pos.x, p.pos.y, p.mass, p.radius]
 			);
 		}
@@ -334,11 +347,24 @@ impl App {
 	pub fn update_field_vis(&mut self) {  // Doesn't need time
 		if self.field_v.draw_using_shader {
 			// Update shader
-			let body_num = self.rl.get_shader_location(&self.field_v.field_shader, "body_num");
-			self.rl.set_shader_value_i(&mut self.field_v.field_shader,
-											 body_num,
-											 &[self.planets.len() as i32]
-			);
+			if self.planets.len() != self.last_body_num {
+				self.rl.set_shader_value_i(&mut self.field_v.field_shader,
+												 SHADER_BODY_NUM_LOC,
+												 &[self.planets.len() as i32]
+				);
+				self.last_body_num = self.planets.len();
+			}
+
+			
+			let largest_rad = self.get_largest_rad();
+
+			if largest_rad != self.last_largest {
+				self.rl.set_shader_value(&mut self.field_v.field_shader,
+												 SHADER_LARGEST_RAD_LOC,
+												 &[largest_rad]
+				);
+				self.last_largest = largest_rad;
+			}
 
 			self.send_planets_to_shader();
 
@@ -354,6 +380,26 @@ impl App {
 			}
 			self.field_v.update_scales();
 		}
+	}
+
+	fn get_largest_mass(&self) -> f32 {
+		let mut largest = 1.0;
+		for p in self.planets.iter() {
+			if p.mass > largest {
+				largest = p.mass;
+			}
+		}
+		largest
+	}
+
+	fn get_largest_rad(&self) -> f32 {
+		let mut largest = 0.0;
+		for p in self.planets.iter() {
+			if p.radius > largest {
+				largest = p.radius;
+			}
+		}
+		largest
 	}
 }
 
