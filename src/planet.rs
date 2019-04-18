@@ -62,11 +62,11 @@ impl Planet {
 		}
 	}
 
-	pub fn draw(&self, rl: &RaylibHandle, time: f32, trails: bool) {
+	pub fn draw(&self, rl: &RaylibHandle, time: f32, trails: bool, field_shader_on: bool) {
 		if trails {
 			self.draw_trail(rl, time);
 		}
-		let col = if self.is_prediction { Color::RED } else { Color::RAYWHITE };
+		let col = if self.is_prediction { Color::RED } else if field_shader_on { Color { r: 43, g: 162, b: 173, a: 255 } } else { Color::RAYWHITE };
 		
 		rl.draw_circle_v(self.pos, self.radius, col);
 		//self.draw_debug(rl);

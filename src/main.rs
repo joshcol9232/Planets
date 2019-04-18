@@ -40,7 +40,7 @@ impl Prediction {
 	}
 
 	pub fn draw(&self, rl: &RaylibHandle, time: f32) {
-		self.body.draw(rl, time, true);
+		self.body.draw(rl, time, true, false);
 	}
 }
 
@@ -159,7 +159,7 @@ impl App {
 		}
 
 		for p in self.planets.iter() {
-			p.draw(&self.rl, self.unpaused_time, self.show_trails);
+			p.draw(&self.rl, self.unpaused_time, self.show_trails, self.field_v.draw_using_shader);
 		}
 
 		if self.rl.is_mouse_button_down(0) {
