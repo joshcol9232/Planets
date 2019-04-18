@@ -47,6 +47,7 @@ struct App {
 	screen_dim: Vector2,
 	planets: Vec<Planet>,
 	collided_bodies: Vec<u32>, // ID's
+	time_multiplier: f32,
 
 	field_v: FieldVisual,
 	field_v_update_timer: f32,
@@ -71,6 +72,7 @@ impl App {
 			screen_dim: Vector2 { x: w as f32, y: h as f32 },
 			planets: vec![],
 			collided_bodies: vec![],
+			time_multiplier: 1.0,
 			field_v: FieldVisual::new(&ray, 30, w, h),
 			field_v_update_timer: 0.0,
 			rl: ray,
@@ -138,7 +140,7 @@ impl App {
 					}
 				}
 
-				self.planets[i].update(dt, self.unpaused_time, self.show_trails);
+				self.planets[i].update(dt * self.time_multiplier, self.unpaused_time, self.show_trails);
 			}
 
 			if self.show_field && (self.field_v.draw_using_shader || self.field_v_update_timer >= FIELD_UPDATE_PERIOD) {
@@ -164,6 +166,7 @@ impl App {
 
 		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, Color::RAYWHITE);
 		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, Color::RAYWHITE);
+		self.rl.draw_text(format!("Time multiplier: {:.2}", self.time_multiplier).as_str(), 10, 80, 20, Color::RAYWHITE);
 		//self.rl.draw_text(format!("Total mass: {}", self.get_total_mass()).as_str(), 10, 80, 20, Color::RAYWHITE);
 		//self.rl.draw_text(format!("Trail nodes: {}", self.get_trail_node_total()).as_str(), 10, 96, 20, Color::RAYWHITE);
 	}
@@ -199,7 +202,13 @@ impl App {
 			self.add_planet(self.rl.get_mouse_position(), Vector2::zero(), self.planet_spawn_size, true);
 		}
 
-		if self.rl.get_mouse_wheel_move() != 0 {
+		if self.rl.is_key_down(consts::KEY_LEFT_SHIFT as i32) && self.rl.get_mouse_wheel_move() != 0 {
+			let dm = self.rl.get_mouse_wheel_move() as f32 * 0.25;
+			
+			if self.time_multiplier + dm > 0.0 {
+				self.time_multiplier += dm;
+			}
+		} else if self.rl.get_mouse_wheel_move() != 0 {
 			let dm = self.rl.get_mouse_wheel_move();
 
 			if dm > 0 {

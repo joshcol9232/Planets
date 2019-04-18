@@ -11,6 +11,8 @@ Left click + drag - Spawn new planet with velocity (and view preview).
 Right click - Spawn square of planets.
 Middle click - Spawn stationary planet.
 
+SHIFT + Mouse wheel - Change time multiplier.
+
 ### Keys:
 P - Pause.
 R - Reset.
