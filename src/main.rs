@@ -40,7 +40,7 @@ impl Prediction {
 	}
 
 	pub fn draw(&self, rl: &RaylibHandle, time: f32) {
-		self.body.draw(rl, time, true, false);
+		self.body.draw(rl, time, true);
 	}
 }
 
@@ -159,7 +159,7 @@ impl App {
 		}
 
 		for p in self.planets.iter() {
-			p.draw(&self.rl, self.unpaused_time, self.show_trails, self.field_v.draw_using_shader);
+			p.draw(&self.rl, self.unpaused_time, self.show_trails);
 		}
 
 		if self.rl.is_mouse_button_down(0) {
@@ -167,10 +167,9 @@ impl App {
 			self.prediction.draw(&self.rl, self.unpaused_time);
 		}
 
-		let col = if self.field_v.draw_using_shader { Color::BLACK } else { Color::RAYWHITE };
-		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, col);
-		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, col);
-		self.rl.draw_text(format!("Time multiplier: {:.2}", self.time_multiplier).as_str(), 10, 80, 20, col);
+		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, Color::RAYWHITE);
+		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, Color::RAYWHITE);
+		self.rl.draw_text(format!("Time multiplier: {:.2}", self.time_multiplier).as_str(), 10, 80, 20, Color::RAYWHITE);
 	}
 
 	fn get_input(&mut self, dt: f32) {
@@ -432,7 +431,7 @@ fn main() {
 		.msaa_4x()
 		.build();
 
-	rl.set_target_fps(144);
+	rl.set_target_fps(144 * 2);
 
 	let mut a = App::new(rl, SCREEN_W, SCREEN_H);
 	

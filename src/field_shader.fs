@@ -1,8 +1,6 @@
 #version 330
 #extension GL_ARB_explicit_uniform_location : enable
 
-#define G 0.001
-
 layout(location = 0) uniform int body_num;
 layout(location = 1) uniform int screen_height;
 layout(location = 2) uniform float largest_rad;
@@ -22,20 +20,18 @@ void main() {
 		float dist = sqrt(pow(dist_vec.x, 2) + pow(dist_vec.y, 2));
 
 		if (dist + 2 >= bodies[i].w) {
-			float force_mag = G * bodies[i].z/pow(dist, 2);
+			float force_mag = bodies[i].z/pow(dist, 2);
 			force.x += force_mag * sin(angle);
 			force.y += force_mag * cos(angle);
 		}
 	}
 
-	if (body_num > 0) {
-		float force_mag = sqrt(pow(force.x, 2) + pow(force.y, 2));
-		float norm = force_mag/(largest_rad * 22);
+	float force_mag = sqrt(pow(force.x, 2) + pow(force.y, 2));
+	float norm = force_mag/(largest_rad * 22000);   
 
-		//finalColor = vec4(0.0, norm, 0.0, 1.0);
-		float anti_norm = 1.0 - norm;
-		finalColor = vec4(anti_norm, anti_norm, anti_norm, 1.0);
-	} else {
-		finalColor = vec4(1.0, 1.0, 1.0, 1.0);
-	}
+	/* Largest radius used to normalise the data since the radius is proporitional to the mass of largest,
+		and mass proportional to grav force. 22000 is to compensate for not multiplying by G, and gives best normal value below 1.
+	*/
+
+	finalColor = vec4(norm, norm, norm/1.2, 1.0);
 }
