@@ -69,7 +69,6 @@ impl Planet {
 		let col = if self.is_prediction { Color::RED } else { Color::RAYWHITE };
 		
 		rl.draw_circle_v(self.pos, self.radius, col);
-		//self.draw_debug(rl);
 	}
 
 	pub fn update(&mut self, dt: f32, time: f32, trails: bool) {
@@ -112,9 +111,7 @@ impl Planet {
 
 	#[inline]
 	fn place_trail(&mut self, time: f32) {
-		//if self.vel.length() > self.radius/2.0 {
 		self.trail_nodes.push(TrailNode { pos: self.pos, time_created: time });
-		//}
 	}
 
 	#[inline]

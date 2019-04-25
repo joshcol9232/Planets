@@ -1,5 +1,12 @@
 use raylib::{Vector2, RaylibHandle, Color, Shader};
 
+#[derive(PartialEq)]
+pub enum ColourMode {
+	BlackAndYellow,
+	YellowAndRed,
+}
+
+
 pub struct FieldNode {
 	pub pos: Vector2,
 	pub force: Vector2,
@@ -12,7 +19,9 @@ pub struct FieldVisual {  // Shows field lines
 	max_line_len: f32,
 	pub directional: bool,
 	pub field_shader: Shader,
-	pub draw_using_shader: bool
+	pub draw_using_shader: bool,
+	pub shader_colour_mode: ColourMode,
+	pub last_colour_mode: ColourMode
 }
 
 impl FieldVisual {
@@ -22,7 +31,9 @@ impl FieldVisual {
 			max_line_len: spacing as f32/2.0,
 			directional: false,
 			field_shader: rl.load_shader("", "src/field_shader.fs"),
-			draw_using_shader: false
+			draw_using_shader: false,
+			shader_colour_mode: ColourMode::BlackAndYellow,
+			last_colour_mode: ColourMode::BlackAndYellow
 		};
 
 		let scrn_height = rl.get_shader_location(&f.field_shader, "screen_height");

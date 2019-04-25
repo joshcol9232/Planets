@@ -4,8 +4,13 @@
 layout(location = 0) uniform int body_num;
 layout(location = 1) uniform int screen_height;
 layout(location = 2) uniform float largest_rad;
+layout(location = 3) uniform int colour_mode;
+/*
+	Black and Yellow (looks like lighting) = 0,
+	Yellow and Red = 1
+*/
 
-layout(location = 3) uniform vec4 bodies[1020]; // pos.x, pos.y, mass, radius : x, y, z, w respectively
+layout(location = 4) uniform vec4 bodies[1019]; // pos.x, pos.y, mass, radius : x, y, z, w respectively
 
 // Output fragment color
 out vec4 finalColor;
@@ -28,10 +33,13 @@ void main() {
 
 	float force_mag = sqrt(pow(force.x, 2) + pow(force.y, 2));
 	float norm = force_mag/(largest_rad * 22000);   
-
 	/* Largest radius used to normalise the data since the radius is proporitional to the mass of largest,
 		and mass proportional to grav force. 22000 is to compensate for not multiplying by G, and gives best normal value below 1.
 	*/
 
-	finalColor = vec4(norm, norm, norm/1.2, 1.0);
+	if (colour_mode == 0) {
+		finalColor = vec4(norm, norm, norm/1.2, 1.0);
+	} else if (colour_mode == 1) {
+		finalColor = vec4(1.0, norm, 0.0, 1.0);
+	}
 }

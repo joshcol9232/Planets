@@ -3,7 +3,7 @@ use raylib::{Color, Vector2, RaylibHandle, consts};
 mod planet;
 mod field_vis;
 use planet::{Planet, PLANET_DENSITY, TrailNode};
-use field_vis::{FieldVisual};
+use field_vis::{FieldVisual, ColourMode};
 
 const SCREEN_W: u32 = 1920;
 const SCREEN_H: u32 = 1080;
@@ -14,7 +14,8 @@ const FIELD_UPDATE_PERIOD: f32 = 0.05;
 // Shader uniform locations:
 const SHADER_BODY_NUM_LOC: i32 = 0;
 const SHADER_LARGEST_RAD_LOC: i32 = 2;
-const SHADER_BODIES_LOC: i32 = 3;
+const SHADER_COLOUR_MODE_LOC: i32 = 3;
+const SHADER_BODIES_LOC: i32 = 4;
 
 struct Prediction {
 	body: Planet,
@@ -354,7 +355,7 @@ impl App {
 		}
 	}
 
-	pub fn update_field_vis(&mut self) {  // Doesn't need time
+	pub fn update_field_vis(&mut self) {  // In App rather than field_v because has direct access to planets array
 		if self.field_v.draw_using_shader {
 			// Update shader
 			if self.planets.len() != self.last_body_num {
@@ -365,6 +366,25 @@ impl App {
 				self.last_body_num = self.planets.len();
 			}
 
+			if self.rl.is_key_pressed(consts::KEY_ONE as i32) {
+                if self.field_v.shader_colour_mode != ColourMode::BlackAndYellow {
+                    self.field_v.shader_colour_mode = ColourMode::BlackAndYellow;
+                    self.rl.set_shader_value_i(&mut self.field_v.field_shader,
+                                                     SHADER_COLOUR_MODE_LOC,
+                                                     &[0]
+                    );
+
+                }
+			} else if self.rl.is_key_pressed(consts::KEY_TWO as i32) {
+                if self.field_v.shader_colour_mode != ColourMode::YellowAndRed {
+                    self.field_v.shader_colour_mode = ColourMode::YellowAndRed;
+                    self.rl.set_shader_value_i(&mut self.field_v.field_shader,
+                                                     SHADER_COLOUR_MODE_LOC,
+                                                     &[1]
+                    );
+
+                }
+			}
 			
 			let largest_rad = self.get_largest_rad();
 
