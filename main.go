@@ -111,8 +111,10 @@ func main() {
 	rl.SetTargetFPS(144)
 
 	g := NewGame(SCREEN_W_DEF, SCREEN_H_DEF)
-	g.addPlanet(rl.NewVector3(0, 0, 0), rl.NewVector3(0, 10, 30), 2)
-	g.addPlanet(rl.NewVector3(50, 0, 0), rl.NewVector3(0, 0, 0), 20)
+	g.addPlanet(rl.NewVector3(50, 0, 0), rl.NewVector3(0, 10, 30), 2)
+	g.addPlanet(rl.NewVector3(0, 0, 0), rl.NewVector3(0, 0, 0), 20)
+
+	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 10)
 
 	g.mainLoop()
 }
