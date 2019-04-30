@@ -1,8 +1,0 @@
-[package]
-name = "Planets"
-version = "0.1.0"
-authors = ["eggmund <>"]
-edition = "2018"
-
-[dependencies]
-raylib = "0.9"
