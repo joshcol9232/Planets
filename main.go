@@ -65,8 +65,6 @@ func (g *Game) draw() {
 
 func (g *Game) update(dt float32) {
 	for i := 0; i < len(g.planets); i++ {
-		g.planets[i].Update(dt)
-
 		for j := 0; j < len(g.planets); j++ { // Update grav force
 			if i != j {
 				iForce, jForce := g.getGravForceBetweenTwoPlanets(g.planets[i], g.planets[j])
@@ -74,6 +72,8 @@ func (g *Game) update(dt float32) {
 				g.planets[j].ResForce = raymath.Vector3Add(g.planets[j].ResForce, jForce)
 			}
 		}
+		
+		g.planets[i].Update(dt)
 	}
 }
 
