@@ -3,7 +3,7 @@ use raylib::{Color, Vector2, RaylibHandle, consts};
 mod planet;
 mod field_vis;
 use planet::{Planet, PLANET_DENSITY, TrailNode};
-use field_vis::{FieldVisual, ColourMode};
+use field_vis::{FieldVisual, ColourMode, get_shader_colour_mode_int};
 
 const SCREEN_W: u32 = 1920;
 const SCREEN_H: u32 = 1080;
@@ -168,9 +168,18 @@ impl App {
 			self.prediction.draw(&self.rl, self.unpaused_time);
 		}
 
-		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, Color::RAYWHITE);
-		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, Color::RAYWHITE);
-		self.rl.draw_text(format!("Time multiplier: {:.2}", self.time_multiplier).as_str(), 10, 80, 20, Color::RAYWHITE);
+		let mut ui_col = Color::RAYWHITE;
+
+		if self.field_v.draw_using_shader {
+			match self.field_v.shader_colour_mode {
+				ColourMode::WhiteAndBlack => ui_col = Color::BLACK,
+				_ => (),
+			}
+		}
+
+		self.rl.draw_text(format!("Bodies: {}", self.planets.len()).as_str(), 10, 36, 20, ui_col);
+		self.rl.draw_text(format!("Spawn size: {}", self.planet_spawn_size).as_str(), 10, 58, 20, ui_col);
+		self.rl.draw_text(format!("Time multiplier: {:.2}", self.time_multiplier).as_str(), 10, 80, 20, ui_col);
 	}
 
 	fn get_input(&mut self, dt: f32) {
@@ -355,6 +364,16 @@ impl App {
 		}
 	}
 
+	pub fn change_field_shader_colour(&mut self, col: ColourMode) {
+		if self.field_v.shader_colour_mode != col {
+		  self.field_v.shader_colour_mode = col.clone();
+		  self.rl.set_shader_value_i(&mut self.field_v.field_shader,
+											 	SHADER_COLOUR_MODE_LOC,
+											 	&[get_shader_colour_mode_int(col)]
+		  );
+		}
+	}
+
 	pub fn update_field_vis(&mut self) {  // In App rather than field_v because has direct access to planets array
 		if self.field_v.draw_using_shader {
 			// Update shader
@@ -366,24 +385,13 @@ impl App {
 				self.last_body_num = self.planets.len();
 			}
 
+			// Shader colour change keys
 			if self.rl.is_key_pressed(consts::KEY_ONE as i32) {
-                if self.field_v.shader_colour_mode != ColourMode::BlackAndYellow {
-                    self.field_v.shader_colour_mode = ColourMode::BlackAndYellow;
-                    self.rl.set_shader_value_i(&mut self.field_v.field_shader,
-                                                     SHADER_COLOUR_MODE_LOC,
-                                                     &[0]
-                    );
-
-                }
+				self.change_field_shader_colour(ColourMode::BlackAndYellow);
 			} else if self.rl.is_key_pressed(consts::KEY_TWO as i32) {
-                if self.field_v.shader_colour_mode != ColourMode::YellowAndRed {
-                    self.field_v.shader_colour_mode = ColourMode::YellowAndRed;
-                    self.rl.set_shader_value_i(&mut self.field_v.field_shader,
-                                                     SHADER_COLOUR_MODE_LOC,
-                                                     &[1]
-                    );
-
-                }
+				self.change_field_shader_colour(ColourMode::YellowAndRed);
+			} else if self.rl.is_key_pressed(consts::KEY_THREE as i32) {
+				self.change_field_shader_colour(ColourMode::WhiteAndBlack);
 			}
 			
 			let largest_rad = self.get_largest_rad();
@@ -451,7 +459,7 @@ fn main() {
 		.msaa_4x()
 		.build();
 
-	rl.set_target_fps(144 * 2);
+	rl.set_target_fps(60 * 2);
 
 	let mut a = App::new(rl, SCREEN_W, SCREEN_H);
 	

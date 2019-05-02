@@ -7,7 +7,8 @@ layout(location = 2) uniform float largest_rad;
 layout(location = 3) uniform int colour_mode;
 /*
 	Black and Yellow (looks like lighting) = 0,
-	Yellow and Red = 1
+	Yellow and Red = 1,
+	White and Black = 2,
 */
 
 layout(location = 4) uniform vec4 bodies[1019]; // pos.x, pos.y, mass, radius : x, y, z, w respectively
@@ -41,5 +42,8 @@ void main() {
 		finalColor = vec4(norm, norm, norm/1.2, 1.0);
 	} else if (colour_mode == 1) {
 		finalColor = vec4(1.0, norm, 0.0, 1.0);
+	} else if (colour_mode == 2) {
+		float antinorm = 1 - norm;
+		finalColor = vec4(antinorm, antinorm, antinorm, 1.0);
 	}
 }

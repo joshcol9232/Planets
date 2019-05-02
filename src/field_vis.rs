@@ -1,9 +1,10 @@
 use raylib::{Vector2, RaylibHandle, Color, Shader};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum ColourMode {
 	BlackAndYellow,
 	YellowAndRed,
+	WhiteAndBlack,
 }
 
 
@@ -113,5 +114,15 @@ impl FieldVisual {
 		}
 
 		out
+	}
+
+}
+
+#[inline]
+pub fn get_shader_colour_mode_int(col: ColourMode) -> i32 {
+	match col {
+		ColourMode::BlackAndYellow => 0,
+		ColourMode::YellowAndRed => 1,
+		ColourMode::WhiteAndBlack => 2,
 	}
 }
