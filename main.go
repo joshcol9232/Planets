@@ -81,6 +81,9 @@ func (g *Game) update(dt float32) {
 	for i := 0; i < len(g.planets); i++ {
 		for j := 0; j < len(g.planets); j++ { // Update grav force
 			if i != j {
+				if g.checkForCollision(g.planets[i], g.planets[j]) {
+					println("egg")
+				}
 				iForce, jForce := g.getGravForceBetweenTwoPlanets(g.planets[i], g.planets[j])
 				g.planets[i].ResForce = raymath.Vector3Add(g.planets[i].ResForce, iForce)
 				g.planets[j].ResForce = raymath.Vector3Add(g.planets[j].ResForce, jForce)
@@ -180,7 +183,12 @@ func (g *Game) getGravForceBetweenTwoPlanets(p1, p2 *planet.Planet) (rl.Vector3,
 }
 
 func (g *Game) checkForCollision(p1, p2 *planet.Planet) bool {
-	return raymath.Vector3Distance(p1.Pos, p2.Pos) <= p1.Radius + p2.Radius
+	distVec := raymath.Vector3Subtract(p1.Pos, p2.Pos)
+	distSqr := (distVec.X * distVec.X) + (distVec.Y * distVec.Y) + (distVec.Z * distVec.Z)
+	radSum := p1.Radius + p2.Radius
+	return distSqr <= (radSum * radSum)
+	// Above probably more efficient since square root is very expensive compared to squaring
+	//return raymath.Vector3Distance(p1.Pos, p2.Pos) <= p1.Radius + p2.Radius
 }
 
 const (
