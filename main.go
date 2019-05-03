@@ -80,8 +80,6 @@ func (g *Game) draw() {
 }
 
 func (g *Game) update(dt float32) {
-	g.removeDeadPlanets()
-
 	for i := 0; i < len(g.planets); i++ {
 		for j := 0; j < len(g.planets); j++ { // Update grav force
 			if i != j {
@@ -100,6 +98,8 @@ func (g *Game) update(dt float32) {
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		g.selectPlanet()
 	}
+	
+	g.removeDeadPlanets()
 }
 
 func (g *Game) drawSelectedPlanetInfo() {
