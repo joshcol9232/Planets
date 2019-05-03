@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	SCREEN_W_DEF = 1280
-	SCREEN_H_DEF = 720
+	SCREEN_W_DEF = 1920
+	SCREEN_H_DEF = 1080
 	FOV = 80
 
 	G = 0.001
@@ -25,7 +25,6 @@ type Game struct {
 	selectedPlanet *planet.Planet
 	trailsEnabled bool
 
-	bloomShader rl.Shader
 	paused bool
 
 	dt float32
@@ -52,7 +51,6 @@ func NewGame(w, h int32) *Game {
 	g := Game {
 		screenDims: rl.NewVector2(float32(w), float32(h)),
 		camera: camera,
-		bloomShader: rl.LoadShader("", "src/bloom.fs"),
 		paused: true,
 		trailsEnabled: false,
 		planets: []*planet.Planet{},
@@ -69,8 +67,6 @@ func NewGame(w, h int32) *Game {
 }
 
 func (g *Game) mainLoop() {
-	target := rl.LoadRenderTexture(int32(g.screenDims.X), int32(g.screenDims.Y))
-
 	for !rl.WindowShouldClose() {
 		rl.UpdateCamera(&g.camera)
 		g.dt = rl.GetFrameTime()
@@ -79,18 +75,11 @@ func (g *Game) mainLoop() {
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
-
-		rl.BeginTextureMode(target)
 		rl.BeginMode3D(g.camera)
 
 		g.draw()
 
 		rl.EndMode3D()
-		rl.EndTextureMode()
-
-		rl.BeginShaderMode(g.bloomShader)
-		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
-		rl.EndShaderMode()
 
 		rl.DrawFPS(10, 10)
 		if g.selectedPlanet != nil {
@@ -289,7 +278,7 @@ func (g *Game) collide(p1, p2 *planet.Planet) {
 	big.Mass = totalMass
 	g.deadPlanetIDs = append(g.deadPlanetIDs, small.ID)
 
-	if g.selectedPlanet.ID == small.ID {
+	if g.selectedPlanet != nil && g.selectedPlanet.ID == small.ID {
 		g.selectedPlanet = big
 	}
 }
@@ -314,7 +303,7 @@ func volumeOfSphere(radius float32) float32 {
 func main() {
 	rl.SetConfigFlags(rl.FlagMsaa4xHint)
 	rl.SetConfigFlags(rl.FlagWindowUndecorated)
-	rl.InitWindow(SCREEN_W_DEF, SCREEN_H_DEF, "Particles")
+	rl.InitWindow(SCREEN_W_DEF, SCREEN_H_DEF, "Planets")
 
 	g := NewGame(SCREEN_W_DEF, SCREEN_H_DEF)
 	/*
