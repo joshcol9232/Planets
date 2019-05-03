@@ -7,6 +7,8 @@ import (
 
 const (
 	PLNT_DENSITY = 5000
+	TRAIL_PLACEMENT_INTERVAL = 0.2
+	TRAIL_NODE_DURATION = 2.0
 )
 
 type Planet struct {
@@ -16,6 +18,8 @@ type Planet struct {
 	ResForce rl.Vector3
 	Radius float32
 	Mass float32
+	trail []*TrailNode
+	trailTimer float32
 }
 
 func NewPlanet(ID int32, pos, vel rl.Vector3, rad float32) *Planet {
@@ -31,9 +35,12 @@ func NewPlanet(ID int32, pos, vel rl.Vector3, rad float32) *Planet {
 
 func (p *Planet) Draw(col rl.Color) {
 	rl.DrawSphere(p.Pos, p.Radius, col)
+	p.drawTrail()
 }
 
-func (p *Planet) Update(dt float32) {
+func (p *Planet) Update(dt, time float32) {
+	p.killTrailNodes(time)
+
 	raymath.Vector3Scale(&p.ResForce, dt/p.Mass)
 	p.Vel = raymath.Vector3Add(p.Vel, p.ResForce)    // F = ma, a = F / m, a * dt = vel increase, f * dt/mass = vel change
 	p.ResForce = rl.NewVector3(0, 0, 0)
@@ -41,6 +48,40 @@ func (p *Planet) Update(dt float32) {
 	p.Pos.X += p.Vel.X * dt;
 	p.Pos.Y += p.Vel.Y * dt;
 	p.Pos.Z += p.Vel.Z * dt;
+
+	p.trailTimer += dt
+	if p.trailTimer >= TRAIL_PLACEMENT_INTERVAL {
+		p.placeTrailNode(time)
+	}
+}
+
+func (p *Planet) drawTrail() {
+	for i := 1; i < len(p.trail); i++ {
+		col := rl.Blue
+		col.A = 255 - uint8(((rl.GetTime() - p.trail[i].TimeCreated) / TRAIL_NODE_DURATION) * 255)
+		rl.DrawLine3D(p.trail[i-1].Pos, p.trail[i].Pos, col)
+	}
+}
+
+func (p *Planet) placeTrailNode(time float32) {
+	p.trail = append(p.trail, &TrailNode {
+		Pos: p.Pos,
+		TimeCreated: time,
+	})
+}
+
+func (p *Planet) killTrailNodes(time float32) {
+	for i := 0; i < len(p.trail); i++ {
+		if time - p.trail[i].TimeCreated >= TRAIL_NODE_DURATION {
+			p.removeTrailNode(i)
+		}
+	}
+}
+
+func (p *Planet) removeTrailNode(i int) {
+	copy(p.trail[i:], p.trail[i+1:])
+	p.trail[len(p.trail)-1] = nil
+	p.trail = p.trail[:len(p.trail)-1]
 }
 
 func (p *Planet) GetSpeed() float32 {
@@ -56,4 +97,10 @@ func (p *Planet) GetMomentum() rl.Vector3 {
 
 func GetMass(rad float32, density float32) float32 {
 	return ((4.0 * rl.Pi * (rad * rad * rad))/3.0) * density
+}
+
+
+type TrailNode struct {
+	Pos rl.Vector3
+	TimeCreated float32
 }

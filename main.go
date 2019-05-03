@@ -80,6 +80,7 @@ func (g *Game) draw() {
 }
 
 func (g *Game) update(dt float32) {
+	time := rl.GetTime()
 	g.removeDeadPlanets()
 
 	for i := 0; i < len(g.planets); i++ {
@@ -94,7 +95,7 @@ func (g *Game) update(dt float32) {
 			}
 		}
 
-		g.planets[i].Update(dt)
+		g.planets[i].Update(dt, time)
 	}
 
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
