@@ -8,7 +8,7 @@ import (
 const (
 	PLNT_DENSITY = 5000
 	TRAIL_PLACEMENT_INTERVAL = 0.2
-	TRAIL_NODE_DURATION = 2.0
+	TRAIL_NODE_DURATION = 1.0
 )
 
 type Planet struct {
@@ -40,7 +40,6 @@ func (p *Planet) Draw(col rl.Color) {
 
 func (p *Planet) Update(dt, time float32) {
 	p.killTrailNodes(time)
-
 	raymath.Vector3Scale(&p.ResForce, dt/p.Mass)
 	p.Vel = raymath.Vector3Add(p.Vel, p.ResForce)    // F = ma, a = F / m, a * dt = vel increase, f * dt/mass = vel change
 	p.ResForce = rl.NewVector3(0, 0, 0)

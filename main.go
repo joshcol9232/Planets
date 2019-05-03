@@ -10,8 +10,18 @@ import (
 )
 
 const (
+	SCREEN_W_DEF = 1280
+	SCREEN_H_DEF = 720
+
 	G = 0.01
+	WORKER_COUNT = 4
 )
+
+type UpdateJob struct {
+	PlanetIndex int
+	Time float32
+	Dt float32
+}
 
 type Game struct {
 	screenDims rl.Vector2
@@ -20,12 +30,18 @@ type Game struct {
 	selectedPlanetID int32
 	selectedPlanet *planet.Planet
 
+	dt float32
+	time float32
+
+	updateJobChannel chan UpdateJob
+	updateDoneChannel chan bool
+
 	deadPlanetIDs []int32
 
 	planets []*planet.Planet
 }
 
-func NewGame(w, h int32) Game {
+func NewGame(w, h int32) *Game {
 	camera := rl.Camera3D{}
 	camera.Position = rl.NewVector3(100.0, 100.0, 100.0)
 	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
@@ -35,18 +51,34 @@ func NewGame(w, h int32) Game {
 
 	rl.SetCameraMode(camera, rl.CameraFree)
 
-	return Game {
+	g := Game {
 		screenDims: rl.NewVector2(float32(w), float32(h)),
 		camera: camera,
 		selectedPlanetID: -1,
 		planets: []*planet.Planet{},
 	}
+
+	g.addPlanet(rl.NewVector3(50, 0, 0), rl.NewVector3(0, 1, 3), 0.5)
+	g.addPlanet(rl.NewVector3(0, 0, 0), rl.NewVector3(0, 0, 0), 5)
+
+	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 2)
+
+	g.updateJobChannel = make(chan UpdateJob, 100)
+	g.updateDoneChannel = make(chan bool)
+
+	for i := 0; i < WORKER_COUNT; i++ {
+		go g.updateWorker()
+	}
+
+	return &g
 }
 
 func (g *Game) mainLoop() {
 	for !rl.WindowShouldClose() {
 		rl.UpdateCamera(&g.camera)
-		g.update(rl.GetFrameTime())
+		g.dt = rl.GetFrameTime()
+		g.time = rl.GetTime()
+		g.update()
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
@@ -79,28 +111,44 @@ func (g *Game) draw() {
 	}
 }
 
-func (g *Game) update(dt float32) {
-	time := rl.GetTime()
+
+func (g *Game) update() {
 	g.removeDeadPlanets()
 
 	for i := 0; i < len(g.planets); i++ {
-		for j := 0; j < len(g.planets); j++ { // Update grav force
-			if i != j {
-				if g.checkForCollision(g.planets[i], g.planets[j]) {
-					g.collide(g.planets[i], g.planets[j])
-				}
-				iForce, jForce := g.getGravForceBetweenTwoPlanets(g.planets[i], g.planets[j])
-				g.planets[i].ResForce = raymath.Vector3Add(g.planets[i].ResForce, iForce)
-				g.planets[j].ResForce = raymath.Vector3Add(g.planets[j].ResForce, jForce)
-			}
-		}
+		g.updateJobChannel<- UpdateJob { PlanetIndex: i, Dt: g.dt, Time: g.time }
+	}
 
-		g.planets[i].Update(dt, time)
+	for i := 0; i < len(g.planets); i++ {
+		<-g.updateDoneChannel // Wait for all to be finished
 	}
 
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		g.selectPlanet()
 	}
+}
+
+func (g *Game) updateWorker() {
+	for job := range g.updateJobChannel {
+		g.updatePlanetFully(job.PlanetIndex, job.Dt, job.Time)
+		g.updateDoneChannel <- true
+	}
+}
+
+func (g *Game) updatePlanetFully(i int, dt, time float32) {
+	for j := 0; j < len(g.planets); j++ { // Update grav force
+		if i != j {
+			if g.checkForCollision(g.planets[i], g.planets[j]) {
+				g.collide(g.planets[i], g.planets[j])
+			} else {
+				iForce, jForce := g.getGravForceBetweenTwoPlanets(g.planets[i], g.planets[j])
+				g.planets[i].ResForce = raymath.Vector3Add(g.planets[i].ResForce, iForce)
+				g.planets[j].ResForce = raymath.Vector3Add(g.planets[j].ResForce, jForce)
+			}
+		}
+	}
+
+	g.planets[i].Update(dt, time)
 }
 
 func (g *Game) drawSelectedPlanetInfo() {
@@ -114,16 +162,6 @@ func (g *Game) addPlanet(pos, vel rl.Vector3, rad float32) {
 	} else {
 		g.planetIDCount = 0
 	}
-}
-
-func (g *Game) removePlanet(ID int32) bool { // returns true if the planet was found and removed
-	for i := 0; i < len(g.planets); i++ {
-		if g.planets[i].ID == ID {
-			g.removePlanetAt(i)
-			return true
-		}
-	}
-	return false
 }
 
 func (g *Game) removePlanetAt(index int) {
@@ -231,8 +269,6 @@ func (g *Game) collide(p1, p2 *planet.Planet) {
 	big.Vel = rl.NewVector3(totalMomentum.X/totalMass, totalMomentum.Y/totalMass, totalMomentum.Z/totalMass)
 	big.Radius = float32(math.Pow(float64((3 * totalVolume)/(4 * rl.Pi)), 1.0/3))
 	big.Mass = totalMass
-	fmt.Println("Total volume:", totalVolume, "hmm:", p1.Mass + p2.Mass, "New radius:", big.Radius, "density", big.Mass/volumeOfSphere(big.Radius))
-
 	g.deadPlanetIDs = append(g.deadPlanetIDs, small.ID)
 }
 
@@ -242,11 +278,6 @@ func volumeOfSphere(radius float32) float32 {
 }
 
 
-const (
-	SCREEN_W_DEF = 1280
-	SCREEN_H_DEF = 720
-)
-
 func main() {
 	rl.SetConfigFlags(rl.FlagMsaa4xHint)
 	rl.SetConfigFlags(rl.FlagWindowUndecorated)
@@ -254,10 +285,6 @@ func main() {
 	//rl.SetTargetFPS(144)
 
 	g := NewGame(SCREEN_W_DEF, SCREEN_H_DEF)
-	g.addPlanet(rl.NewVector3(50, 0, 0), rl.NewVector3(0, 1, 3), 0.5)
-	g.addPlanet(rl.NewVector3(0, 0, 0), rl.NewVector3(0, 0, 0), 5)
-
-	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 2)
 
 	g.mainLoop()
 }
