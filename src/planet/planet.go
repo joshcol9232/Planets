@@ -33,12 +33,14 @@ func NewPlanet(ID int32, pos, vel rl.Vector3, rad float32) *Planet {
 	}
 }
 
-func (p *Planet) Draw(col rl.Color) {
-	rl.DrawSphere(p.Pos, p.Radius, col)
-	p.drawTrail()
+func (p *Planet) Draw(col rl.Color, trails bool) {
+	rl.DrawSphereEx(p.Pos, p.Radius, 6, 6, col)
+	if trails {
+		p.drawTrail()
+	}
 }
 
-func (p *Planet) Update(dt, time float32) {
+func (p *Planet) Update(dt, time float32, trails bool) {
 	p.killTrailNodes(time)
 	raymath.Vector3Scale(&p.ResForce, dt/p.Mass)
 	p.Vel = raymath.Vector3Add(p.Vel, p.ResForce)    // F = ma, a = F / m, a * dt = vel increase, f * dt/mass = vel change
@@ -48,9 +50,11 @@ func (p *Planet) Update(dt, time float32) {
 	p.Pos.Y += p.Vel.Y * dt;
 	p.Pos.Z += p.Vel.Z * dt;
 
-	p.trailTimer += dt
-	if p.trailTimer >= TRAIL_PLACEMENT_INTERVAL {
-		p.placeTrailNode(time)
+	if trails {
+		p.trailTimer += dt
+		if p.trailTimer >= TRAIL_PLACEMENT_INTERVAL {
+			p.placeTrailNode(time)
+		}
 	}
 }
 

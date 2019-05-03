@@ -12,16 +12,11 @@ import (
 const (
 	SCREEN_W_DEF = 1280
 	SCREEN_H_DEF = 720
+	FOV = 80
 
-	G = 0.01
+	G = 0.001
 	WORKER_COUNT = 4
 )
-
-type UpdateJob struct {
-	PlanetIndex int
-	Time float32
-	Dt float32
-}
 
 type Game struct {
 	screenDims rl.Vector2
@@ -29,11 +24,12 @@ type Game struct {
 	planetIDCount int32
 	selectedPlanetID int32
 	selectedPlanet *planet.Planet
+	trailsEnabled bool
 
 	dt float32
 	time float32
 
-	updateJobChannel chan UpdateJob
+	updateJobChannel chan int
 	updateDoneChannel chan bool
 
 	deadPlanetIDs []int32
@@ -46,7 +42,7 @@ func NewGame(w, h int32) *Game {
 	camera.Position = rl.NewVector3(100.0, 100.0, 100.0)
 	camera.Target = rl.NewVector3(0.0, 0.0, 0.0)
 	camera.Up = rl.NewVector3(0.0, 1.0, 0.0)
-	camera.Fovy = 45.0
+	camera.Fovy = FOV
 	camera.Type = rl.CameraPerspective
 
 	rl.SetCameraMode(camera, rl.CameraFree)
@@ -55,15 +51,11 @@ func NewGame(w, h int32) *Game {
 		screenDims: rl.NewVector2(float32(w), float32(h)),
 		camera: camera,
 		selectedPlanetID: -1,
+		trailsEnabled: false,
 		planets: []*planet.Planet{},
 	}
 
-	g.addPlanet(rl.NewVector3(50, 0, 0), rl.NewVector3(0, 1, 3), 0.5)
-	g.addPlanet(rl.NewVector3(0, 0, 0), rl.NewVector3(0, 0, 0), 5)
-
-	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 2)
-
-	g.updateJobChannel = make(chan UpdateJob, 100)
+	g.updateJobChannel = make(chan int, 100)
 	g.updateDoneChannel = make(chan bool)
 
 	for i := 0; i < WORKER_COUNT; i++ {
@@ -92,6 +84,8 @@ func (g *Game) mainLoop() {
 		if g.selectedPlanetID > -1 {
 			g.drawSelectedPlanetInfo()
 		}
+
+		rl.DrawText(fmt.Sprintf("Body num: %d", len(g.planets)), 10, int32(g.screenDims.Y - 30), 20, rl.RayWhite)
 		rl.EndDrawing()
 	}
 
@@ -99,7 +93,7 @@ func (g *Game) mainLoop() {
 }
 
 func (g *Game) draw() {
-	rl.DrawGrid(50, 500.0)
+	rl.DrawGrid(50, 100.0)
 
 	for i := 0; i < len(g.planets); i++ {
 		col := rl.RayWhite
@@ -107,7 +101,7 @@ func (g *Game) draw() {
 			col = rl.Lime
 			g.camera.Target = g.planets[i].Pos
 		}
-		g.planets[i].Draw(col)
+		g.planets[i].Draw(col, g.trailsEnabled)
 	}
 }
 
@@ -116,7 +110,7 @@ func (g *Game) update() {
 	g.removeDeadPlanets()
 
 	for i := 0; i < len(g.planets); i++ {
-		g.updateJobChannel<- UpdateJob { PlanetIndex: i, Dt: g.dt, Time: g.time }
+		g.updateJobChannel<- i
 	}
 
 	for i := 0; i < len(g.planets); i++ {
@@ -130,12 +124,12 @@ func (g *Game) update() {
 
 func (g *Game) updateWorker() {
 	for job := range g.updateJobChannel {
-		g.updatePlanetFully(job.PlanetIndex, job.Dt, job.Time)
+		g.updatePlanetFully(job, g.dt, g.time, g.trailsEnabled)
 		g.updateDoneChannel <- true
 	}
 }
 
-func (g *Game) updatePlanetFully(i int, dt, time float32) {
+func (g *Game) updatePlanetFully(i int, dt, time float32, trails bool) {
 	for j := 0; j < len(g.planets); j++ { // Update grav force
 		if i != j {
 			if g.checkForCollision(g.planets[i], g.planets[j]) {
@@ -148,7 +142,7 @@ func (g *Game) updatePlanetFully(i int, dt, time float32) {
 		}
 	}
 
-	g.planets[i].Update(dt, time)
+	g.planets[i].Update(dt, time, trails)
 }
 
 func (g *Game) drawSelectedPlanetInfo() {
@@ -267,9 +261,25 @@ func (g *Game) collide(p1, p2 *planet.Planet) {
 	}
 
 	big.Vel = rl.NewVector3(totalMomentum.X/totalMass, totalMomentum.Y/totalMass, totalMomentum.Z/totalMass)
-	big.Radius = float32(math.Pow(float64((3 * totalVolume)/(4 * rl.Pi)), 1.0/3))
+	big.Radius = float32(math.Pow(float64((3 * totalVolume)/(4 * rl.Pi)), 1.0/3))   // Volume of sphere rearranged for r
 	big.Mass = totalMass
 	g.deadPlanetIDs = append(g.deadPlanetIDs, small.ID)
+
+	if g.selectedPlanetID == small.ID {
+		g.selectedPlanetID = big.ID
+		g.selectedPlanet = big
+	}
+}
+
+
+func (g *Game) makeCube(width, height, depth int, spacing, rad float32) {
+	for x := float32(0); x < float32(width) * spacing; x += spacing {
+		for y := float32(0); y < float32(height) * spacing; y += spacing {
+			for z := float32(0); z < float32(depth) * spacing; z += spacing {
+				g.addPlanet(rl.NewVector3(x, y, z), rl.NewVector3(0, 0, 0), rad)
+			}
+		}
+	}
 }
 
 
@@ -285,6 +295,18 @@ func main() {
 	//rl.SetTargetFPS(144)
 
 	g := NewGame(SCREEN_W_DEF, SCREEN_H_DEF)
+	/*
+	g.addPlanet(rl.NewVector3(50, 0, 0), rl.NewVector3(0, 1, 3), 0.5)
+	g.addPlanet(rl.NewVector3(0, 0, 0), rl.NewVector3(0, 0, 0), 5)
+
+	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 2)
+	*/
+
+	w := 4
+	h := 5
+	d := 5
+	fmt.Println("Total num:", w*h*d)
+	g.makeCube(w, h, d, 100, 2)
 
 	g.mainLoop()
 }
