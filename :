@@ -228,16 +228,11 @@ func (g *Game) collide(p1, p2 *planet.Planet) {
 	}
 
 	big.Vel = rl.NewVector3(totalMomentum.X/totalMass, totalMomentum.Y/totalMass, totalMomentum.Z/totalMass)
-	big.Radius = float32(math.Pow(float64((3 * totalVolume)/(4 * rl.Pi)), 1.0/3))
+	big.Radius = float32(math.Pow(float64((3 * totalVolume)/(4 * rl.Pi)), 1/3))
+	fmt.Println("Total volume:", totalVolume, "hmm:", p1.Mass + p2.Mass, "New radius:", big.Radius, ((3.0/4.0) * totalVolume)/rl.Pi)
 	big.Mass = totalMass
-	fmt.Println("Total volume:", totalVolume, "hmm:", p1.Mass + p2.Mass, "New radius:", big.Radius, "density", big.Mass/volumeOfSphere(big.Radius))
 
 	g.deadPlanetIDs = append(g.deadPlanetIDs, small.ID)
-}
-
-
-func volumeOfSphere(radius float32) float32 {
-	return (4.0 * rl.Pi * (radius * radius * radius))/3.0
 }
 
 

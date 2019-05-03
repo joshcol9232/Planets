@@ -3,7 +3,6 @@ package planet
 import (
 	"github.com/gen2brain/raylib-go/raylib"
 	"github.com/gen2brain/raylib-go/raymath"
-	"math"
 )
 
 const (
@@ -26,7 +25,7 @@ func NewPlanet(ID int32, pos, vel rl.Vector3, rad float32) *Planet {
 		Vel: vel,
 		ResForce: rl.NewVector3(0, 0, 0),
 		Radius: rad,
-		Mass: getMass(rad, PLNT_DENSITY),
+		Mass: GetMass(rad, PLNT_DENSITY),
 	}
 }
 
@@ -48,8 +47,13 @@ func (p *Planet) GetSpeed() float32 {
 	return raymath.Vector3Length(p.Vel)
 }
 
+func (p *Planet) GetMomentum() rl.Vector3 {
+	momentum := p.Vel
+	raymath.Vector3Scale(&momentum, p.Mass)
+	return momentum
+}
 
 
-func getMass(rad float32, density float32) float32 {
-	return (4/3) * rl.Pi * float32(math.Pow(float64(rad), 3.0)) * density
+func GetMass(rad float32, density float32) float32 {
+	return ((4.0 * rl.Pi * (rad * rad * rad))/3.0) * density
 }
