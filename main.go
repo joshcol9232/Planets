@@ -15,7 +15,7 @@ const (
 	FOV = 80
 
 	G = 0.001
-	WORKER_COUNT = 4
+	WORKER_COUNT = 1250
 )
 
 type Game struct {
@@ -302,9 +302,9 @@ func main() {
 	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 2)
 	*/
 
-	w := 4
-	h := 5
-	d := 5
+	w := 8
+	h := 8
+	d := 8
 	fmt.Println("Total num:", w*h*d)
 	g.makeCube(w, h, d, 100, 2)
 
