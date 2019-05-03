@@ -15,16 +15,18 @@ const (
 	FOV = 80
 
 	G = 0.001
-	WORKER_COUNT = 1250
+	WORKER_COUNT = 256
 )
 
 type Game struct {
 	screenDims rl.Vector2
 	camera rl.Camera3D
 	planetIDCount int32
-	selectedPlanetID int32
 	selectedPlanet *planet.Planet
 	trailsEnabled bool
+
+	bloomShader rl.Shader
+	paused bool
 
 	dt float32
 	time float32
@@ -50,12 +52,13 @@ func NewGame(w, h int32) *Game {
 	g := Game {
 		screenDims: rl.NewVector2(float32(w), float32(h)),
 		camera: camera,
-		selectedPlanetID: -1,
+		bloomShader: rl.LoadShader("", "src/bloom.fs"),
+		paused: true,
 		trailsEnabled: false,
 		planets: []*planet.Planet{},
 	}
 
-	g.updateJobChannel = make(chan int, 100)
+	g.updateJobChannel = make(chan int, 256)
 	g.updateDoneChannel = make(chan bool)
 
 	for i := 0; i < WORKER_COUNT; i++ {
@@ -66,6 +69,8 @@ func NewGame(w, h int32) *Game {
 }
 
 func (g *Game) mainLoop() {
+	target := rl.LoadRenderTexture(int32(g.screenDims.X), int32(g.screenDims.Y))
+
 	for !rl.WindowShouldClose() {
 		rl.UpdateCamera(&g.camera)
 		g.dt = rl.GetFrameTime()
@@ -75,13 +80,20 @@ func (g *Game) mainLoop() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.Black)
 
+		rl.BeginTextureMode(target)
 		rl.BeginMode3D(g.camera)
+
 		g.draw()
 
 		rl.EndMode3D()
+		rl.EndTextureMode()
+
+		rl.BeginShaderMode(g.bloomShader)
+		rl.DrawTextureRec(target.Texture, rl.NewRectangle(0, 0, float32(target.Texture.Width), float32(-target.Texture.Height)), rl.NewVector2(0, 0), rl.White)
+		rl.EndShaderMode()
 
 		rl.DrawFPS(10, 10)
-		if g.selectedPlanetID > -1 {
+		if g.selectedPlanet != nil {
 			g.drawSelectedPlanetInfo()
 		}
 
@@ -97,7 +109,7 @@ func (g *Game) draw() {
 
 	for i := 0; i < len(g.planets); i++ {
 		col := rl.RayWhite
-		if g.planets[i].ID == g.selectedPlanetID {
+		if g.selectedPlanet != nil && g.planets[i].ID == g.selectedPlanet.ID {
 			col = rl.Lime
 			g.camera.Target = g.planets[i].Pos
 		}
@@ -106,20 +118,34 @@ func (g *Game) draw() {
 }
 
 
-func (g *Game) update() {
-	g.removeDeadPlanets()
-
-	for i := 0; i < len(g.planets); i++ {
-		g.updateJobChannel<- i
+func (g *Game) getInput() {
+	if rl.IsKeyPressed(rl.KeyP) {
+		g.paused = !g.paused
 	}
 
-	for i := 0; i < len(g.planets); i++ {
-		<-g.updateDoneChannel // Wait for all to be finished
+	if rl.IsKeyPressed(rl.KeyT) {
+		g.trailsEnabled = !g.trailsEnabled
 	}
 
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		g.selectPlanet()
 	}
+}
+
+func (g *Game) update() {
+	if !g.paused {
+		g.removeDeadPlanets()
+
+		for i := 0; i < len(g.planets); i++ {
+			g.updateJobChannel<- i
+		}
+
+		for i := 0; i < len(g.planets); i++ {
+			<-g.updateDoneChannel // Wait for all to be finished
+		}
+	}
+
+	g.getInput()
 }
 
 func (g *Game) updateWorker() {
@@ -204,14 +230,12 @@ func (g *Game) selectPlanet() {
 	found := false
 	for i := 0; i < len(g.planets) && !found; i++ {
 		if rl.CheckCollisionRaySphere(ray, g.planets[i].Pos, g.planets[i].Radius + 5) {
-			g.selectedPlanetID = g.planets[i].ID
 			g.selectedPlanet = g.planets[i]
 			found = true
 		}
 	}
 
 	if !found {
-		g.selectedPlanetID = -1
 		g.selectedPlanet = nil
 	}
 }
@@ -265,18 +289,17 @@ func (g *Game) collide(p1, p2 *planet.Planet) {
 	big.Mass = totalMass
 	g.deadPlanetIDs = append(g.deadPlanetIDs, small.ID)
 
-	if g.selectedPlanetID == small.ID {
-		g.selectedPlanetID = big.ID
+	if g.selectedPlanet.ID == small.ID {
 		g.selectedPlanet = big
 	}
 }
 
 
-func (g *Game) makeCube(width, height, depth int, spacing, rad float32) {
+func (g *Game) makeCube(pos rl.Vector3, width, height, depth int, spacing, rad float32) {
 	for x := float32(0); x < float32(width) * spacing; x += spacing {
 		for y := float32(0); y < float32(height) * spacing; y += spacing {
 			for z := float32(0); z < float32(depth) * spacing; z += spacing {
-				g.addPlanet(rl.NewVector3(x, y, z), rl.NewVector3(0, 0, 0), rad)
+				g.addPlanet(raymath.Vector3Add(pos, rl.NewVector3(x, y, z)), rl.NewVector3(0, 0, 0), rad)
 			}
 		}
 	}
@@ -292,7 +315,6 @@ func main() {
 	rl.SetConfigFlags(rl.FlagMsaa4xHint)
 	rl.SetConfigFlags(rl.FlagWindowUndecorated)
 	rl.InitWindow(SCREEN_W_DEF, SCREEN_H_DEF, "Particles")
-	//rl.SetTargetFPS(144)
 
 	g := NewGame(SCREEN_W_DEF, SCREEN_H_DEF)
 	/*
@@ -306,7 +328,7 @@ func main() {
 	h := 8
 	d := 8
 	fmt.Println("Total num:", w*h*d)
-	g.makeCube(w, h, d, 100, 2)
+	g.makeCube(rl.NewVector3(0.0, 100.0, 0.0), w, h, d, 60, 2)
 
 	g.mainLoop()
 }
