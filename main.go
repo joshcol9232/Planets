@@ -80,12 +80,9 @@ func (g *Game) draw() {
 }
 
 func (g *Game) update(dt float32) {
-<<<<<<< HEAD
 	time := rl.GetTime()
 	g.removeDeadPlanets()
 
-=======
->>>>>>> 20c7467c86433879f7b7417b28be26b20b200c59
 	for i := 0; i < len(g.planets); i++ {
 		for j := 0; j < len(g.planets); j++ { // Update grav force
 			if i != j {
@@ -104,8 +101,6 @@ func (g *Game) update(dt float32) {
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		g.selectPlanet()
 	}
-	
-	g.removeDeadPlanets()
 }
 
 func (g *Game) drawSelectedPlanetInfo() {
@@ -253,6 +248,8 @@ const (
 )
 
 func main() {
+	rl.SetConfigFlags(rl.FlagMsaa4xHint)
+	rl.SetConfigFlags(rl.FlagWindowUndecorated)
 	rl.InitWindow(SCREEN_W_DEF, SCREEN_H_DEF, "Particles")
 	//rl.SetTargetFPS(144)
 
