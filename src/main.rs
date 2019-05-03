@@ -312,7 +312,7 @@ impl App {
 		let new_rad = (((3.0/4.0) * (p1_volume + p2_volume))/consts::PI as f32).powf(1.0/3.0);
 		let total_mass = self.planets[p1].mass + self.planets[p2].mass;
 
-		let (big, small) = if self.planets[p1].radius > self.planets[p2].radius { (p1, p2) } else if self.planets[p1].radius < self.planets[p2].radius { (p2, p1) } else { (p1, p2) };
+		let (big, small) = if self.planets[p1].radius >= self.planets[p2].radius { (p1, p2) } else if self.planets[p1].radius < self.planets[p2].radius { (p2, p1) };
 
 		let considerable_diference = (self.planets[big].radius/self.planets[small].radius).powi(3) > 2.0; // If largest more than x times more volume (proportionaly)
 
