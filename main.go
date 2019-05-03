@@ -15,7 +15,7 @@ const (
 	FOV = 80
 
 	G = 0.001
-	WORKER_COUNT = 256
+	WORKER_COUNT = 512
 )
 
 type Game struct {
@@ -56,7 +56,7 @@ func NewGame(w, h int32) *Game {
 		planets: []*planet.Planet{},
 	}
 
-	g.updateJobChannel = make(chan int, 256)
+	g.updateJobChannel = make(chan int, WORKER_COUNT)
 	g.updateDoneChannel = make(chan bool)
 
 	for i := 0; i < WORKER_COUNT; i++ {
@@ -313,9 +313,9 @@ func main() {
 	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 2)
 	*/
 
-	w := 8
-	h := 8
-	d := 8
+	w := 9
+	h := 9
+	d := 9
 	fmt.Println("Total num:", w*h*d)
 	g.makeCube(rl.NewVector3(0.0, 100.0, 0.0), w, h, d, 60, 2)
 
