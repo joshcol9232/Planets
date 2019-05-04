@@ -249,12 +249,15 @@ func (g *Game) getGravForceBetweenTwoPlanets(p1, p2 *planet.Planet) (rl.Vector3,
 }
 
 func (g *Game) checkForCollision(p1, p2 *planet.Planet) bool {
-	distVec := raymath.Vector3Subtract(p1.Pos, p2.Pos)
-	distSqr := (distVec.X * distVec.X) + (distVec.Y * distVec.Y) + (distVec.Z * distVec.Z)
-	radSum := p1.Radius + p2.Radius
-	return distSqr <= (radSum * radSum)
-	// Above probably more efficient since square root is very expensive compared to squaring
-	//return raymath.Vector3Distance(p1.Pos, p2.Pos) <= p1.Radius + p2.Radius
+	distVec := raymath.Vector3Subtract(p2.Pos, p1.Pos)
+	radSum := float64(p1.Radius + p2.Radius)
+
+	if math.Abs(float64(distVec.X)) <= radSum && math.Abs(float64(distVec.Y)) <= radSum && math.Abs(float64(distVec.Z)) <= radSum && radSum < 100 { // Box collision to do a rough check
+		distSqr := (distVec.X * distVec.X) + (distVec.Y * distVec.Y) + (distVec.Z * distVec.Z)
+		return distSqr <= float32(radSum * radSum)
+	} else {
+		return false
+	}
 }
 
 func (g *Game) collide(p1, p2 *planet.Planet) {
@@ -313,9 +316,9 @@ func main() {
 	g.addPlanet(rl.NewVector3(-70, 0, 0), rl.NewVector3(0, -10, -30), 2)
 	*/
 
-	w := 9
-	h := 9
-	d := 9
+	w := 8
+	h := 8
+	d := 8
 	fmt.Println("Total num:", w*h*d)
 	g.makeCube(rl.NewVector3(0.0, 100.0, 0.0), w, h, d, 60, 2)
 
