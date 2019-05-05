@@ -300,30 +300,31 @@ impl App {
 	}
 
 	pub fn check_for_collision(&self, p1: &Planet, p2: &Planet) -> bool {
-		(p2.pos - p1.pos).length() <= p1.radius + p2.radius
+		let dist_vec = p2.pos - p1.pos;
+		let rad_sum = p1.radius + p2.radius;
+		if dist_vec.x <= rad_sum && dist_vec.y <= rad_sum {  // Initial box collision
+			(dist_vec.x * dist_vec.x) + (dist_vec.y * dist_vec.y) <= rad_sum * rad_sum  // Performs better since square root is expensive
+		} else {
+			return false;
+		}
+		//(p2.pos - p1.pos).length() <= p1.radius + p2.radius
 	}
 
 	fn collide(&mut self, p1: usize, p2: usize) {
 		let total_momentum = self.planets[p1].get_momentum() + self.planets[p2].get_momentum();
-
-		let p1_volume = self.planets[p1].mass/PLANET_DENSITY;
-		let p2_volume = self.planets[p2].mass/PLANET_DENSITY;
-
-		let new_rad = (((3.0/4.0) * (p1_volume + p2_volume))/consts::PI as f32).powf(1.0/3.0);
+		let total_volume = self.planets[p1].mass/PLANET_DENSITY + self.planets[p2].mass/PLANET_DENSITY;
 		let total_mass = self.planets[p1].mass + self.planets[p2].mass;
 
 		let (big, small) = if self.planets[p1].radius >= self.planets[p2].radius { (p1, p2) } else { (p2, p1) };
 
-		let considerable_diference = (self.planets[big].radius/self.planets[small].radius).powi(3) > 2.0; // If largest more than x times more volume (proportionaly)
-
-		self.planets[big].pos = if !considerable_diference {
+		self.planets[big].pos = if !((self.planets[big].radius/self.planets[small].radius).powi(3) > 2.0) { // If largest not more than x times more volume (proportionaly)
 											(self.planets[big].pos + self.planets[small].pos)/2.0
 										} else {
 											self.planets[big].pos
 										};
 
 		self.planets[big].vel = total_momentum/total_mass;
-		self.planets[big].radius = new_rad;
+		self.planets[big].radius = (((3.0/4.0) * total_volume)/consts::PI as f32).powf(1.0/3.0);
 		self.planets[big].mass = total_mass;
 
 		self.collided_bodies.push(self.planets[small].id);
@@ -459,17 +460,17 @@ fn main() {
 		.msaa_4x()
 		.build();
 
-	rl.set_target_fps(60 * 2);
+	//rl.set_target_fps(60 * 2);
 
 	let mut a = App::new(rl, SCREEN_W, SCREEN_H);
 	
 	
-	a.add_planet(Vector2 { x: 400.0, y: 340.0 }, Vector2::zero(), 40.0, false);
+	//a.add_planet(Vector2 { x: 400.0, y: 340.0 }, Vector2::zero(), 40.0, false);
 
-	//a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, false);
-	//a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
+	a.add_planet(Vector2 { x: 740.0, y: 540.0 }, Vector2::zero(), 40.0, true);
+	a.add_planet(Vector2 { x: 1180.0, y: 540.0 }, Vector2::zero(), 40.0, true);
 
-	//a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
+	a.make_square(Vector2{ x: 840.0, y: 900.0 }, false, 1.0, 10.0, 12, 10);
 	
 
 	//a.make_square(Vector2{ x: 840.0, y: 500.0 }, false, 10.0, 20.0, 10, 10);
