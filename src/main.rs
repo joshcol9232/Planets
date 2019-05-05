@@ -332,10 +332,9 @@ impl App {
 
 	pub fn get_grav_force_between_two_planets(&self, p1: &Planet, p2: &Planet) -> (Vector2, Vector2) {   // returns force on pl1 and pl2
 		let dist = (p2.pos - p1.pos).length();
-		let angle = p1.pos.angle_to(p2.pos);
 
 		if dist > p1.radius + p2.radius {  // If colliding then don't bother
-			let vec1 = get_grav_force(dist, angle, p1.mass, p2.mass);
+			let vec1 = get_grav_force(dist, p1.pos.angle_to(p2.pos), p1.mass, p2.mass);
 			(vec1, Vector2 { x: -vec1.x, y: -vec1.y })
 		} else {
 			(Vector2::zero(), Vector2::zero())

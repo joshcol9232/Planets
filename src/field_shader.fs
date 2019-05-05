@@ -43,7 +43,11 @@ void main() {
 	} else if (colour_mode == 1) {
 		finalColor = vec4(1.0, norm, 0.0, 1.0);
 	} else if (colour_mode == 2) {
-		float antinorm = 1 - norm;
-		finalColor = vec4(antinorm, antinorm, antinorm, 1.0);
+		if (body_num > 0) {
+			float antinorm = 1 - norm;
+			finalColor = vec4(antinorm, antinorm, antinorm, 1.0);
+		} else {
+			finalColor = vec4(1.0, 1.0, 1.0, 1.0);
+		}
 	}
 }
