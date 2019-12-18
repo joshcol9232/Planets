@@ -314,20 +314,15 @@ impl App {
 		let total_momentum = self.planets[p1].get_momentum() + self.planets[p2].get_momentum();
 		let total_volume = self.planets[p1].mass/PLANET_DENSITY + self.planets[p2].mass/PLANET_DENSITY;
 		let total_mass = self.planets[p1].mass + self.planets[p2].mass;
+		// Use centre of mass of system as position of new planet
+		let new_position = ((self.planets[p1].pos * self.planets[p1].mass) + (self.planets[p2].pos * self.planets[p2].mass))/total_mass;
 
-		let (big, small) = if self.planets[p1].radius >= self.planets[p2].radius { (p1, p2) } else { (p2, p1) };
+		self.planets[p1].vel = total_momentum/total_mass;
+		self.planets[p1].radius = (((3.0/4.0) * total_volume)/consts::PI as f32).powf(1.0/3.0);
+		self.planets[p1].mass = total_mass;
+		self.planets[p1].pos = new_position;
 
-		self.planets[big].pos = if !((self.planets[big].radius/self.planets[small].radius).powi(3) > 2.0) { // If largest not more than x times more volume (proportionaly)
-											(self.planets[big].pos + self.planets[small].pos)/2.0
-										} else {
-											self.planets[big].pos
-										};
-
-		self.planets[big].vel = total_momentum/total_mass;
-		self.planets[big].radius = (((3.0/4.0) * total_volume)/consts::PI as f32).powf(1.0/3.0);
-		self.planets[big].mass = total_mass;
-
-		self.collided_bodies.push(self.planets[small].id);
+		self.collided_bodies.push(self.planets[p2].id);
 	}
 
 	pub fn get_grav_force_between_two_planets(&self, p1: &Planet, p2: &Planet) -> (Vector2, Vector2) {   // returns force on pl1 and pl2
